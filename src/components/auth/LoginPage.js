@@ -13,11 +13,13 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import useAuth from "@/hooks/useAuth"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import { getUserByQrCode } from "@/lib/api"
 
 export default function LoginPage() {
   const [result, setResult] = useState(null)
   const [user, setUser] = useState(null)
-  const { token } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     const readerElement = document.getElementById('reader');
@@ -54,16 +56,11 @@ export default function LoginPage() {
       if (result === null) return
       try {
         console.log(result)
-        const response = await axios.get(`http://localhost:8080/api/employees/${encodeURIComponent(result)}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.data.data.length > 0) {
+        const response = await getUserByQrCode(result)
+        if (response) {
           setUser(response.data.data[0]);
         }
       } catch (error) {
-        console.error(error);
         setUser(null);
         setResult(null);
         toast("Error", {
@@ -80,54 +77,29 @@ export default function LoginPage() {
     attendance(user.employee_id);
   }, [user]);
 
-  const attendance = (id) => {
+  const attendance = async (id) => {
     try {
-      fetch(`http://localhost:8080/api/attendance/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if (data && data.data.length === 0) {
-            fetch('http://localhost:8080/api/time_in', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ employee_id: id, attendance_id: uuidv4() }),
-            })
-              .then(response => response.json())
-              .then(data => console.log(data))
-              .catch((error) => {
-                console.error('Error:', error);
-              });
-          } else {
-            console.log("data", data.data[0].time_in)
-            fetch(`http://localhost:8080/api/time_out/${data.data[0].attendance_id}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ time_in: data.data[0].time_in }),
-            })
-              .then(response => response.json())
-              .then(data => console.log(data))
-              .catch((error) => {
-                console.error('Error:', error);
-              });
-          }
-        })
-        .catch((error) => {
-          console.error('Error:', error);
+      axios.defaults.withCredentials = true;
+      const response = await axios.get(`http://localhost:8080/api/attendance/${id}`);
+      const data = response.data;
+
+      if (data && data.data.length === 0) {
+        const timeInResponse = await axios.post('http://localhost:8080/api/time_in', {
+          employee_id: id,
+          attendance_id: uuidv4()
         });
-    } catch (e) {
-      console.error(e)
+        console.log(timeInResponse.data);
+      } else {
+        console.log("data", data.data[0].time_in);
+        const timeOutResponse = await axios.put(`http://localhost:8080/api/time_out/${data.data[0].attendance_id}`, {
+          time_in: data.data[0].time_in
+        });
+        console.log(timeOutResponse.data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
-  }
+  };
 
   useEffect(() => {
     let timer;
@@ -136,6 +108,7 @@ export default function LoginPage() {
         // Reset user and result here
         setUser(null);
         setResult(null);
+        window.location.reload()
       }, 5000); // 5000 milliseconds = 5 seconds
     }
 
@@ -154,7 +127,7 @@ export default function LoginPage() {
         <UserForm />
       </div> */}
       <div className="flex items-center justify-center bg-muted/50">
-        {user ?
+        {user !== null &&
           <div>
             <Image width={300} height={300} src={user.qrcode} alt={user.name} />
             <h1 className="mt-3 text-xl font-semibold tracking-tight border-b scroll-m-20 first:mt-0">{user.name}</h1>
@@ -166,10 +139,10 @@ export default function LoginPage() {
             <Button onClick={() => {
               setUser(null)
               setResult(null)
+              window.location.reload()
             }}>Reset</Button>
-          </div> :
-          <div id="reader" className="w-[300px] h-[300px] border-0"></div>
-        }
+          </div>}
+        <div id="reader" className="w-[300px] h-[300px] border-0"></div>
       </div>
     </div>
   )

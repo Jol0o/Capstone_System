@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import useAuth from './useAuth';
 import axios from 'axios';
+import { getEarlyBirds, getLateEmployees, getEarlyDepartures, getAbsents, getYearlyAttendance, getMonthlyAttendance, getMonthlyEmployees, getOff } from '@/lib/api';
 
 function useAnalytics() {
     const { token } = useAuth()
@@ -16,76 +17,44 @@ function useAnalytics() {
 
     useEffect(() => {
         if (!token) return
-        
+
         const fetchEarlyBirds = async () => {
-            const response = await axios.get('http://localhost:8080/api/early_employees', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await getEarlyBirds(token)
             setEarlyBirds(response.data.data)
         };
 
         const fetchLates = async () => {
-            const response = await axios.get('http://localhost:8080/api/late_employees', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await getLateEmployees(token)
             setLates(response.data.data)
         };
 
         const fetchEarlyDepartures = async () => {
-            const response = await axios.get('http://localhost:8080/api/early_departures', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await getEarlyDepartures(token)
             setEarlyDepartures(response.data.data)
         };
 
         const fetchAbsents = async () => {
-            const response = await axios.get('http://localhost:8080/api/absent_employees', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await getAbsents(token)
             setAbsents(response.data.data)
         };
 
         const fetchOff = async () => {
-            const response = await axios.get('http://localhost:8080/api/off', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await await getOff(token)
             setOff(response.data.data)
         };
 
         const fetchEmployees = async () => {
-            const response = await axios.get('http://localhost:8080/api/monthly_employees', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await getMonthlyEmployees(token)
             setEmployee(response.data.data)
         };
 
         const fetchMonthly = async () => {
-            const response = await axios.get('http://localhost:8080/api/monthly_attendance', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await getMonthlyAttendance(token)
             setMonthly(response.data.data)
         };
 
         const fetchYearly = async () => {
-            const response = await axios.get('http://localhost:8080/api/yearly_attendance', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await getYearlyAttendance(token)
             setYearly(response.data.data)
         };
 

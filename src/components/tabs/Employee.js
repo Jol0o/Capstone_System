@@ -23,6 +23,7 @@ import useAuth from '@/hooks/useAuth';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/hooks/useStore';
+import { removeEmployee, sendEmailToEmployee } from '@/lib/api';
 
 function Employee({ setTab }) {
     const [data, setData] = useState([])
@@ -37,7 +38,6 @@ function Employee({ setTab }) {
     useEffect(() => {
         if (employee) {
             setData(employee);
-            console.table(employee);
             setFilteredData(employee)
         }
     }, [employee]);
@@ -63,15 +63,17 @@ function Employee({ setTab }) {
     }, [filter])
 
     const deleteEmployee = async (id) => {
+        const isConfirmed = window.confirm("Are you sure you want to delete this employee?");
+
+        if (!isConfirmed) {
+            return;
+        }
+
         try {
-            const response = await axios.delete(`http://localhost:8080/api/employee/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await removeEmployee(id, token);
             toast("Successfull", {
                 description: "Deleted employee successfully!",
-            })
+            });
             const updatedData = data.filter((item) => item.id !== id);
             setData(updatedData);
             setFilteredData(updatedData);
@@ -79,9 +81,9 @@ function Employee({ setTab }) {
             console.error('Error deleting employee:', error);
             toast("Error", {
                 description: "Error deleting the employee!",
-            })
+            });
         }
-    }
+    };
 
     const handleExcelDownload = (data) => {
         const ws = XLSX.utils.json_to_sheet(data);
@@ -99,27 +101,19 @@ function Employee({ setTab }) {
     };
 
     const handleEmail = async (item) => {
-        console.log(item)
-        if (item) {
-            await axios.post(`http://localhost:8080/api/send_email`, {
-                qrcode: item.qrcode,
-                email: item.email,
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }).then(() => {
-                toast("Successfull", {
-                    description: "Email Send!",
-                })
-            })
-                .catch(error => {
-                    toast("Error", {
-                        description: error.response.data.message,
-                    })
-                });
+        if (!item) return;
+
+        try {
+            await sendEmailToEmployee(item, token)
+            toast("Successful", {
+                description: "Email Sent!",
+            });
+        } catch (error) {
+            toast("Error", {
+                description: error.response?.data?.message || "An error occurred",
+            });
         }
-    }
+    };
 
     return (
         <div className="w-full">
@@ -160,7 +154,7 @@ function Employee({ setTab }) {
                                     <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
                                         {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
                                             height={36}
-                                            className="overflow-hidden rounded-full" /> : <User />}
+                                            className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.salary_date)}</TableCell>

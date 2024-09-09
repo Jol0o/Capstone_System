@@ -4,13 +4,11 @@ import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import QRCode from 'qrcode.react';
 import { ref, getDownloadURL, uploadBytes, uploadBytesResumable } from "firebase/storage";
 import { storage } from '../lib/firebase';
-import useStore from '../lib/Zustand';
 
 
 function GenerateQr() {
     const [url, setUrl] = React.useState("");
     const qrCodeRef = useRef(null);
-    const setDownloadURL = useStore(state => state.setDownloadURL);
 
     const downloadQRCode = async () => {
         const canvas = qrCodeRef.current.querySelector("canvas");
@@ -21,7 +19,6 @@ function GenerateQr() {
             document.body.appendChild(downloadLink);
             const downloadURL = await uploadFile(blob);
             console.log(downloadURL); // Log the download URL
-            setDownloadURL(downloadURL);
             downloadLink.click();
             document.body.removeChild(downloadLink);
         }, 'image/png');

@@ -17,9 +17,9 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import useAuth from "@/hooks/useAuth"
-import axios from "axios"
+import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUserAdmin } from "@/lib/api"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { toast } from "sonner"
 
 function LoginAdmin() {
@@ -43,11 +43,8 @@ function LoginAdmin() {
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/admin/login', {
-                email: userForm.email,
-                password: userForm.password,
-            })
-            localStorage.setItem('token', response.data.token)
+            const response = await loginAdmin(userForm)
+            // localStorage.setItem('token', response.data.token)
             localStorage.setItem('admin', JSON.stringify(response.data.admin))
             router.push('/dashboard')
             setError("")
@@ -68,11 +65,8 @@ function LoginAdmin() {
             return;
         }
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/login', {
-                email: userForm.email,
-                password: userForm.password,
-            })
-            localStorage.setItem('token', response.data.token)
+            const response = await loginEmployeeApi(userForm)
+            // localStorage.setItem('token', response.data.token)
             localStorage.setItem('user', JSON.stringify(response.data.user))
             router.push('/dashboard')
             setError("")
@@ -87,10 +81,7 @@ function LoginAdmin() {
     const register = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/register', {
-                email: userForm.email,
-                password: userForm.password,
-            })
+            const response = await registerUserAdmin(userForm)
                 .then(() => {
                     toast("Successfull", {
                         description: "Success creating an account!",
@@ -111,10 +102,7 @@ function LoginAdmin() {
     const registerAdmin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/admin/register', {
-                email: userForm.email,
-                password: userForm.password,
-            })
+            const response = await registerAdminAcc(userForm)
                 .then(() => {
                     toast("Successfull", {
                         description: "Success creating an account!",

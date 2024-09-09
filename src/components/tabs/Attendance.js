@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import generate from '../pdf_template/generatePDF';
+import { getAttendance, removeAttendance } from '@/lib/api';
 
 function Attendance() {
     const [data, setData] = useState([])
@@ -28,6 +29,22 @@ function Attendance() {
     const limit = 15
     const { token } = useAuth()
     const router = useRouter()
+    const [filter, setFilter] = useState('')
+
+    useEffect(() => {
+        if (!filter) {
+            setFilteredData(data)
+            return;
+        }
+        const results = data.filter((item) =>
+            item.name.toLowerCase().includes(filter.toLowerCase()) ||
+            item.email.toLowerCase().includes(filter.toLowerCase()) ||
+            item.department.toLowerCase().includes(filter.toLowerCase()) ||
+            item.position.toLowerCase().includes(filter.toLowerCase()) ||
+            item.phone_number.toLowerCase().includes(filter.toLowerCase())
+        )
+        setFilteredData(results);
+    }, [filter])
 
     function formatDate(dateString) {
         const options = { year: "numeric", month: "long", day: "numeric" };
@@ -36,12 +53,7 @@ function Attendance() {
 
     useEffect(() => {
         const fetchpayroll = async () => {
-
-            const response = await axios.get(`http://localhost:8080/api/attendances?page=${page}&limit=${limit}`, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
-            })
+            const response = await getAttendance(page, limit, token)
             if (response) {
                 console.log(response.data)
                 setTotalPages(response.data.totalPages)
@@ -61,13 +73,9 @@ function Attendance() {
         setPage(prevPage => Math.max(prevPage - 1, 1));
     };
 
-    const deletePayroll = (id) => {
+    const deleteAttendance = async (id) => {
         try {
-            axios.delete(`http://localhost:8080/api/attendance/${id}`, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
-            })
+            await removeAttendance(id, token)
             toast("Successfull", {
                 description: "Deleted payroll successfully!",
             })
@@ -117,7 +125,7 @@ function Attendance() {
                                     <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
                                         {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
                                             height={36}
-                                            className="overflow-hidden rounded-full" /> : <User />}
+                                            className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
@@ -138,7 +146,7 @@ function Attendance() {
                                                 Copy Attendance ID
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
-                                                onClick={() => deletePayroll(item.id)}
+                                                onClick={() => deleteAttendance(item.id)}
                                             >
                                                 Delete
                                             </DropdownMenuItem>

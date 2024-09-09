@@ -20,7 +20,8 @@ import {
     User,
     Truck,
     Users2,
-    Coins
+    Coins,
+    FileCheck
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -86,6 +87,9 @@ import Employee from "@/components/tabs/Employee"
 import Attendance from "@/components/tabs/Attendance"
 import Profile from "@/components/tabs/Profile"
 import Payroll from "@/components/tabs/Payroll"
+import UserPayroll from "@/components/tabs/UserPayroll"
+import LeaveRequest from "@/components/tabs/LeaveRequest"
+import { logoutUser } from "@/lib/api"
 
 export default function Page() {
     const { auth, user } = useAuth();
@@ -109,24 +113,34 @@ export default function Page() {
     //     console.log(daysOfWeek.findIndex(item => item === daysOfWeek[day]));
     // }, []);
 
-    function logout() {
-        // Remove the token from localStorage
-        localStorage.removeItem('token');
-        localStorage.removeItem('admmin');
-        router.push("/")
+    async function logout() {
+        try {
+            await logoutUser(); // Removed the unused 'res' variable
+            console.log('Logged Out');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('admin');
+            router.push("/");
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     const renderComponent = () => {
-        if (tab === 'dashboard') {
+        if (user?.status === 'admin' && tab === 'dashboard') {
             return <Dashboard />
-        } else if (tab === 'employee') {
+        } else if (user?.status === 'admin' && tab === 'employee') {
             return <Employee setTab={setTab} />
-        } else if (tab === 'attendance') {
+        } else if (user?.status === 'admin' && tab === 'attendance') {
             return <Attendance />
-        } else if (tab === 'payroll') {
+        } else if (user?.status === 'admin' && tab === 'payroll') {
             return <Payroll />
         } else if (tab === 'profile') {
             return <Profile />
+        } else if (tab === 'leave') {
+            return <LeaveRequest />
+        } else if (tab === 'userpayroll') {
+            return <UserPayroll />
         }
     }
 
@@ -220,6 +234,38 @@ export default function Page() {
                                         </Link>
                                     </TooltipTrigger>
                                     <TooltipContent side="right">Profile</TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link
+                                            href="#"
+                                            onClick={() => setTab("leave")}
+                                            className={`${tab === "leave" ? "bg-accent" : ""
+                                                } flex items-center justify-center transition-colors rounded-lg h-9 w-9 text-muted-foreground hover:text-foreground md:h-8 md:w-8`}
+                                        >
+                                            <FileCheck className="w-5 h-5" />
+                                            <span className="sr-only">Leave Request</span>
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">Leave Request</TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link
+                                            href="#"
+                                            onClick={() => setTab("userpayroll")}
+                                            className={`${tab === "userpayroll" ? "bg-accent" : ""
+                                                } flex items-center justify-center transition-colors rounded-lg h-9 w-9 text-muted-foreground hover:text-foreground md:h-8 md:w-8`}
+                                        >
+                                            <Coins className="w-5 h-5" />
+                                            <span className="sr-only">Payroll</span>
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">Payroll</TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         </>

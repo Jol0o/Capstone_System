@@ -1,6 +1,5 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
-import useStore from '../../lib/Zustand';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -22,6 +21,8 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import axios from 'axios';
 import { toast } from 'sonner';
+import createUser from '@/hooks/useCreateUser';
+import { getEmployeeById } from '@/lib/api';
 
 function UserForm({ token, id }) {
     const qrCodeRef = useRef(null);
@@ -44,11 +45,7 @@ function UserForm({ token, id }) {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/employees/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await getEmployeeById(id, token);
                 setUserForm({ ...userForm, ...response.data.data[0] });
                 console.log(response.data);
             } catch (error) {
@@ -81,12 +78,11 @@ function UserForm({ token, id }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
             // Wait for the QR code to be downloaded
             const image = await downloadQRCode();
             if (image) {
-                setUserForm({ ...userForm, qrcode: image })
+                setUserForm({ ...userForm, qrcode: image });
             }
             // Now check the form fields
             for (let key of Object.keys(userForm)) {
@@ -96,11 +92,10 @@ function UserForm({ token, id }) {
                     return;
                 }
             }
-
             // Proceed with the rest of the function
             const url = id ? `http://localhost:8080/api/employees/${id}` : 'http://localhost:8080/api/create_employee';
             const method = id ? 'put' : 'post';
-
+            if (!id) await createUser({ email: userForm.email, password: userForm.phone_number.toString().slice(6, 12), id: userForm.employee_id });
             await axios[method](url, {
                 name: userForm.name,
                 email: userForm.email,
@@ -119,8 +114,8 @@ function UserForm({ token, id }) {
             })
                 .then(() => {
                     toast("Successfull", {
-                        description: "Employee added succesfully !",
-                    })
+                        description: "Employee added successfully!",
+                    });
                     setUserForm({
                         name: '',
                         email: '',
@@ -137,7 +132,7 @@ function UserForm({ token, id }) {
                 .catch(error => {
                     toast("Error", {
                         description: error.response.data.errors[0].msg,
-                    })
+                    });
                 });
         } catch (err) {
             console.error('Error:', err);
@@ -158,7 +153,7 @@ function UserForm({ token, id }) {
                         try {
                             const image = await uploadFile(blob);
                             if (image) {
-                                setUserData({ ...userData, qrcode: image })
+                                setUserForm({ ...userForm, qrcode: image })
                                 setQrcode(image);
                                 console.log(image);
                                 document.body.removeChild(downloadLink);
@@ -180,8 +175,6 @@ function UserForm({ token, id }) {
         setQrcode(downloadURL);
         return downloadURL;
     };
-
-
 
     return (
         <form className='flex flex-col gap-3' onSubmit={handleSubmit}>

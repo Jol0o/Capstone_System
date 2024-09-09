@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useAuth from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { getPayrolls, removePayroll } from '@/lib/api';
 
 function Payroll() {
     const [data, setData] = useState([])
@@ -26,25 +27,21 @@ function Payroll() {
     const { token } = useAuth()
 
     function formatDate(dateString) {
+        console.log(dateString)
         const options = { year: "numeric", month: "long", day: "numeric" };
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
 
     useEffect(() => {
+        if (!token) return
         const fetchpayroll = async () => {
-
-            const response = await axios.get(`http://localhost:8080/api/payroll?page=${page}&limit=${limit}`, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
-            })
+            const response = await getPayrolls(page, limit, token)
             if (response) {
                 console.table(response.data.data)
                 setData(response.data.data)
                 setFilteredData(response.data.data)
             }
         }
-
         fetchpayroll()
     }, [page])
 
@@ -56,13 +53,9 @@ function Payroll() {
         setPage(prevPage => Math.max(prevPage - 1, 1));
     };
 
-    const deletePayroll = (id) => {
+    const deletePayroll = async (id) => {
         try {
-            axios.delete(`http://localhost:8080/api/payroll/${id}`, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
-            })
+            await removePayroll(id, token)
             toast("Successfull", {
                 description: "Deleted payroll successfully!",
             })
@@ -101,7 +94,7 @@ function Payroll() {
                                     <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
                                         {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
                                             height={36}
-                                            className="overflow-hidden rounded-full" /> : <User />}
+                                            className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.created_at)}</TableCell>

@@ -14,13 +14,6 @@ function Dashboard() {
   const formattedTime = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const date = time.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  function formatDate(dateString) {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  }
-
-  console.log(employee)
-
   const data = {
     labels: monthly && monthly.map((item) => item.day),
     datasets: [
@@ -112,7 +105,7 @@ function Dashboard() {
           </div>
           <div className="flex-end">
             <h3 className="font-medium text-md">Today</h3>
-            <p className="text-3xl font-normal text-slate-400">{date}</p>
+            <p className="text-3xl font-semibold">{date}</p>
           </div>
         </div>
         <div className="flex flex-col gap-7">

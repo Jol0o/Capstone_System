@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import useAuth from "@/hooks/useAuth"
 import axios from "axios"
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Image from "next/image"
 import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage"
 import { storage } from "@/lib/firebase"
@@ -29,10 +29,14 @@ import { toast } from "sonner"
 import QRCode from "qrcode.react"
 import { useRouter } from "next/navigation"
 import { useStore } from '@/hooks/useStore';
+import { editEmployeeData, getEmployeebyEmail, logoutUser } from "@/lib/api"
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:8080');
 
 function Profile() {
     const qrCodeRef = useRef(null);
-    const { user, token } = useAuth()
+    const { user } = useAuth()
     const [userData, setUserData] = useState({
         name: '',
         email: '',
@@ -53,38 +57,42 @@ function Profile() {
     const router = useRouter()
     const userEmail = useStore(state => state.userEmail)
 
-    useEffect(() => {
-        if (!token) return
-        const fetchUser = async () => {
-            if (user && user.email && user.status === 'user') {
-                const response = await axios.get(`http://localhost:8080/api/employee/${user.email}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (response.data.data.length > 0) {
-                    setUserData(response.data.data[0])
-                    setOriginalData(response.data.data[0])
-                    console.log(response.data);
-                }
-            } else {
-                if (userEmail) {
-                    const response = await axios.get(`http://localhost:8080/api/employee/${userEmail}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    if (response.data.data.length > 0) {
-                        setUserData(response.data.data[0])
-                        setOriginalData(response.data.data[0])
-                        console.log(response.data);
-                    }
-                }
 
+    const fetchUser = useCallback(async () => {
+        const emailToUse = user?.email && user.status === 'user' ? user.email : userEmail;
+        try {
+            if (emailToUse) {
+                console.log('running');
+                const response = await getEmployeebyEmail(emailToUse);
+                if (response.data.data.length > 0) {
+                    const userData = response.data.data[0];
+                    setUserData(userData);
+                    setOriginalData(userData);
+                }
             }
+        } catch (e) {
+            console.log(e);
         }
-        fetchUser();
     }, [user, userEmail]);
+
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
+
+    useEffect(() => {
+        // Listen for real-time updates
+        const handleEmployeeDataUpdate = (update) => {
+            console.log('Update received:', update);
+            fetchUser();
+        };
+
+        socket.on('employeeDataUpdate', handleEmployeeDataUpdate);
+
+        // Cleanup on unmount
+        return () => {
+            socket.off('employeeDataUpdate', handleEmployeeDataUpdate);
+        };
+    }, [fetchUser]);
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -102,57 +110,55 @@ function Profile() {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        if (userData.name !== originalData.name) {
-            let image = await downloadQRCode();
+
+        const updateUserDataWithImage = async (imageKey, imageFunction) => {
+            let image = await imageFunction();
             if (image) {
-                setUserData({ ...userData, qrcode: image })
+                const url = await uploadFile(image);
+                setUserData((prevUserData) => ({ ...prevUserData, [imageKey]: url }));
+                return true;
+            }
+            return false;
+        };
+
+        if (userData.avatar) {
+            const url = await uploadAvatar(userData.avatar);
+            if (url) {
+                setUserData({ ...userData, avatar: url });
             }
         }
 
-        if (image) {
-            const url = await uploadFile(image)
-            setUserData({ ...userData, avatar: url })
+        if (userData.name !== originalData.name) {
+            const qrCodeUpdated = await updateUserDataWithImage('qrcode', downloadQRCode);
+            if (!qrCodeUpdated) return;
         }
 
         for (let key of Object.keys(userData)) {
+            if (!userData.avatar && key === 'avatar') continue
+            if (key === 'day_off') continue;
             if (!userData[key]) {
                 toast("Error", {
                     description: `${key} is required`,
-                })
+                });
                 return;
             }
         }
 
-        await axios.put(`http://localhost:8080/api/employees/${userData.id}`, {
-            name: userData.name,
-            email: userData.email,
-            salary_date: userData.salary_date,
-            department: userData.department,
-            position: userData.position,
-            qrcode: userData.qrcode,
-            phone_number: userData.phone_number,
-            password: userData.password,
-            salary: userData.salary,
-            avatar: userData.avatar
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-            .then(() => {
-                toast("Successfull", {
-                    description: "Succesfully save!",
-                })
-                setUserData(originalData);
-                setQrcode(null)
-                setImage(null)
-                setDate(null)
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        console.log(userData)
 
-    }
+        try {
+            await editEmployeeData(userData);
+            toast("Successful", {
+                description: "Successfully saved!",
+            });
+            setUserData(originalData);
+            setQrcode(null);
+            setImage(null);
+            setDate(null);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const downloadQRCode = async () => {
         if (qrCodeRef.current) {
@@ -167,8 +173,8 @@ function Profile() {
                         try {
                             const image = await uploadFile(blob);
                             if (image) {
-                                setUserData({ ...userData, qrcode: image })
-                                setQrcode(image);
+                                // setUserData({ ...userData, qrcode: image })
+                                // setQrcode(image);
                                 console.log(image);
                                 document.body.removeChild(downloadLink);
                                 resolve(image);
@@ -185,6 +191,14 @@ function Profile() {
     const uploadFile = async (file) => {
         if (!file) return;
         const storageRef = ref(storage, file.name ? `qrCode/${file.name}` : `qrCode/${userData.name}.png`);
+        const uploadTaskSnapshot = await uploadBytesResumable(storageRef, file);
+        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+        return downloadURL;
+    };
+
+    const uploadAvatar = async (file) => {
+        if (!file) return;
+        const storageRef = ref(storage, `avatars/${file.name}`);
         const uploadTaskSnapshot = await uploadBytesResumable(storageRef, file);
         const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
         return downloadURL;
@@ -223,11 +237,16 @@ function Profile() {
         }
     };
 
-    function logout() {
-        // Remove the token from localStorage
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        router.push("/")
+    async function logout() {
+        try {
+            await logoutUser();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('admin');
+            router.push("/")
+        } catch (e) {
+            console.log(e)
+        }
     }
 
 
@@ -267,7 +286,7 @@ function Profile() {
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="password">Password</Label>
-                                <Input type="password" required id="password" value={userData?.password} name="password" onChange={handleChange} />
+                                <Input type="password" placeholder="*******" required id="password" value={userData?.password} name="password" onChange={handleChange} />
                             </div>
                         </CardContent>
                     </Card>

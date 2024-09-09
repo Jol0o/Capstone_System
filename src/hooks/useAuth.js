@@ -1,7 +1,5 @@
 'use strict';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
 
 const useAuth = () => {
     const [auth, setAuth] = useState(false);
@@ -13,7 +11,6 @@ const useAuth = () => {
         }
         return null;
     });
-    const router = useRouter();
 
     useEffect(() => {
         let localStorageUser;
@@ -23,13 +20,11 @@ const useAuth = () => {
             localStorageUser = JSON.parse(localStorage.getItem('user'));
             localStorageAdmin = JSON.parse(localStorage.getItem('admin'));
 
-            // Set user if exists in localStorage, otherwise set admin
-            setUser(localStorageUser ? { ...localStorageUser, status: 'user' } : { ...localStorageAdmin, status: 'admin' });
 
-            if (!token) {
-                router.push('/');
-            } else {
-                axios.defaults.headers.common['Authorization'] = token;
+            // Set user if exists in localStorage, otherwise set admin
+            const userToSet = localStorageUser ? { ...localStorageUser, status: 'user' } : { ...localStorageAdmin, status: 'admin' };
+            setUser(userToSet);
+            if (userToSet) {
                 setAuth(true);
             }
         }
