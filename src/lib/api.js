@@ -132,11 +132,7 @@ export const getMonthlyEmployees = async () => {
 
 export const getMonthlyAttendance = async () => {
     axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/monthly_attendance`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
+    const response = await axios.get(`${API_URL}/api/monthly_attendance`);
     if (response.status === 200) {
         return response;
     } else {
@@ -147,6 +143,7 @@ export const getMonthlyAttendance = async () => {
 export const getYearlyAttendance = async () => {
     axios.defaults.withCredentials = true;
     const response = await axios.get(`${API_URL}/api/yearly_attendance`);
+    console.log(response)
     if (response.status === 200) {
         return response;
     } else {
@@ -159,12 +156,31 @@ export const getPayrolls = async (page, limit) => {
     axios.defaults.withCredentials = true;
     const response = await axios.get(`${API_URL}/api/payroll?page=${page}&limit=${limit}`)
     if (response) {
-        console.log(response)
+
         return response;
     } else {
         return null;
     }
 }
+
+export const getUserPayroll = async (page, limit, id) => {
+    if (!id) {
+        console.error('Error: User ID is undefined');
+        return null;
+    }
+    axios.defaults.withCredentials = true;
+    try {
+        const response = await axios.get(`${API_URL}/api/payroll/${id}?page=${page}&limit=${limit}`);
+        if (response) {
+            return response;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching user payroll:', error);
+        return null;
+    }
+};
 
 export const removePayroll = async (id) => {
     axios.defaults.withCredentials = true;
@@ -247,14 +263,27 @@ export const leaveRequest = async (data) => {
     return response;
 }
 
-export const updateLeaveStatus = async (status) => {
+export const getLeaveRequests = async (page, limit) => {
     axios.defaults.withCredentials = true;
-    const response = await axios.put(`${API_URL}/api/leave_request/${id}/status`, status);
+    const response = await axios.get(`${API_URL}/api/leave_request?page=${page}&limit=${limit}`);
+    return response;
+}
+
+export const updateLeaveStatus = async (id,status) => {
+    console.log(id, status)
+    axios.defaults.withCredentials = true;
+    const response = await axios.put(`${API_URL}/api/leave_request/${id}/status`, {status});
     return response;
 }
 
 export const userRequests = async (status) => {
     axios.defaults.withCredentials = true;
     const response = await axios.get(`${API_URL}/api/user_request`, status);
+    return response;
+}
+
+export const checkToken = async () => {
+    axios.defaults.withCredentials = true;
+    const response = await axios.get(`${API_URL}/api/auth/check-token`)
     return response;
 }

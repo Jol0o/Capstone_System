@@ -90,6 +90,7 @@ import Payroll from "@/components/tabs/Payroll"
 import UserPayroll from "@/components/tabs/UserPayroll"
 import LeaveRequest from "@/components/tabs/LeaveRequest"
 import { logoutUser } from "@/lib/api"
+import Request from "@/components/tabs/Request"
 
 export default function Page() {
     const { auth, user } = useAuth();
@@ -141,6 +142,8 @@ export default function Page() {
             return <LeaveRequest />
         } else if (tab === 'userpayroll') {
             return <UserPayroll />
+        } else if (tab === 'request') {
+            return <Request />
         }
     }
 
@@ -217,6 +220,22 @@ export default function Page() {
                                     </Link>
                                 </TooltipTrigger>
                                 <TooltipContent side="right">Payroll</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link
+                                        href="#"
+                                        onClick={() => setTab("request")}
+                                        className={`${tab === "request" ? "bg-accent" : ""
+                                            } flex items-center justify-center transition-colors rounded-lg h-9 w-9 text-muted-foreground hover:text-foreground md:h-8 md:w-8`}
+                                    >
+                                        <FileCheck className="w-5 h-5" />
+                                        <span className="sr-only">Leave Request</span>
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">Leave Request</TooltipContent>
                             </Tooltip>
                         </TooltipProvider></> :
                         <>

@@ -62,7 +62,6 @@ function Profile() {
         const emailToUse = user?.email && user.status === 'user' ? user.email : userEmail;
         try {
             if (emailToUse) {
-                console.log('running');
                 const response = await getEmployeebyEmail(emailToUse);
                 if (response.data.data.length > 0) {
                     const userData = response.data.data[0];
@@ -144,7 +143,6 @@ function Profile() {
             }
         }
 
-        console.log(userData)
 
         try {
             await editEmployeeData(userData);

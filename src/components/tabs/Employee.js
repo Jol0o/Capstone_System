@@ -163,7 +163,7 @@ function Employee({ setTab }) {
                                     <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.email}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.salary}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.day_off === 1 ? 'Off' : 'On'}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.day_off === 1 ? 'Off Duty' : 'On Duty'}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="w-8 h-8 p-0">

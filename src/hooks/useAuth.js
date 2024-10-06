@@ -1,16 +1,29 @@
 'use strict';
+import { checkToken } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 const useAuth = () => {
     const [auth, setAuth] = useState(false);
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(() => {
-        if (typeof window !== 'undefined') {
-            // Now we are in the client-side context
-            return localStorage.getItem('token');
+    const [token, setToken] = useState(null);
+    const [isTokenChecked, setIsTokenChecked] = useState(false);
+    const router = useRouter();
+
+    const getToken = async () => {
+        try {
+            const res = await checkToken();
+            if (res.status === 200) {
+                setToken(true);
+            } else {
+                setToken(false);
+            }
+        } catch (e) {
+            setToken(false);
+        } finally {
+            setIsTokenChecked(true);
         }
-        return null;
-    });
+    };
 
     useEffect(() => {
         let localStorageUser;
@@ -19,16 +32,23 @@ const useAuth = () => {
         if (typeof window !== 'undefined') {
             localStorageUser = JSON.parse(localStorage.getItem('user'));
             localStorageAdmin = JSON.parse(localStorage.getItem('admin'));
-
+            getToken();
 
             // Set user if exists in localStorage, otherwise set admin
             const userToSet = localStorageUser ? { ...localStorageUser, status: 'user' } : { ...localStorageAdmin, status: 'admin' };
             setUser(userToSet);
-            if (userToSet) {
-                setAuth(true);
-            }
         }
     }, []);
+
+    useEffect(() => {
+        if (isTokenChecked) {
+            if (token) {
+                setAuth(true);
+            } else {
+                router.push("/");
+            }
+        }
+    }, [isTokenChecked, token, router]);
 
     return { auth, user, token };
 };

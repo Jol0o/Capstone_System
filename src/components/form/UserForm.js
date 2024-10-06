@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 import createUser from '@/hooks/useCreateUser';
 import { getEmployeeById } from '@/lib/api';
 
-function UserForm({ token, id }) {
+function UserForm({ id }) {
     const qrCodeRef = useRef(null);
     const [userForm, setUserForm] = useState({
         name: '',
@@ -45,7 +45,7 @@ function UserForm({ token, id }) {
 
         const fetchData = async () => {
             try {
-                const response = await getEmployeeById(id, token);
+                const response = await getEmployeeById(id);
                 setUserForm({ ...userForm, ...response.data.data[0] });
                 console.log(response.data);
             } catch (error) {
@@ -107,11 +107,7 @@ function UserForm({ token, id }) {
                 password: userForm.phone_number.toString().slice(-4),
                 salary: userForm.salary,
                 employee_id: userForm.employee_id
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            },)
                 .then(() => {
                     toast("Successfull", {
                         description: "Employee added successfully!",

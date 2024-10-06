@@ -55,6 +55,9 @@ function LeaveRequest() {
                 if (res) {
                     console.log(res.data.data)
                     setData(res.data.data)
+                    if (res.data.data.length === 0) {
+                        setRequest(true)
+                    }
                 }
             } catch (e) {
                 console.log(e)
@@ -115,8 +118,8 @@ function LeaveRequest() {
             <div className="max-w-[1000px] m-auto flex flex-col gap-5">
                 <div className="flex justify-end">
                     <Button
-                        variant={data.some(request => request.status === 'Pending') ? 'secondary' : ''}
-                        disabled={data.some(request => request.status === 'Pending')}
+                        variant={data.some(request => request.status === 'Pending' || request.status === 'Process') ? 'secondary' : ''}
+                        disabled={data.some(request => request.status === 'Pending' || request.status === 'Process')}
                         onClick={() => setRequest(!request)}
                     >
                         Create Request

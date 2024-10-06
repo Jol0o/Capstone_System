@@ -14,6 +14,8 @@ function Dashboard() {
   const formattedTime = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const date = time.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
+  // console.log(useAnalytics())
+
   const data = {
     labels: monthly && monthly.map((item) => item.day),
     datasets: [
