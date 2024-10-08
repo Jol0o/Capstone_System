@@ -21,7 +21,8 @@ import {
     Truck,
     Users2,
     Coins,
-    FileCheck
+    FileCheck,
+    Users
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -91,6 +92,7 @@ import UserPayroll from "@/components/tabs/UserPayroll"
 import LeaveRequest from "@/components/tabs/LeaveRequest"
 import { logoutUser } from "@/lib/api"
 import Request from "@/components/tabs/Request"
+import UserAccounts from "@/components/tabs/UserAccounts"
 
 export default function Page() {
     const { auth, user } = useAuth();
@@ -144,6 +146,8 @@ export default function Page() {
             return <UserPayroll />
         } else if (tab === 'request') {
             return <Request />
+        } else if (tab === 'users') {
+            return <UserAccounts />
         }
     }
 
@@ -174,6 +178,22 @@ export default function Page() {
                             <TooltipContent side="right">Dashboard</TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
+                    <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link
+                                        href="#"
+                                        onClick={() => setTab("users")}
+                                        className={`${tab === "users" ? "bg-accent" : ""
+                                            } flex items-center justify-center transition-colors rounded-lg h-9 w-9 text-muted-foreground hover:text-foreground md:h-8 md:w-8`}
+                                    >
+                                        <Users className="w-5 h-5" />
+                                        <span className="sr-only">Users Account</span>
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">Users Account</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>

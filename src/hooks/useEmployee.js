@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
-import { getEmployees } from '@/lib/api';
+import { getAllUsers, getEmployees } from '@/lib/api';
 
-const socket = io('http://localhost:8080');
+const socket = io('https://api.aap-h.com');
 
 const useEmployee = (page, limit) => {
     const [data, setData] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [usersTotalPages, setUsersTotalPages] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     // Fetch employees function
@@ -20,9 +22,20 @@ const useEmployee = (page, limit) => {
         }
     };
 
+    const fetchEmpoyeesAccount = async () => {
+        try {
+            const response = await getAllUsers(limit, page)
+            setUsers(response.data.data);
+            setUsersTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error('Error fetching employees:', error.response ? error.response.data : error.message);
+        }
+    };
+
     // Effect for fetching employees
     useEffect(() => {
         fetchEmployees();
+        fetchEmpoyeesAccount();
     }, [page, limit]);
 
     useEffect(() => {
@@ -30,6 +43,7 @@ const useEmployee = (page, limit) => {
         socket.on('employeeDataUpdate', (update) => {
             console.log('Update received:', update);
             fetchEmployees();
+            fetchEmpoyeesAccount();
         });
 
         // Cleanup on unmount
@@ -38,7 +52,7 @@ const useEmployee = (page, limit) => {
         };
     }, []);
 
-    return { employee: data, totalPages };
+    return { employee: data, totalPages , users: users, userTotal : usersTotalPages  };
 };
 
 export default useEmployee;

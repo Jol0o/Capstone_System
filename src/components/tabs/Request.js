@@ -21,7 +21,7 @@ import { getLeaveRequests, updateLeaveStatus } from '@/lib/api';
 import UpdateLeaveStatus from '../modal/UpdateLeaveStatus';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:8080');
+const socket = io('https://api.aap-h.com');
 
 function Request() {
     const limit = 15

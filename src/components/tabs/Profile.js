@@ -32,7 +32,7 @@ import { useStore } from '@/hooks/useStore';
 import { editEmployeeData, getEmployeebyEmail, logoutUser } from "@/lib/api"
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:8080');
+const socket = io('https://api.aap-h.com');
 
 function Profile() {
     const qrCodeRef = useRef(null);

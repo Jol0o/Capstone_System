@@ -36,6 +36,7 @@ function UserForm({ id }) {
         employee_id: "",
         phone_number: 0,
         salary: 0,
+        day_off: 0
     });
     const [qrcode, setQrcode] = useState("")
     const [date, setDate] = useState(null);
@@ -86,14 +87,14 @@ function UserForm({ id }) {
             }
             // Now check the form fields
             for (let key of Object.keys(userForm)) {
-                if (key === 'avatar') continue;
+                if (key === 'avatar' || key === 'day_off') continue;
                 if (!userForm[key]) {
                     alert(`Please fill in the ${key} field.`);
                     return;
                 }
             }
             // Proceed with the rest of the function
-            const url = id ? `http://localhost:8080/api/employees/${id}` : 'http://localhost:8080/api/create_employee';
+            const url = id ? `https://api.aap-h.com/api/employees/${id}` : 'https://api.aap-h.com/api/create_employee';
             const method = id ? 'put' : 'post';
             if (!id) await createUser({ email: userForm.email, password: userForm.phone_number.toString().slice(6, 12), id: userForm.employee_id });
             await axios[method](url, {
@@ -106,7 +107,8 @@ function UserForm({ id }) {
                 phone_number: userForm.phone_number,
                 password: userForm.phone_number.toString().slice(-4),
                 salary: userForm.salary,
-                employee_id: userForm.employee_id
+                employee_id: userForm.employee_id,
+                day_off: userForm.day_off
             },)
                 .then(() => {
                     toast("Successfull", {

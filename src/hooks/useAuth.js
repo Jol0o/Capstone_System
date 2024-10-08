@@ -42,6 +42,7 @@ const useAuth = () => {
 
     useEffect(() => {
         if (isTokenChecked) {
+            console.log('Token checked:', token);
             if (token) {
                 setAuth(true);
             } else {

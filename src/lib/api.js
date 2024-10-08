@@ -2,7 +2,7 @@
 import axios from "axios";
 import { cache } from "react";
 
-export const API_URL = "http://localhost:8080";
+export const API_URL = "https://api.aap-h.com";
 
 export const getEmployees = async (limit, page) => {
     axios.defaults.withCredentials = true;
@@ -287,3 +287,20 @@ export const checkToken = async () => {
     const response = await axios.get(`${API_URL}/api/auth/check-token`)
     return response;
 }
+
+export const getAllUsers = async (page, limit) => {
+    axios.defaults.withCredentials = true;
+    try {
+        const response = await axios.get(`${API_URL}/api/get-users`, {
+            params: {
+                page: page,
+                limit: 10
+            }
+        });
+        console.log(response)
+        return response;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
+};
