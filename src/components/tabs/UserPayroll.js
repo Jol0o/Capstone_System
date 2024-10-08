@@ -73,7 +73,7 @@ function UserPayroll() {
                     </CardContent>
                 </Card>
             ))}
-            {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
+            {data.length > 0 ? <div className="flex items-center justify-end py-4 space-x-2">
                 {filterData.total > limit && <div className="flex items-center gap-2">
                     <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
                         <ChevronLeft className="w-4 h-4" />
@@ -83,6 +83,8 @@ function UserPayroll() {
                         <ChevronRight className="w-4 h-4" />
                     </Button>
                 </div>}
+            </div> : <div className="flex items-center justify-center h-40">
+            <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">No Available Data</p>
             </div>}
         </div>
     )
