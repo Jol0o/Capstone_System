@@ -54,7 +54,7 @@ function UserPayroll() {
 
     return (
         <div className="max-w-[1000px] m-auto flex flex-col gap-5">
-            {data && data.map(item => (
+            {data.length > 0 ? data.map(item => (
                 <Card className="rounded-xl" key={item.id}>
                     <CardHeader>
                         <CardTitle className="flex justify-between capitalize text-md">
@@ -72,8 +72,10 @@ function UserPayroll() {
                         </CardDescription>
                     </CardContent>
                 </Card>
-            ))}
-            {data.length > 0 ? <div className="flex items-center justify-end py-4 space-x-2">
+            )):  <Card className="rounded-xl">
+            <CardContent className="flex flex-col gap-3 text-xl font-semibold">No Available Data</CardContent>
+            </Card>}
+            {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
                 {filterData.total > limit && <div className="flex items-center gap-2">
                     <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
                         <ChevronLeft className="w-4 h-4" />
@@ -83,8 +85,6 @@ function UserPayroll() {
                         <ChevronRight className="w-4 h-4" />
                     </Button>
                 </div>}
-            </div> : <div className="flex items-center justify-center h-40">
-            <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">No Available Data</p>
             </div>}
         </div>
     )
