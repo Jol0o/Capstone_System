@@ -74,7 +74,7 @@ function UserPayroll() {
                 </Card>
             )):  <Card className="rounded-xl">
             <CardContent className="flex flex-col text-xl font-semibold ite">
-            <CardDescription className="flex items-center justify-between">
+            <CardDescription className="flex items-center justify-center">
                 No Available Data
             </CardDescription>
             </CardContent>
