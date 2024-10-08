@@ -73,7 +73,11 @@ function UserPayroll() {
                     </CardContent>
                 </Card>
             )):  <Card className="rounded-xl">
-            <CardContent className="flex flex-col gap-3 text-xl font-semibold">No Available Data</CardContent>
+            <CardContent className="flex flex-col text-xl font-semibold ite">
+            <CardDescription className="flex items-center justify-between">
+                No Available Data
+            </CardDescription>
+            </CardContent>
             </Card>}
             {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
                 {filterData.total > limit && <div className="flex items-center gap-2">
