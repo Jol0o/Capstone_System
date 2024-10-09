@@ -21,7 +21,8 @@ import { getLeaveRequests, updateLeaveStatus } from '@/lib/api';
 import UpdateLeaveStatus from '../modal/UpdateLeaveStatus';
 import { io } from 'socket.io-client';
 
-const socket = io('https://api.aap-h.com');
+const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
+const socket = io(`${API_URL}`);
 
 function Request() {
     const limit = 15
@@ -42,7 +43,7 @@ function Request() {
     }, [filter])
 
     function formatDate(dateString) {
-       
+
         const options = { year: "numeric", month: "long", day: "numeric" };
         return new Date(dateString).toLocaleDateString(undefined, options);
     }

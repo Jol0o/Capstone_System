@@ -3,7 +3,8 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import { getAllUsers, getEmployees } from '@/lib/api';
 
-const socket = io('https://api.aap-h.com');
+const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
+const socket = io(`${API_URL}`);
 
 const useEmployee = (page, limit) => {
     const [data, setData] = useState([]);
@@ -52,7 +53,7 @@ const useEmployee = (page, limit) => {
         };
     }, []);
 
-    return { employee: data, totalPages , users: users, userTotal : usersTotalPages  };
+    return { employee: data, totalPages, users: users, userTotal: usersTotalPages };
 };
 
 export default useEmployee;

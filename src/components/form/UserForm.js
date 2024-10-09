@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import createUser from '@/hooks/useCreateUser';
 import { getEmployeeById } from '@/lib/api';
 
+const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 function UserForm({ id }) {
     const qrCodeRef = useRef(null);
     const [userForm, setUserForm] = useState({
@@ -94,7 +95,7 @@ function UserForm({ id }) {
                 }
             }
             // Proceed with the rest of the function
-            const url = id ? `https://api.aap-h.com/api/employees/${id}` : 'https://api.aap-h.com/api/create_employee';
+            const url = id ? `${API_URL}/api/employees/${id}` : `${API_URL}/api/create_employee`;
             const method = id ? 'put' : 'post';
             if (!id) await createUser({ email: userForm.email, password: userForm.phone_number.toString().slice(-4), id: userForm.employee_id });
             await axios[method](url, {

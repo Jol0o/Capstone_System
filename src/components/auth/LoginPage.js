@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { getUserByQrCode } from "@/lib/api"
 
+const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 export default function LoginPage() {
   const [result, setResult] = useState(null)
   const [user, setUser] = useState(null)
@@ -66,6 +67,7 @@ export default function LoginPage() {
         toast("Error", {
           description: "User Not Found",
         })
+        window.location.reload()
       }
     };
     fetchData();
@@ -80,18 +82,18 @@ export default function LoginPage() {
   const attendance = async (id) => {
     try {
       axios.defaults.withCredentials = true;
-      const response = await axios.get(`https://api.aap-h.com/api/attendance/${id}`);
+      const response = await axios.get(`${API_URL}/api/attendance/${id}`);
       const data = response.data;
 
       if (data && data.data.length === 0) {
-        const timeInResponse = await axios.post('https://api.aap-h.com/api/time_in', {
+        const timeInResponse = await axios.post(`${API_URL}/api/time_in`, {
           employee_id: id,
           attendance_id: uuidv4()
         });
         console.log(timeInResponse.data);
       } else {
         console.log("data", data.data[0].time_in);
-        const timeOutResponse = await axios.put(`https://api.aap-h.com/api/time_out/${data.data[0].attendance_id}`, {
+        const timeOutResponse = await axios.put(`${API_URL}/api/time_out/${data.data[0].attendance_id}`, {
           time_in: data.data[0].time_in
         });
         console.log(timeOutResponse.data);
@@ -101,24 +103,24 @@ export default function LoginPage() {
     }
   };
 
-  useEffect(() => {
-    let timer;
-    if (user && result) {
-      timer = setTimeout(() => {
-        // Reset user and result here
-        setUser(null);
-        setResult(null);
-        window.location.reload()
-      }, 5000); // 5000 milliseconds = 5 seconds
-    }
+  // useEffect(() => {
+  //   let timer;
+  //   if (user && result) {
+  //     timer = setTimeout(() => {
+  //       // Reset user and result here
+  //       setUser(null);
+  //       setResult(null);
+  //       window.location.reload()
+  //     }, 5000); // 5000 milliseconds = 5 seconds
+  //   }
 
-    // Cleanup function
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [user, result]);
+  //   // Cleanup function
+  //   return () => {
+  //     if (timer) {
+  //       clearTimeout(timer);
+  //     }
+  //   };
+  // }, [user, result]);
 
   return (
     <div className="grid w-full min-h-screen grid-cols-1 ">
@@ -126,7 +128,7 @@ export default function LoginPage() {
 
         <UserForm />
       </div> */}
-      <div className="flex items-center justify-center bg-muted/50">
+      <div className="flex flex-col items-center justify-center bg-muted/50">
         {user !== null &&
           <div>
             <Image width={300} height={300} src={user.qrcode} alt={user.name} />
