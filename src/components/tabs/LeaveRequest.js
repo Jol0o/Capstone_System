@@ -7,7 +7,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../ui/select"
-import { format } from "date-fns"
+import { format, isBefore, isEqual, startOfDay } from "date-fns"
 import { Calendar as CalendarIcon, Divide, LoaderCircle } from "lucide-react"
 import {
     Card,
@@ -30,8 +30,9 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import useAuth from '@/hooks/useAuth';
 import { toast } from "sonner"
-import { leaveRequest, userRequests } from '@/lib/api';
+import { getEmployeebyEmail, getEmployeeById, leaveRequest, userRequests } from '@/lib/api';
 import { Badge } from "@/components/ui/badge"
+import SubmitDialog from '../modal/SubmitDialog';
 
 
 function LeaveRequest() {
@@ -76,12 +77,24 @@ function LeaveRequest() {
     };
 
     useEffect(() => {
-        setFormData({ ...formData, name: user?.name, email: user?.email })
+        if (!user) return
+        const fetchUser = async () => {
+            try {
+                const res = await getEmployeebyEmail(user.email);
+                console.log(res.data.data)
+                if (res) {
+                    if (res.data.data.length > 0) {
+                        setFormData({ ...formData, name: res.data.data[0].name, email: user?.email })
+                    }
+                }
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        fetchUser()
     }, [user])
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        // Handle form submission logic here
         try {
             setIsloading(true)
             for (let key of Object.keys(formData)) {
@@ -95,7 +108,6 @@ function LeaveRequest() {
 
             const res = await leaveRequest(formData)
             if (res) {
-                console.log('Form data submitted:', formData);
                 console.log(isLoading)
                 setIsloading(false)
                 setFormData({
@@ -119,7 +131,7 @@ function LeaveRequest() {
                 <div className="flex justify-end">
                     <Button
                         variant={data.some(request => request.status === 'Pending' || request.status === 'Process') ? 'secondary' : ''}
-                        disabled={data.some(request => request.status === 'Pending' || request.status === 'Process')}
+                        disabled={data.some(request => request.status === 'Pending' || request.status === 'Process') ? true : undefined}
                         onClick={() => setRequest(!request)}
                     >
                         Create Request
@@ -130,7 +142,7 @@ function LeaveRequest() {
                         <CardTitle className="text-md">Leave Request Form</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
-                        <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+                        <form className="flex flex-col gap-2">
                             <div>
                                 <Label htmlFor="name">Name:</Label>
                                 <Input
@@ -197,6 +209,7 @@ function LeaveRequest() {
                                                     console.log(date);
                                                 }}
                                                 initialFocus
+                                                disabled={(date) => isBefore(date, startOfDay(new Date())) ? true : false}
                                             />
                                         </PopoverContent>
                                     </Popover>
@@ -225,6 +238,7 @@ function LeaveRequest() {
                                                     console.log(date);
                                                 }}
                                                 initialFocus
+                                                disabled={(date) => formData.startDate && (isBefore(date, startOfDay(formData.startDate)) || isEqual(date, startOfDay(formData.startDate))) ? true : false}
                                             />
                                         </PopoverContent>
                                     </Popover>
@@ -240,7 +254,7 @@ function LeaveRequest() {
                                     required
                                 />
                             </div>
-                            <Button type="submit" disable={isLoading}>{isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}</Button>
+                            <SubmitDialog isLoading={isLoading} onSubmit={handleSubmit} label={"Leave request"}/>
                         </form>
                     </CardContent>
                 </Card>}

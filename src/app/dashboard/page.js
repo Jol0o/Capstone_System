@@ -93,6 +93,7 @@ import LeaveRequest from "@/components/tabs/LeaveRequest"
 import { logoutUser } from "@/lib/api"
 import Request from "@/components/tabs/Request"
 import UserAccounts from "@/components/tabs/UserAccounts"
+import Loader from "@/components/Loader"
 
 export default function Page() {
     const { auth, user } = useAuth();
@@ -106,7 +107,7 @@ export default function Page() {
         }
     }, [user])
 
-    if (!auth) return <div>Loading...</div>;
+    if (!auth) return <Loader />;
 
 
     // useEffect(() => {
@@ -368,6 +369,14 @@ export default function Page() {
                                 >
                                     <Coins className="w-5 h-5" />
                                     Payroll
+                                </Link>
+                                <Link
+                                    href="#"
+                                    onClick={() => setTab("request")}
+                                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                                >
+                                    <FileCheck className="w-5 h-5" />
+                                    Leave Request
                                 </Link>
 
                             </nav> :
