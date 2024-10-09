@@ -32,7 +32,8 @@ import { useStore } from '@/hooks/useStore';
 import { editEmployeeData, getEmployeebyEmail, logoutUser } from "@/lib/api"
 import io from 'socket.io-client';
 
-const socket = io('https://api.aap-h.com');
+const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
+const socket = io(`${API_URL}`);
 
 function Profile() {
     const qrCodeRef = useRef(null);

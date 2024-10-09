@@ -2,7 +2,9 @@
 import axios from "axios";
 import { cache } from "react";
 
-export const API_URL = "https://api.aap-h.com";
+export const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
+
+console.log(API_URL);
 
 export const getEmployees = async (limit, page) => {
     axios.defaults.withCredentials = true;
@@ -263,16 +265,16 @@ export const leaveRequest = async (data) => {
     return response;
 }
 
-export const getLeaveRequests = async (page, limit) => {
+export const getLeaveRequests = async (limit, page) => {
     axios.defaults.withCredentials = true;
     const response = await axios.get(`${API_URL}/api/leave_request?page=${page}&limit=${limit}`);
     return response;
 }
 
-export const updateLeaveStatus = async (id,status) => {
+export const updateLeaveStatus = async (id, status) => {
     console.log(id, status)
     axios.defaults.withCredentials = true;
-    const response = await axios.put(`${API_URL}/api/leave_request/${id}/status`, {status});
+    const response = await axios.put(`${API_URL}/api/leave_request/${id}/status`, { status });
     return response;
 }
 
@@ -288,19 +290,18 @@ export const checkToken = async () => {
     return response;
 }
 
-export const getAllUsers = async (page, limit) => {
+export const getAllUsers = async (limit, page) => {
     axios.defaults.withCredentials = true;
     try {
-        const response = await axios.get(`${API_URL}/api/get-users`, {
-            params: {
-                page: page,
-                limit: 10
-            }
-        });
-        console.log(response)
+        const response = await axios.get(`${API_URL}/api/get-users?page=${page}&limit=${limit}`);
         return response;
     } catch (error) {
-        console.error('Error fetching users:', error);
         throw error;
     }
 };
+
+export const removeUserById = async (id) => {
+    axios.defaults.withCredentials = true;
+    const response = await axios.delete(`${API_URL}/api/delete-user/${id}`);
+    return response;
+}

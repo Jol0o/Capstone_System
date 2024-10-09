@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { getUserByQrCode } from "@/lib/api"
 
+const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 export default function LoginPage() {
   const [result, setResult] = useState(null)
   const [user, setUser] = useState(null)
@@ -80,18 +81,18 @@ export default function LoginPage() {
   const attendance = async (id) => {
     try {
       axios.defaults.withCredentials = true;
-      const response = await axios.get(`https://api.aap-h.com/api/attendance/${id}`);
+      const response = await axios.get(`${API_URL}/api/attendance/${id}`);
       const data = response.data;
 
       if (data && data.data.length === 0) {
-        const timeInResponse = await axios.post('https://api.aap-h.com/api/time_in', {
+        const timeInResponse = await axios.post('${API_URL}/api/time_in', {
           employee_id: id,
           attendance_id: uuidv4()
         });
         console.log(timeInResponse.data);
       } else {
         console.log("data", data.data[0].time_in);
-        const timeOutResponse = await axios.put(`https://api.aap-h.com/api/time_out/${data.data[0].attendance_id}`, {
+        const timeOutResponse = await axios.put(`${API_URL}/api/time_out/${data.data[0].attendance_id}`, {
           time_in: data.data[0].time_in
         });
         console.log(timeOutResponse.data);
