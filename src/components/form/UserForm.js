@@ -95,7 +95,7 @@ function UserForm({ id }) {
                 }
             }
             // Proceed with the rest of the function
-            const url = id ? `${API_URL}/api/employees/${id}` : '${API_URL}/api/create_employee';
+            const url = id ? `${API_URL}/api/employees/${id}` : `${API_URL}/api/create_employee`;
             const method = id ? 'put' : 'post';
             if (!id) await createUser({ email: userForm.email, password: userForm.phone_number.toString().slice(-4), id: userForm.employee_id });
             await axios[method](url, {

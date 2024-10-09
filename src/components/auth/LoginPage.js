@@ -67,6 +67,7 @@ export default function LoginPage() {
         toast("Error", {
           description: "User Not Found",
         })
+        window.location.reload()
       }
     };
     fetchData();
@@ -85,7 +86,7 @@ export default function LoginPage() {
       const data = response.data;
 
       if (data && data.data.length === 0) {
-        const timeInResponse = await axios.post('${API_URL}/api/time_in', {
+        const timeInResponse = await axios.post(`${API_URL}/api/time_in`, {
           employee_id: id,
           attendance_id: uuidv4()
         });
@@ -102,24 +103,24 @@ export default function LoginPage() {
     }
   };
 
-  useEffect(() => {
-    let timer;
-    if (user && result) {
-      timer = setTimeout(() => {
-        // Reset user and result here
-        setUser(null);
-        setResult(null);
-        window.location.reload()
-      }, 5000); // 5000 milliseconds = 5 seconds
-    }
+  // useEffect(() => {
+  //   let timer;
+  //   if (user && result) {
+  //     timer = setTimeout(() => {
+  //       // Reset user and result here
+  //       setUser(null);
+  //       setResult(null);
+  //       window.location.reload()
+  //     }, 5000); // 5000 milliseconds = 5 seconds
+  //   }
 
-    // Cleanup function
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [user, result]);
+  //   // Cleanup function
+  //   return () => {
+  //     if (timer) {
+  //       clearTimeout(timer);
+  //     }
+  //   };
+  // }, [user, result]);
 
   return (
     <div className="grid w-full min-h-screen grid-cols-1 ">
@@ -127,7 +128,7 @@ export default function LoginPage() {
 
         <UserForm />
       </div> */}
-      <div className="flex items-center justify-center bg-muted/50">
+      <div className="flex flex-col items-center justify-center bg-muted/50">
         {user !== null &&
           <div>
             <Image width={300} height={300} src={user.qrcode} alt={user.name} />
