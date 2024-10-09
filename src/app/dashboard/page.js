@@ -401,7 +401,7 @@ export default function Page() {
                                         className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                                     >
                                         <Coins className="w-5 h-5" />
-                                        Payroll
+                                        Payrolls
                                     </Link>
                                 </nav>}
                         </SheetContent>
