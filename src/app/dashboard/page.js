@@ -339,6 +339,13 @@ export default function Page() {
                                     Dashboard
                                 </Link>
                                 <Link
+                                        href="#"
+                                        onClick={() => setTab("users")}
+                                       className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
+                                        <Users className="w-5 h-5" />
+                                        Users
+                                    </Link>
+                                <Link
                                     href="#"
                                     onClick={() => setTab("employee")}
                                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
@@ -365,6 +372,13 @@ export default function Page() {
 
                             </nav> :
                                 <nav className="grid gap-6 text-lg font-medium">
+                                       <Link
+                                    href="#"
+                                    className="flex items-center justify-center w-10 h-10 gap-2 text-lg font-semibold rounded-full group shrink-0 bg-primary text-primary-foreground md:text-base"
+                                >
+                                    <Package2 className="w-5 h-5 transition-all group-hover:scale-110" />
+                                    <span className="sr-only">Acme Inc</span>
+                                </Link>
                                     <Link
                                         href="#"
                                         onClick={() => setTab("profile")}
@@ -372,6 +386,22 @@ export default function Page() {
                                     >
                                         <User className="w-5 h-5" />
                                         Profile
+                                    </Link>
+                                    <Link
+                                        href="#"
+                                        onClick={() => setTab("leave")}
+                                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                                    >
+                                        <FileCheck className="w-5 h-5" />
+                                        Leave Request
+                                    </Link>
+                                    <Link
+                                        href="#"
+                                        onClick={() => setTab("userpayroll")}
+                                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                                    >
+                                        <Coins className="w-5 h-5" />
+                                        Payroll
                                     </Link>
                                 </nav>}
                         </SheetContent>
