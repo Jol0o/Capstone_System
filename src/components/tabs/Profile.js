@@ -110,42 +110,54 @@ function Profile() {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        setIsLoading(true)
-
-        let data = { ...userData }
-
-        if (userData.avatar) {
-            const url = await uploadAvatar(userData.avatar);
-            if (url) {
-                data = { ...data, avatar: url }
-            }
-        }
-
-        for (let key of Object.keys(userData)) {
-            if (!userData.avatar && key === 'avatar') continue
-            if (key === 'day_off') continue;
-            if (!userData[key]) {
+        setIsLoading(true);
+    
+        let data = { ...userData };
+    
+        if (userData.avatar && typeof userData.avatar !== 'string') {
+            try {
+                const url = await uploadAvatar(userData.avatar);
+                if (url) {
+                    data.avatar = url;
+                }
+            } catch (error) {
+                console.error("Error uploading avatar:", error);
                 toast("Error", {
-                    description: `${key} is required`,
+                    description: "Failed to upload avatar. Please try again.",
                 });
+                setIsLoading(false);
                 return;
             }
         }
-
-
+    
+        for (let key of Object.keys(data)) {
+            if (!data.avatar && key === 'avatar') continue;
+            if (key === 'day_off') continue;
+            if (!data[key]) {
+                toast("Error", {
+                    description: `${key} is required`,
+                });
+                setIsLoading(false);
+                return;
+            }
+        }
+    
         try {
-            await editEmployeeData(userData);
+            await editEmployeeData(data);
             toast("Successful", {
                 description: "Successfully saved!",
             });
-            setUserData(originalData)
+            setOriginalData(data);
+            setUserData(data);
             setImage(null);
             setDate(null);
         } catch (error) {
             console.error(error);
-            setIsLoading(false)
+            toast("Error", {
+                description: "Failed to save data. Please try again.",
+            });
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     };
 
