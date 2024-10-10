@@ -17,12 +17,6 @@ import { CirclePlus } from 'lucide-react'
 
 function AddEmployee() {
 
-    let token
-    if (typeof window !== 'undefined') {
-        // Now we are in the client-side context
-        token = localStorage.getItem('token');
-        // rest of your code
-    }
 
     return (
         <Dialog>
@@ -37,7 +31,7 @@ function AddEmployee() {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="gap-4 py-4 ">
-                    <UserForm token={token} />
+                    <UserForm/>
                 </div>
             </DialogContent>
         </Dialog>

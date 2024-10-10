@@ -23,7 +23,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, LoaderCircle } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import QRCode from "qrcode.react"
@@ -55,6 +55,7 @@ function Profile() {
     const [image, setImage] = useState(null)
     const [date, setDate] = useState(null)
     const [qrCode, setQrcode] = useState(null)
+    const [isLoading , setIsLoading] = useState(false)
     const router = useRouter()
     const userEmail = useStore(state => state.userEmail)
 
@@ -110,27 +111,15 @@ function Profile() {
 
     const handleSave = async (e) => {
         e.preventDefault();
+        setIsLoading(true)
 
-        const updateUserDataWithImage = async (imageKey, imageFunction) => {
-            let image = await imageFunction();
-            if (image) {
-                const url = await uploadFile(image);
-                setUserData((prevUserData) => ({ ...prevUserData, [imageKey]: url }));
-                return true;
-            }
-            return false;
-        };
+        let data = { ...userData }
 
         if (userData.avatar) {
             const url = await uploadAvatar(userData.avatar);
             if (url) {
-                setUserData({ ...userData, avatar: url });
+                data = { ...data, avatar: url }
             }
-        }
-
-        if (userData.name !== originalData.name) {
-            const qrCodeUpdated = await updateUserDataWithImage('qrcode', downloadQRCode);
-            if (!qrCodeUpdated) return;
         }
 
         for (let key of Object.keys(userData)) {
@@ -156,44 +145,12 @@ function Profile() {
             setDate(null);
         } catch (error) {
             console.error(error);
+            setIsLoading(false)
+        } finally {
+            setIsLoading(false)
         }
     };
 
-    const downloadQRCode = async () => {
-        if (qrCodeRef.current) {
-            const canvas = qrCodeRef.current.querySelector("canvas");
-            if (canvas) {
-                return new Promise((resolve, reject) => {
-                    canvas.toBlob(async (blob) => {
-                        let downloadLink = document.createElement("a");
-                        downloadLink.href = URL.createObjectURL(blob);
-                        downloadLink.download = `${userData.name}.png`;
-                        document.body.appendChild(downloadLink);
-                        try {
-                            const image = await uploadFile(blob);
-                            if (image) {
-                                // setUserData({ ...userData, qrcode: image })
-                                // setQrcode(image);
-                                console.log(image);
-                                document.body.removeChild(downloadLink);
-                                resolve(image);
-                            }
-                        } catch (error) {
-                            reject(error);
-                        }
-                    }, 'image/png');
-                });
-            }
-        }
-    };
-
-    const uploadFile = async (file) => {
-        if (!file) return;
-        const storageRef = ref(storage, file.name ? `qrCode/${file.name}` : `qrCode/${userData.name}.png`);
-        const uploadTaskSnapshot = await uploadBytesResumable(storageRef, file);
-        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
-        return downloadURL;
-    };
 
     const uploadAvatar = async (file) => {
         if (!file) return;
@@ -258,7 +215,7 @@ function Profile() {
 
                 <div className="flex gap-2">
                     <Button onClick={handleDiscard} className="rounded-lg" variant="outline" size="sm"> Discard </Button>
-                    <Button onClick={handleSave} className="rounded-lg" size="sm"> Save </Button>
+                    <Button onClick={handleSave} className="rounded-lg" size="sm">     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Save'} </Button>
                 </div>
             </div>
 

@@ -103,31 +103,28 @@ export default function LoginPage() {
     }
   };
 
-  // useEffect(() => {
-  //   let timer;
-  //   if (user && result) {
-  //     timer = setTimeout(() => {
-  //       // Reset user and result here
-  //       setUser(null);
-  //       setResult(null);
-  //       window.location.reload()
-  //     }, 5000); // 5000 milliseconds = 5 seconds
-  //   }
+  useEffect(() => {
+    let timer;
+    if (user && result) {
+      timer = setTimeout(() => {
+        // Reset user and result here
+        setUser(null);
+        setResult(null);
+        window.location.reload()
+      }, 5000); // 5000 milliseconds = 5 seconds
+    }
 
-  //   // Cleanup function
-  //   return () => {
-  //     if (timer) {
-  //       clearTimeout(timer);
-  //     }
-  //   };
-  // }, [user, result]);
+    // Cleanup function
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [user, result]);
 
   return (
     <div className="grid w-full min-h-screen grid-cols-1 ">
-      {/* <div className="flex items-center justify-center py-12">
 
-        <UserForm />
-      </div> */}
       <div className="flex flex-col items-center justify-center bg-muted/50">
         {user !== null &&
           <div>

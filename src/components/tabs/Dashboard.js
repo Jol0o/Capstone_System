@@ -1,10 +1,12 @@
 'use client'
 import useAnalytics from '@/hooks/useAnalytics';
 import axios from 'axios';
-import { CalendarClock, CirclePlus, Cloud, Moon, Sun, Timer, TimerOff, TrendingDown, TrendingUp, Users } from 'lucide-react'
+import { BarChart, CalendarClock, CirclePlus, Cloud, Moon, Sun, Timer, TimerOff, TrendingDown, TrendingUp, Users } from 'lucide-react'
 import React, { useEffect } from 'react'
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, BarElement } from 'chart.js';
+import { LineChart } from '../chart/LinceChart';
+import { BarChartComponent } from '../chart/BarChart';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, BarElement);
 
@@ -14,34 +16,6 @@ function Dashboard() {
   const formattedTime = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const date = time.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  // console.log(useAnalytics())
-
-  const data = {
-    labels: monthly && monthly.map((item) => item.day),
-    datasets: [
-      {
-        label: 'My First dataset',
-        fill: false,
-        lineTension: 0.1,
-        backgroundColor: 'rgba(75,192,192,0.4)',
-        borderColor: 'rgba(75,192,192,1)',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
-        pointBorderColor: 'rgba(75,192,192,1)',
-        pointBackgroundColor: '#fff',
-        pointBorderWidth: 1,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        pointHoverBorderColor: 'rgba(220,220,220,1)',
-        pointHoverBorderWidth: 2,
-        pointRadius: 1,
-        pointHitRadius: 10,
-        data: monthly && monthly.map((item) => item.attendance_count)
-      }
-    ]
-  };
 
   const options = {
     plugins: {
@@ -208,21 +182,9 @@ function Dashboard() {
           </div>
         </div>
       </div>
-      <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-2">
-        <div className="p-5 mt-5 border-2 rounded-md md:w-full w-[clamp(250px,100%,500px)] ">
-          <p className="mb-3 text-sm font-semibold text-slate-400" style={{ letterSpacing: '1px' }}>Attendance Comparison Chart</p>
-          <Line
-            data={data}
-            options={options}
-          />
-        </div>
-        <div className="p-5 mt-5 border-2 rounded-md md:w-full w-[clamp(250px,100%,500px)]">
-          <p className="mb-3 text-sm font-semibold text-slate-400" style={{ letterSpacing: '1px' }}>Yearly Attendance</p>
-          <Bar
-            options={options}
-            data={dataYearly}
-          />
-        </div>
+      <div className="grid w-full grid-cols-1 gap-5 mt-5 lg:grid-cols-2">
+           <LineChart data={monthly}/>
+           <BarChartComponent data={yearly}/>
       </div>
     </div>
   )

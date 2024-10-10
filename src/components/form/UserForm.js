@@ -147,12 +147,12 @@ function UserForm({ id }) {
                     canvas.toBlob(async (blob) => {
                         let downloadLink = document.createElement("a");
                         downloadLink.href = URL.createObjectURL(blob);
-                        downloadLink.download = `${userForm.name}.png`;
+                        downloadLink.download = `${userForm.employee_id}.png`; // Use employee_id instead of name
                         document.body.appendChild(downloadLink);
                         try {
                             const image = await uploadFile(blob);
                             if (image) {
-                                setUserForm({ ...userForm, qrcode: image })
+                                setUserForm({ ...userForm, qrcode: image });
                                 setQrcode(image);
                                 console.log(image);
                                 document.body.removeChild(downloadLink);
@@ -271,9 +271,9 @@ function UserForm({ id }) {
                     Submit
                 </Button>
             </div>
-            {userForm.name && (
+            {userForm.employee_id && (
                 <div className="hidden" ref={qrCodeRef}>
-                    <QRCode size={200} level="M" value={userForm.name} />
+                    <QRCode size={200} level="M" value={userForm.employee_id} />
                 </div>
             )}
         </form>
