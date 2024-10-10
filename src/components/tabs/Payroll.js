@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useAuth from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import { getPayrolls, removePayroll } from '@/lib/api';
+import { getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
 
 function Payroll() {
     const [data, setData] = useState([])
@@ -31,17 +31,19 @@ function Payroll() {
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
 
+   
     useEffect(() => {
-        if (!filter) {
-            setFilteredData(data)
-            return;
-        }
-        const results = data.filter((item) =>
-            item.name.toLowerCase().includes(filter.toLowerCase()) || 
-        item.employee_id.toLowerCase().includes(filter.toLowerCase()) || item.payroll_id.toLowerCase().includes(filter.toLowerCase())
-        )
-        setFilteredData(results);
-    }, [filter])
+        const fetchData = async () => {
+            if (filter.trim() === '') {
+                setFilteredData(data);
+                return;
+            }
+            const res = await searchPayroll(filter.trim());
+            setFilteredData(res.data.data);
+        };
+
+        fetchData();
+    }, [filter]);
 
     useEffect(() => {
         const fetchpayroll = async () => {
@@ -80,7 +82,7 @@ function Payroll() {
         <div className="w-full">
             <div className="flex items-center justify-between py-4">
                 <Input
-                    placeholder="Filter Candidate Name..."
+                    placeholder="Filter Payrolls..."
                     onChange={(event) => setFilter(event.target.value)}
                     className="max-w-sm"
                 />

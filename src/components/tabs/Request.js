@@ -32,15 +32,17 @@ function Request() {
     const [page, setPage] = useState(1)
 
     useEffect(() => {
-        if (!filter) {
-            setFilteredData(data)
-            return;
-        }
-        const results = data.filter((item) =>
-            item.name.toLowerCase().includes(filter.toLowerCase()) || item.employee_id.toLowerCase().includes(filter.toLowerCase())
-        )
-        setFilteredData(results);
-    }, [filter])
+        const fetchData = async () => {
+            if (filter.trim() === '') {
+                setFilteredData(data);
+                return;
+            }
+            const res = await searchPayroll(filter.trim());
+            setFilteredData(res.data.data);
+        };
+
+        fetchData();
+    }, [filter]);
 
     function formatDate(dateString) {
 
@@ -93,7 +95,7 @@ function Request() {
         <div className="w-full">
             <div className="flex items-center justify-between py-4">
                 <Input
-                    placeholder="Filter Candidate Name..."
+                    placeholder="Filter Leave Requests..."
                     onChange={(event) => setFilter(event.target.value)}
                     className="max-w-sm"
                 />

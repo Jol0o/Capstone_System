@@ -23,12 +23,12 @@ import useAuth from '@/hooks/useAuth';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/hooks/useStore';
-import { removeEmployee, sendEmailToEmployee } from '@/lib/api';
+import { removeEmployee, searchEmployee, sendEmailToEmployee } from '@/lib/api';
 
 function Employee({ setTab }) {
     const [data, setData] = useState([])
     const [filterData, setFilteredData] = useState([])
-    const [filter, setFilter] = useState('')
+    const [filter, setFilter] = useState(' ')
     const [page, setPage] = useState(1)
     const limit = 15
     const { employee, totalPages } = useEmployee(page, limit)
@@ -46,21 +46,18 @@ function Employee({ setTab }) {
         const options = { year: "numeric", month: "long", day: "numeric" };
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
-
     useEffect(() => {
-        if (!filter) {
-            setFilteredData(data)
-            return;
-        }
-        const results = data.filter((item) =>
-            item.name.toLowerCase().includes(filter.toLowerCase()) ||
-            item.email.toLowerCase().includes(filter.toLowerCase()) ||
-            item.department.toLowerCase().includes(filter.toLowerCase()) ||
-            item.position.toLowerCase().includes(filter.toLowerCase()) ||
-            item.phone_number.toLowerCase().includes(filter.toLowerCase())
-        )
-        setFilteredData(results);
-    }, [filter])
+        const fetchData = async () => {
+            if (filter.trim() === '') {
+                setFilteredData(data);
+                return;
+            }
+            const res = await searchEmployee(filter.trim());
+            setFilteredData(res.data.data);
+        };
+
+        fetchData();
+    }, [filter]);
 
     const deleteEmployee = async (id) => {
         const isConfirmed = window.confirm("Are you sure you want to delete this employee?");
@@ -174,7 +171,7 @@ function Employee({ setTab }) {
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                             <DropdownMenuItem
-                                                onClick={() => navigator.clipboard.writeText(item.id)}
+                                                onClick={() => navigator.clipboard.writeText(item.employee_id)}
                                             >
                                                 Copy Candidate ID
                                             </DropdownMenuItem>
@@ -213,10 +210,7 @@ function Employee({ setTab }) {
                 </Table>}
             </div>
             {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {filterData.length} of{" "}
-                    {data.length} row(s) selected.
-                </div>
+           
                 <div className="flex items-center gap-2">
                     {totalPages === '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
                         <ChevronLeft className="w-4 h-4" />

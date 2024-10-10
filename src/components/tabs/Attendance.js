@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import generate from '../pdf_template/generatePDF';
-import { getAttendance, removeAttendance } from '@/lib/api';
+import { getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
 
 function Attendance() {
     const [data, setData] = useState([])
@@ -32,19 +32,17 @@ function Attendance() {
     const [filter, setFilter] = useState('')
 
     useEffect(() => {
-        if (!filter) {
-            setFilteredData(data)
-            return;
-        }
-        const results = data.filter((item) =>
-            item.name.toLowerCase().includes(filter.toLowerCase()) ||
-            item.email.toLowerCase().includes(filter.toLowerCase()) ||
-            item.department.toLowerCase().includes(filter.toLowerCase()) ||
-            item.position.toLowerCase().includes(filter.toLowerCase()) ||
-            item.phone_number.toLowerCase().includes(filter.toLowerCase())
-        )
-        setFilteredData(results);
-    }, [filter])
+        const fetchData = async () => {
+            if (filter.trim() === '') {
+                setFilteredData(data);
+                return;
+            }
+            const res = await searchAttendance(filter.trim());
+            setFilteredData(res.data.data);
+        };
+
+        fetchData();
+    }, [filter]);
 
     function formatDate(dateString) {
         const options = { year: "numeric", month: "long", day: "numeric" };
@@ -96,12 +94,11 @@ function Attendance() {
         <div className="w-full">
             <div className="flex items-center justify-between py-4">
                 <Input
-                    placeholder="Filter Candidate Name..."
+                    placeholder="Filter Attendance..."
                     onChange={(event) => setFilter(event.target.value)}
                     className="max-w-sm"
                 />
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleGenerate} className="flex items-center gap-2">Generate</Button>
                     <Button variant="outline" onClick={() => router.push('scan')} className="flex items-center gap-2">Scan QR</Button>
                 </div>
 
@@ -170,10 +167,7 @@ function Attendance() {
                 </Table>}
             </div>
             {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {filterData.length} of{" "}
-                    {data.length} row(s) selected.
-                </div>
+        
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
                         <ChevronLeft className="w-4 h-4" />

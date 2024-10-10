@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon, LoaderCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
@@ -17,8 +17,6 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { auth, db, storage } from '../../lib/firebase';
 import QRCode from 'qrcode.react';
 import { v4 as uuidv4 } from 'uuid';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import axios from 'axios';
 import { toast } from 'sonner';
 import createUser from '@/hooks/useCreateUser';
@@ -41,6 +39,7 @@ function UserForm({ id }) {
     });
     const [qrcode, setQrcode] = useState("")
     const [date, setDate] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (!id) return
@@ -80,61 +79,74 @@ function UserForm({ id }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+    
         try {
-            // Wait for the QR code to be downloaded
+            // Wait for the QR code to be downloaded and uploaded
             const image = await downloadQRCode();
-            if (image) {
-                setUserForm({ ...userForm, qrcode: image });
+            if (!image && !userForm.qrcode) {
+                throw new Error("QR code generation failed");
             }
+            
+            // Update the userForm with the QR code image only if the image is generated
+            const updatedForm = image ? { ...userForm, qrcode: image } : { ...userForm };
+    
             // Now check the form fields
-            for (let key of Object.keys(userForm)) {
+            for (let key of Object.keys(updatedForm)) {
                 if (key === 'avatar' || key === 'day_off') continue;
-                if (!userForm[key]) {
-                    alert(`Please fill in the ${key} field.`);
+                if (!updatedForm[key]) {
+                    toast("Error", {
+                        description: `Please fill in the ${key} field.`,
+                    });
+                    setIsLoading(false);
                     return;
                 }
             }
-            // Proceed with the rest of the function
+    
+            // Proceed with creating the employee first
             const url = id ? `${API_URL}/api/employees/${id}` : `${API_URL}/api/create_employee`;
             const method = id ? 'put' : 'post';
-            if (!id) await createUser({ email: userForm.email, password: userForm.phone_number.toString().slice(-4), id: userForm.employee_id });
             await axios[method](url, {
-                name: userForm.name,
-                email: userForm.email,
-                salary_date: userForm.salary_date,
-                department: userForm.department,
-                position: userForm.position,
-                qrcode: userForm.qrcode,
-                phone_number: userForm.phone_number,
-                password: userForm.phone_number.toString().slice(-4),
-                salary: userForm.salary,
-                employee_id: userForm.employee_id,
-                day_off: userForm.day_off
-            },)
-                .then(() => {
-                    toast("Successfull", {
-                        description: "Employee added successfully!",
-                    });
-                    setUserForm({
-                        name: '',
-                        email: '',
-                        password: '',
-                        salary_date: '',
-                        department: '',
-                        position: '',
-                        qrcode: '',
-                        phone_number: '',
-                        employee_id: "",
-                        salary: 0
-                    });
-                })
-                .catch(error => {
-                    toast("Error", {
-                        description: error.response.data.errors[0].msg,
-                    });
-                });
-        } catch (err) {
-            console.error('Error:', err);
+                name: updatedForm.name,
+                email: updatedForm.email,
+                salary_date: updatedForm.salary_date,
+                department: updatedForm.department,
+                position: updatedForm.position,
+                qrcode: updatedForm.qrcode,
+                phone_number: updatedForm.phone_number,
+                password: updatedForm.phone_number.toString().slice(-4),
+                salary: updatedForm.salary,
+                employee_id: updatedForm.employee_id,
+                day_off: updatedForm.day_off
+            });
+    
+            // Now create the user only if the employee creation is successful
+            if (!id) {
+                await createUser({ email: updatedForm.email, password: updatedForm.phone_number.toString().slice(-4), id: updatedForm.employee_id });
+            }
+    
+            toast("Successful", {
+                description: "Employee added successfully!",
+            });
+            setUserForm({
+                name: '',
+                email: '',
+                password: '',
+                salary_date: '',
+                department: '',
+                position: '',
+                qrcode: '',
+                phone_number: '',
+                employee_id: "",
+                salary: 0
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            toast("Error", {
+                description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again." ,
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -268,7 +280,7 @@ function UserForm({ id }) {
                     />
                 </div>
                 <Button type="submit" className="w-full">
-                    Submit
+                {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
                 </Button>
             </div>
             {userForm.employee_id && (

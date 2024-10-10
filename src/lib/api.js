@@ -305,3 +305,29 @@ export const removeUserById = async (id) => {
     const response = await axios.delete(`${API_URL}/api/delete-user/${id}`);
     return response;
 }
+
+//seach routes
+
+export const searchEmployee = async (search) => {
+    axios.defaults.withCredentials = true;
+    const response = await axios.get(`${API_URL}/api/search_employee?q=${search}`);
+    return response;
+}
+
+export const searchAttendance = async (search) => {
+    axios.defaults.withCredentials = true;
+    const response = await axios.get(`${API_URL}/api/search_attendance?q=${search}`);
+    return response;
+}
+
+export const searchPayroll = async (search) => {
+    axios.defaults.withCredentials = true;
+    const response = await axios.get(`${API_URL}/api/search_payroll?q=${search}`);
+    return response;
+}
+
+export const searchLeaveRequest = async (search) => {
+    axios.defaults.withCredentials = true;
+    const response = await axios.get(`${API_URL}/api/search_leave_request?q=${search}`);
+    return response;
+}
