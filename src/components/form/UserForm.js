@@ -54,7 +54,7 @@ function UserForm({ id }) {
             }
         };
         fetchData()
-    }, [])
+    }, [id])
 
     useEffect(() => {
         console.log(userForm)
