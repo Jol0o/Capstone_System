@@ -54,7 +54,6 @@ function Profile() {
     const [originalData, setOriginalData] = useState(null)
     const [image, setImage] = useState(null)
     const [date, setDate] = useState(null)
-    const [qrCode, setQrcode] = useState(null)
     const [isLoading , setIsLoading] = useState(false)
     const router = useRouter()
     const userEmail = useStore(state => state.userEmail)
@@ -139,8 +138,7 @@ function Profile() {
             toast("Successful", {
                 description: "Successfully saved!",
             });
-            setUserData(originalData);
-            setQrcode(null);
+            setUserData(originalData)
             setImage(null);
             setDate(null);
         } catch (error) {
@@ -182,7 +180,6 @@ function Profile() {
         if (e.target.name === "name") {
             setUserData(prevUserData => ({
                 ...prevUserData,
-                qrcode: "",
                 [e.target.name]: e.target.value
             }));
         } else {
@@ -331,7 +328,7 @@ function Profile() {
                             <CardDescription>User QR Code Here!</CardDescription>
                         </CardHeader>
                         <CardContent className="flex flex-col w-full">
-                            {userData?.name === originalData?.name && userData.qrcode ?
+                            {userData?.qrcode && 
                                 <a href={userData.qrcode} target="_blank" download>
                                     <Image
                                         src={userData.qrcode}
@@ -340,11 +337,7 @@ function Profile() {
                                         alt="Avatar"
                                         className="self-center max-h-[230px] overflow-hidden object-cover rounded-lg"
                                     />
-                                </a> :
-                                <div className="w-full max-w-[500px]" ref={qrCodeRef}>
-                                    <QRCode size={200} level="M" value={userData.name} />
-                                </div>
-                            }
+                                </a>}
                         </CardContent>
                     </Card>
                 </div>
