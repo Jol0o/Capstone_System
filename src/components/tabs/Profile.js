@@ -29,7 +29,7 @@ import { toast } from "sonner"
 import QRCode from "qrcode.react"
 import { useRouter } from "next/navigation"
 import { useStore } from '@/hooks/useStore';
-import { editEmployeeData, getEmployeebyEmail, logoutUser } from "@/lib/api"
+import { editEmployeeData, getEmployeebyEmail, getEmployeeById, logoutUser } from "@/lib/api"
 import io from 'socket.io-client';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
@@ -60,10 +60,10 @@ function Profile() {
 
 
     const fetchUser = useCallback(async () => {
-        const emailToUse = user?.email && user.status === 'user' ? user.email : userEmail;
+        const id = user?.user_id;
         try {
-            if (emailToUse) {
-                const response = await getEmployeebyEmail(emailToUse);
+            if (id) {
+                const response = await getEmployeeById(emailToUse);
                 if (response.data.data.length > 0) {
                     const userData = response.data.data[0];
                     setUserData(userData);
@@ -73,7 +73,7 @@ function Profile() {
         } catch (e) {
             console.log(e);
         }
-    }, [user, userEmail]);
+    }, [user]);
 
     useEffect(() => {
         fetchUser();
