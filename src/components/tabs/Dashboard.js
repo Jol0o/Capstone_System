@@ -7,6 +7,7 @@ import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, BarElement } from 'chart.js';
 import { LineChart } from '../chart/LinceChart';
 import { BarChartComponent } from '../chart/BarChart';
+import { Card } from '../ui/card';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, BarElement);
 
@@ -71,7 +72,7 @@ function Dashboard() {
   return (
     <div className="w-full h-full overflow-hidden">
       <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <div className='flex flex-col justify-between border-2 rounded-md w-full  h-[300px] p-5'>
+        <Card className='flex flex-col justify-between border-2 rounded-md w-full  h-[300px] p-5'>
           <div className="flex items-center justify-between">
             <Sun className="w-20 h-20" />
             <div>
@@ -83,9 +84,9 @@ function Dashboard() {
             <h3 className="font-medium text-md">Today</h3>
             <p className="text-3xl font-semibold">{date}</p>
           </div>
-        </div>
+        </Card>
         <div className="flex flex-col gap-7">
-          <div className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
+          <Card className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">{employee?.this_month}</h2>
               <div className="p-1 border-2 rounded-full border-slate-200">
@@ -99,8 +100,8 @@ function Dashboard() {
                 {employee && employee.difference >= 0 ? <p className="text-xs text-green-500">+{employee.difference} New employees added!</p> : <p className="text-red-500">{employee && employee.difference}</p>}
               </div>
             </div>
-          </div>
-          <div className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
+          </Card>
+          <Card className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">
                 {lates && lates.today}
@@ -117,10 +118,10 @@ function Dashboard() {
                 {lates ? (lates.difference >= 0 ? <p className="text-xs text-green-500">+{lates.difference} Decrease than yesterday!</p> : <p className="text-xs text-red-500">{lates.difference} Increase than yesterday!</p>) : null}
               </div>
             </div>
-          </div>
+          </Card>
         </div>
         <div className="flex flex-col gap-7">
-          <div className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
+          <Card className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">{earlyBirds && earlyBirds.today}</h2>
               <div className="p-1 border-2 rounded-full border-slate-200">
@@ -135,8 +136,8 @@ function Dashboard() {
                 {earlyBirds && earlyBirds.difference >= 0 ? <p className="text-xs text-green-500">+{earlyBirds.difference} Increase than yesterday!</p> : <p className="text-xs text-red-500">{earlyBirds && earlyBirds.difference} Decrease than yesterday!</p>}
               </div>
             </div>
-          </div>
-          <div className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
+          </Card>
+          <Card className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">{earlyDepartures && earlyDepartures.today}</h2>
               <div className="p-1 border-2 rounded-full border-slate-200">
@@ -150,10 +151,10 @@ function Dashboard() {
                 {earlyDepartures && earlyDepartures.difference >= 0 ? <p className="text-xs text-green-500">+{earlyDepartures.difference} Decrease than yesterday!</p> : <p className="text-xs text-red-500">{earlyDepartures && earlyDepartures.difference} Increase than yesterday!</p>}
               </div>
             </div>
-          </div>
+          </Card>
         </div>
         <div className="flex flex-col gap-7">
-          <div className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
+          <Card className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">{absents && absents.today}</h2>
               <div className="p-1 border-2 rounded-full border-slate-200">
@@ -168,8 +169,8 @@ function Dashboard() {
                 {absents && absents.difference >= 0 ? <p className="text-xs text-red-500">+{absents.difference} Increase than yesterday!</p> : <p className="text-xs text-green-500">{absents && absents.difference} Decrease than yesterday!</p>}
               </div>
             </div>
-          </div>
-          <div className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
+          </Card>
+          <Card className="border-2 flex flex-col justify-between rounded-md w-full  h-[130px] p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">{off?.length}</h2>
               <div className="p-1 border-2 rounded-full border-slate-200">
@@ -179,7 +180,7 @@ function Dashboard() {
             <div className="flex flex-col gap-2">
               <h2 className="font-semibold text-md">Day Off</h2>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
       <div className="grid w-full grid-cols-1 gap-5 mt-5 lg:grid-cols-2">
