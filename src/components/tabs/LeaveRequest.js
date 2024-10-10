@@ -80,11 +80,11 @@ function LeaveRequest() {
         if (!user) return
         const fetchUser = async () => {
             try {
-                const res = await getEmployeebyEmail(user.email);
-                console.log(res.data.data)
+                const res = await getEmployeeById(user.user_id);
+                console.log(res)
                 if (res) {
-                    if (res.data.data.length > 0) {
-                        setFormData({ ...formData, name: res.data.data[0].name, email: user?.email })
+                    if (res.data.length > 0) {
+                        setFormData({ ...formData, name: res.data[0].name, email: user?.email })
                     }
                 }
             } catch (e) {

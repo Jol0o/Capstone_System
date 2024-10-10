@@ -63,9 +63,10 @@ function Profile() {
         const id = user?.user_id;
         try {
             if (id) {
-                const response = await getEmployeeById(emailToUse);
-                if (response.data.data.length > 0) {
-                    const userData = response.data.data[0];
+                const response = await getEmployeeById(id);
+                if (response.data) {
+                    const userData = response.data[0];
+                    console.log(userData);
                     setUserData(userData);
                     setOriginalData(userData);
                 }
