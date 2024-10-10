@@ -154,7 +154,7 @@ function Profile() {
         } catch (error) {
             console.error(error);
             toast("Error", {
-                description: "Failed to save data. Please try again.",
+                description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again." ,
             });
         } finally {
             setIsLoading(false);
