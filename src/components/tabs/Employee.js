@@ -177,7 +177,7 @@ function Employee({ setTab }) {
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => {
                                                 setTab("profile")
-                                                setUser(item.email)
+                                                setUser(item.employee_id)
                                             }}>
                                                 View
                                             </DropdownMenuItem>
