@@ -345,10 +345,10 @@ function Profile() {
                                 <a href={userData.qrcode} target="_blank" download>
                                     <Image
                                         src={userData.qrcode}
-                                        width={300}
-                                        height={250}
+                                        width={500}
+                                        height={500}
                                         alt="Avatar"
-                                        className="self-center max-h-[230px] overflow-hidden object-cover rounded-lg"
+                                        className="self-center max-h-[230px] overflow-hidden object-fit rounded-lg"
                                     />
                                 </a>}
                         </CardContent>
