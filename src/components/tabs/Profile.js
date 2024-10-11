@@ -60,7 +60,7 @@ function Profile() {
 
 
     const fetchUser = useCallback(async () => {
-        const id = user?.user_id;
+        const id = userEmail ? userEmail : user?.user_id;
         try {
             if (id) {
                 const response = await getEmployeeById(id);
