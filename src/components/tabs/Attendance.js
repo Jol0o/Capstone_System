@@ -72,6 +72,11 @@ function Attendance() {
     };
 
     const deleteAttendance = async (id) => {
+        const isConfirmed = window.confirm("Are you sure you want to delete this employee?");
+
+        if (!isConfirmed) {
+            return;
+        }
         try {
             await removeAttendance(id, token)
             toast("Successfull", {
