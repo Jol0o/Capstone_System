@@ -256,23 +256,23 @@ function Profile() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className="rounded-xl">
+                                       <Card className="rounded-xl">
                         <CardHeader>
                             <CardTitle className="text-md">Employment Details</CardTitle>
-                            <CardDescription>User Employment Information here </CardDescription>
+                            <CardDescription>User Employment Information here</CardDescription>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-3">
                             <div className="space-y-1">
                                 <Label htmlFor="position">Position / Job Title</Label>
-                                <Input type="tet" required id="position" value={userData?.position} name="position" onChange={handleChange} />
+                                <Input type="text" id="position" value={userData?.position} name="position" readOnly />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="department">Department</Label>
-                                <Input type="tet" required id="department" value={userData?.department} name="department" onChange={handleChange} />
+                                <Input type="text" id="department" value={userData?.department} name="department" readOnly />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="salary">Salary</Label>
-                                <Input type="tet" required id="salary" value={userData?.salary} name="salary" onChange={handleChange} />
+                                <Input type="text" id="salary" value={userData?.salary} name="salary" readOnly />
                             </div>
                             <div className="grid items-center grid-cols-1 gap-2">
                                 <Label htmlFor="date">Date</Label>
@@ -285,6 +285,7 @@ function Profile() {
                                                 " justify-start text-left font-normal",
                                                 !userData.salary_date && "text-muted-foreground"
                                             )}
+                                            disabled
                                         >
                                             <CalendarIcon className="w-4 h-4 mr-2" />
                                             {userData.salary_date ? format(userData.salary_date, "PPP") : <span>Pick a date</span>}
@@ -299,6 +300,7 @@ function Profile() {
                                                 console.log(date);
                                             }}
                                             initialFocus
+                                            disabled
                                         />
                                     </PopoverContent>
                                 </Popover>
