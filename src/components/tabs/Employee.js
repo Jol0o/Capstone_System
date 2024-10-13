@@ -122,7 +122,7 @@ function Employee({ setTab }) {
                 />
                 <div className="flex gap-3">
 
-                    <Button onClick={() => handleExcelDownload(filterData)} variant="outline" size="sm" className="gap-1 h-7">
+                    <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" size="sm" className="gap-1 h-7">
                         <FileDown className="h-3.5 w-3.5" />
                         Export
                     </Button>

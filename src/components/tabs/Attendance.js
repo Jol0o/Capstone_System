@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, User } from "lucide-react";
+import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -20,6 +20,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import generate from '../pdf_template/generatePDF';
 import { getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
+import * as XLSX from 'xlsx';
 
 function Attendance() {
     const [data, setData] = useState([])
@@ -95,6 +96,14 @@ function Attendance() {
         window.open(link, '_blank');
     }
 
+    const handleExcelDownload = (data) => {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, "attendance.xlsx");
+    };
+
+
     return (
         <div className="w-full">
             <div className="flex items-center justify-between py-4">
@@ -104,6 +113,10 @@ function Attendance() {
                     className="max-w-sm"
                 />
                 <div className="flex gap-2">
+                <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                        <FileDown className="h-3.5 w-3.5" />
+                        Export
+                    </Button>
                     <Button variant="outline" onClick={() => router.push('scan')} className="flex items-center gap-2">Scan QR</Button>
                 </div>
 

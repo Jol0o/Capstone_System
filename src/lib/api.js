@@ -6,173 +6,161 @@ export const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:
 
 console.log(API_URL);
 
-export const getEmployees = async (limit, page) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/employees?page=${page}&limit=${limit}`);
+const axiosInstance = axios.create({
+    withCredentials: true,
+});
+
+const cacheWrapper = (fn) => cache(async (...args) => {
+    const response = await fn(...args);
+    return response;
+});
+
+export const getEmployees = cacheWrapper(async (limit, page) => {
+    const response = await axiosInstance.get(`${API_URL}/api/employees?page=${page}&limit=${limit}`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getEmployeebyEmail = async (email) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/employee/${email}`);
+export const getEmployeebyEmail = cacheWrapper(async (email) => {
+    const response = await axiosInstance.get(`${API_URL}/api/employee/${email}`);
     if (response) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getEmployeeById = async (id) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/employees/${id}`);
+export const getEmployeeById = cacheWrapper(async (id) => {
+    const response = await axiosInstance.get(`${API_URL}/api/employees/${id}`);
     if (response.status === 200) {
         return response.data;
     } else {
         return null;
     }
-}
+});
 
 export const sendEmailToEmployee = async (item) => {
-    axios.defaults.withCredentials = true;
-    await axios.post(`${API_URL}/api/send_email`, {
+    await axiosInstance.post(`${API_URL}/api/send_email`, {
         qrcode: item.qrcode,
         email: item.email,
     });
-}
+};
 
 export const editEmployeeData = async (userData) => {
-    axios.defaults.withCredentials = true;
-    await axios.put(`${API_URL}/api/employees/${userData.id}`, userData);
-}
+    await axiosInstance.put(`${API_URL}/api/employees/${userData.id}`, userData);
+};
 
 export const removeEmployee = async (id) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.delete(`${API_URL}/api/employee/${id}`);
-}
+    await axiosInstance.delete(`${API_URL}/api/employee/${id}`);
+};
 
-export const getAttendance = async (page, limit) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/attendances?page=${page}&limit=${limit}`)
+export const getAttendance = cacheWrapper(async (page, limit) => {
+    const response = await axiosInstance.get(`${API_URL}/api/attendances?page=${page}&limit=${limit}`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
 export const removeAttendance = async (id) => {
-    axios.defaults.withCredentials = true;
-    axios.delete(`${API_URL}/api/attendance/${id}`)
-}
+    await axiosInstance.delete(`${API_URL}/api/attendance/${id}`);
+};
 
-//for analytics api
-
-export const getEarlyBirds = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/early_employees`);
+// for analytics api
+export const getEarlyBirds = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/early_employees`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getLateEmployees = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/late_employees`);
+export const getLateEmployees = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/late_employees`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getEarlyDepartures = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/early_departures`);
+export const getEarlyDepartures = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/early_departures`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getAbsents = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/absent_employees`);
+export const getAbsents = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/absent_employees`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getOff = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/off`);
+export const getOff = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/off`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getMonthlyEmployees = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/monthly_employees`);
+export const getMonthlyEmployees = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/monthly_employees`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-
-export const getMonthlyAttendance = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/monthly_attendance`);
+export const getMonthlyAttendance = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/monthly_attendance`);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getYearlyAttendance = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/yearly_attendance`);
-    console.log(response)
+export const getYearlyAttendance = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/yearly_attendance`);
+    console.log(response);
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+});
 
-//api for payroll
-export const getPayrolls = async (page, limit) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/payroll?page=${page}&limit=${limit}`)
+// api for payroll
+export const getPayrolls = cacheWrapper(async (page, limit) => {
+    const response = await axiosInstance.get(`${API_URL}/api/payroll?page=${page}&limit=${limit}`);
     if (response) {
-
         return response;
     } else {
         return null;
     }
-}
+});
 
-export const getUserPayroll = async (page, limit, id) => {
+export const getUserPayroll = cacheWrapper(async (page, limit, id) => {
     if (!id) {
         console.error('Error: User ID is undefined');
         return null;
     }
-    axios.defaults.withCredentials = true;
     try {
-        const response = await axios.get(`${API_URL}/api/payroll/${id}?page=${page}&limit=${limit}`);
+        const response = await axiosInstance.get(`${API_URL}/api/payroll/${id}?page=${page}&limit=${limit}`);
         if (response) {
             return response;
         } else {
@@ -182,152 +170,133 @@ export const getUserPayroll = async (page, limit, id) => {
         console.error('Error fetching user payroll:', error);
         return null;
     }
-};
+});
 
 export const removePayroll = async (id) => {
-    axios.defaults.withCredentials = true;
-    axios.delete(`${API_URL}/api/payroll/${id}`)
-}
+    await axiosInstance.delete(`${API_URL}/api/payroll/${id}`);
+};
 
-//api authentication methods
+// api authentication methods
 export const loginAdmin = async (userForm) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.post(`${API_URL}/api/auth/admin/login`, {
+    const response = await axiosInstance.post(`${API_URL}/api/auth/admin/login`, {
         email: userForm.email,
         password: userForm.password,
-    })
+    });
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+};
 
 export const loginEmployeeApi = async (userForm) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.post(`${API_URL}/api/auth/login`, {
+    const response = await axiosInstance.post(`${API_URL}/api/auth/login`, {
         email: userForm.email,
         password: userForm.password,
-    })
+    });
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+};
 
 export const registerUserAdmin = async (userForm) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.post(`${API_URL}/api/auth/register`, {
+    const response = await axiosInstance.post(`${API_URL}/api/auth/register`, {
         email: userForm.email,
         password: userForm.password,
-        user_id: userForm.user_id
-    })
+        user_id: userForm.user_id,
+    });
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+};
 
 export const registerAdminAcc = async (userForm) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.post(`${API_URL}/api/auth/admin/register`, {
+    const response = await axiosInstance.post(`${API_URL}/api/auth/admin/register`, {
         email: userForm.email,
         password: userForm.password,
-    })
+    });
     if (response.status === 200) {
         return response;
     } else {
         return null;
     }
-}
+};
 
-export const getUserByQrCode = async (result) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/employees/${encodeURIComponent(result)}`);
+export const getUserByQrCode = cacheWrapper(async (result) => {
+    const response = await axiosInstance.get(`${API_URL}/api/employees/${encodeURIComponent(result)}`);
     if (response) {
         return response;
     } else {
         return null;
     }
-}
+});
 
 export const logoutUser = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.post(`${API_URL}/api/auth/logout`);
-}
+    await axiosInstance.post(`${API_URL}/api/auth/logout`);
+};
 
-//leave request route
+// leave request route
 export const leaveRequest = async (data) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.post(`${API_URL}/api/leave_request`, data);
+    const response = await axiosInstance.post(`${API_URL}/api/leave_request`, data);
     return response;
-}
+};
 
-export const getLeaveRequests = async (limit, page) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/leave_request?page=${page}&limit=${limit}`);
+export const getLeaveRequests = cacheWrapper(async (limit, page) => {
+    const response = await axiosInstance.get(`${API_URL}/api/leave_request?page=${page}&limit=${limit}`);
     return response;
-}
+});
 
 export const updateLeaveStatus = async (id, status) => {
-    console.log(id, status)
-    axios.defaults.withCredentials = true;
-    const response = await axios.put(`${API_URL}/api/leave_request/${id}/status`, { status });
+    console.log(id, status);
+    const response = await axiosInstance.put(`${API_URL}/api/leave_request/${id}/status`, { status });
     return response;
-}
+};
 
-export const userRequests = async (status) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/user_request`, status);
+export const userRequests = cacheWrapper(async (status) => {
+    const response = await axiosInstance.get(`${API_URL}/api/user_request`, status);
     return response;
-}
+});
 
-export const checkToken = async () => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/auth/check-token`)
+export const checkToken = cacheWrapper(async () => {
+    const response = await axiosInstance.get(`${API_URL}/api/auth/check-token`);
     return response;
-}
+});
 
-export const getAllUsers = async (limit, page) => {
-    axios.defaults.withCredentials = true;
+export const getAllUsers = cacheWrapper(async (limit, page) => {
     try {
-        const response = await axios.get(`${API_URL}/api/get-users?page=${page}&limit=${limit}`);
+        const response = await axiosInstance.get(`${API_URL}/api/get-users?page=${page}&limit=${limit}`);
         return response;
     } catch (error) {
         throw error;
     }
-};
+});
 
 export const removeUserById = async (id) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.delete(`${API_URL}/api/delete-user/${id}`);
+    const response = await axiosInstance.delete(`${API_URL}/api/delete-user/${id}`);
     return response;
-}
+};
 
-//seach routes
-
-export const searchEmployee = async (search) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/search_employee?q=${search}`);
+// search routes
+export const searchEmployee = cacheWrapper(async (search) => {
+    const response = await axiosInstance.get(`${API_URL}/api/search_employee?q=${search}`);
     return response;
-}
+});
 
-export const searchAttendance = async (search) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/search_attendance?q=${search}`);
+export const searchAttendance = cacheWrapper(async (search) => {
+    const response = await axiosInstance.get(`${API_URL}/api/search_attendance?q=${search}`);
     return response;
-}
+});
 
-export const searchPayroll = async (search) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/search_payroll?q=${search}`);
+export const searchPayroll = cacheWrapper(async (search) => {
+    const response = await axiosInstance.get(`${API_URL}/api/search_payroll?q=${search}`);
     return response;
-}
+});
 
-export const searchLeaveRequest = async (search) => {
-    axios.defaults.withCredentials = true;
-    const response = await axios.get(`${API_URL}/api/search_leave_request?q=${search}`);
+export const searchLeaveRequest = cacheWrapper(async (search) => {
+    const response = await axiosInstance.get(`${API_URL}/api/search_leave_request?q=${search}`);
     return response;
-}
+});

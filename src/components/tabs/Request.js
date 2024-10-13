@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal, User } from "lucide-react";
+import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -20,6 +20,7 @@ import Image from 'next/image';
 import { getLeaveRequests, updateLeaveStatus } from '@/lib/api';
 import UpdateLeaveStatus from '../modal/UpdateLeaveStatus';
 import { io } from 'socket.io-client';
+import * as XLSX from 'xlsx';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
@@ -90,6 +91,14 @@ function Request() {
         };
     }, [fetch]);
 
+    const handleExcelDownload = (data) => {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, "leavereaquest.xlsx");
+    };
+
+
 
     return (
         <div className="w-full">
@@ -99,6 +108,10 @@ function Request() {
                     onChange={(event) => setFilter(event.target.value)}
                     className="max-w-sm"
                 />
+                         <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                        <FileDown className="h-3.5 w-3.5" />
+                        Export
+                    </Button>
             </div>
             <div className="border rounded-md">
                 {filterData && filterData.length ? <Table>

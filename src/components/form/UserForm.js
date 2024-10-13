@@ -23,7 +23,7 @@ import createUser from '@/hooks/useCreateUser';
 import { getEmployeeById } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
-function UserForm({ id }) {
+function UserForm({ id , setIsDialogOpen }) {
     const qrCodeRef = useRef(null);
     const [userForm, setUserForm] = useState({
         name: '',
@@ -77,6 +77,10 @@ function UserForm({ id }) {
         });
     };
 
+    const axiosInstance = axios.create({
+        withCredentials: true,
+    });
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -106,7 +110,7 @@ function UserForm({ id }) {
             // Proceed with creating the employee first
             const url = id ? `${API_URL}/api/employees/${id}` : `${API_URL}/api/create_employee`;
             const method = id ? 'put' : 'post';
-            await axios[method](url, {
+            await axiosInstance[method](url, {
                 name: updatedForm.name,
                 email: updatedForm.email,
                 salary_date: updatedForm.salary_date,
@@ -147,6 +151,7 @@ function UserForm({ id }) {
             });
         } finally {
             setIsLoading(false);
+            setIsDialogOpen(false);
         }
     };
 

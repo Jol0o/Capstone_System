@@ -16,10 +16,11 @@ import UserForm from "../form/UserForm"
 import { CirclePlus } from 'lucide-react'
 
 function AddEmployee() {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 
     return (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button size="sm" className="gap-1 h-7"> <CirclePlus className="h-3.5 w-3.5" /> Add Employee</Button>
             </DialogTrigger>
@@ -31,7 +32,7 @@ function AddEmployee() {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="gap-4 py-4 ">
-                    <UserForm/>
+                    <UserForm setIsDialogOpen={setIsDialogOpen}/>
                 </div>
             </DialogContent>
         </Dialog>
