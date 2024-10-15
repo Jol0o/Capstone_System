@@ -94,6 +94,7 @@ import { logoutUser } from "@/lib/api"
 import Request from "@/components/tabs/Request"
 import UserAccounts from "@/components/tabs/UserAccounts"
 import Loader from "@/components/Loader"
+import { ModeToggle } from "@/components/buttons/DarkMode"
 
 export default function Page() {
     const { auth, user } = useAuth();
@@ -179,7 +180,7 @@ export default function Page() {
                             <TooltipContent side="right">Dashboard</TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-                    <TooltipProvider>
+                        <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Link
@@ -340,12 +341,12 @@ export default function Page() {
                                     Dashboard
                                 </Link>
                                 <Link
-                                        href="#"
-                                        onClick={() => setTab("users")}
-                                       className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
-                                        <Users className="w-5 h-5" />
-                                        Users
-                                    </Link>
+                                    href="#"
+                                    onClick={() => setTab("users")}
+                                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground">
+                                    <Users className="w-5 h-5" />
+                                    Users
+                                </Link>
                                 <Link
                                     href="#"
                                     onClick={() => setTab("employee")}
@@ -381,13 +382,13 @@ export default function Page() {
 
                             </nav> :
                                 <nav className="grid gap-6 text-lg font-medium">
-                                       <Link
-                                    href="#"
-                                    className="flex items-center justify-center w-10 h-10 gap-2 text-lg font-semibold rounded-full group shrink-0 bg-primary text-primary-foreground md:text-base"
-                                >
-                                    <Package2 className="w-5 h-5 transition-all group-hover:scale-110" />
-                                    <span className="sr-only">Acme Inc</span>
-                                </Link>
+                                    <Link
+                                        href="#"
+                                        className="flex items-center justify-center w-10 h-10 gap-2 text-lg font-semibold rounded-full group shrink-0 bg-primary text-primary-foreground md:text-base"
+                                    >
+                                        <Package2 className="w-5 h-5 transition-all group-hover:scale-110" />
+                                        <span className="sr-only">Acme Inc</span>
+                                    </Link>
                                     <Link
                                         href="#"
                                         onClick={() => setTab("profile")}
@@ -432,7 +433,9 @@ export default function Page() {
 
                         </BreadcrumbList>
                     </Breadcrumb>
-
+                    
+                    <div className="flex items-center justify-center gap-4">
+                    <ModeToggle />
                     {user.status === 'admin' && <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
@@ -451,13 +454,11 @@ export default function Page() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Settings</DropdownMenuItem>
-                            <DropdownMenuItem>Support</DropdownMenuItem>
-                            <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
-                    </DropdownMenu>}
+                    </DropdownMenu>
+                    
+                    }</div>
                 </header>
                 <main className="p-5">
                     {renderComponent()}

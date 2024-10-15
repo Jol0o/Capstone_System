@@ -38,9 +38,11 @@ function Employee({ setTab }) {
     const [isLoading, setIsloading] = useState(false)
 
     useEffect(() => {
+        setIsloading(true)
         if (employee) {
             setData(employee);
             setFilteredData(employee)
+            setIsloading(false)
         }
     }, [employee]);
 

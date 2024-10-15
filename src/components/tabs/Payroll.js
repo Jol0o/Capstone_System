@@ -51,12 +51,14 @@ function Payroll() {
     }, [filter]);
 
     useEffect(() => {
+        setIsLoading(true)
         const fetchpayroll = async () => {
             const response = await getPayrolls(page, limit)
             if (response) {
                 console.table('Payroll', response.data.data)
                 setData(response.data.data)
                 setFilteredData(response.data.data)
+                setIsLoading(false)
             }
         }
         fetchpayroll()

@@ -64,12 +64,14 @@ function Request() {
     };
 
     const fetch = async () => {
+        setIsLoading(true)
         try {
             const res = await getLeaveRequests(limit, page)
             if (res) {
                 console.table('Request', res.data)
                 setData(res.data.data)
                 setFilteredData(res.data.data)
+                setIsLoading(false)
             }
         } catch (e) {
             console.log(e)

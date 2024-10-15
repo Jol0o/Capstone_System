@@ -55,6 +55,7 @@ function Attendance() {
     }
 
     useEffect(() => {
+        setIsLoading(true)
         const fetchpayroll = async () => {
             const response = await getAttendance(page, limit, token)
             if (response) {
@@ -62,7 +63,9 @@ function Attendance() {
                 setTotalPages(response.data.totalPages)
                 setData(response.data.data)
                 setFilteredData(response.data.data)
+                setIsLoading(false)
             }
+
         }
 
         fetchpayroll()
