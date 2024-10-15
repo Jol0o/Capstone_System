@@ -36,7 +36,6 @@ function Payroll() {
 
 
     useEffect(() => {
-        setIsLoading(true)
         const fetchData = async () => {
             if (filter.trim() === '') {
                 setFilteredData(data);
@@ -44,7 +43,6 @@ function Payroll() {
             }
             const res = await searchPayroll(filter.trim());
             setFilteredData(res.data.data);
-            setIsLoading(false)
         };
 
         fetchData();
@@ -118,7 +116,6 @@ function Payroll() {
                 {filterData && filterData.length ? <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="capitalize">Id</TableHead>
                             <TableHead className="capitalize">Name</TableHead>
                             <TableHead className="capitalize">Created At</TableHead>
                             <TableHead className="capitalize">Hours Worked</TableHead>
@@ -129,7 +126,6 @@ function Payroll() {
                         {
                             filterData.map(item =>
                                 <TableRow key={item.id}>
-                                    <TableCell className="font-medium max-w-[200px] whitespace-nowrap truncate overflow-hidden">{item.employee_id}</TableCell>
                                     <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
                                         {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={30}
                                             height={36}

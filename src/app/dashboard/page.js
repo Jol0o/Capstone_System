@@ -102,7 +102,6 @@ export default function Page() {
     const router = useRouter();
 
     useEffect(() => {
-        console.log(auth, user)
         if (user && user.status === "user") {
             setTab("profile")
         }
