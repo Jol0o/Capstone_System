@@ -19,12 +19,14 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
 import * as XLSX from 'xlsx';
+import Loader from '../Loader';
 
 function Payroll() {
     const [data, setData] = useState([])
     const [filterData, setFilteredData] = useState([])
     const [page, setPage] = useState(1)
     const [filter, setFilter] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const limit = 15
 
     function formatDate(dateString) {
@@ -32,8 +34,9 @@ function Payroll() {
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
 
-   
+
     useEffect(() => {
+        setIsLoading(true)
         const fetchData = async () => {
             if (filter.trim() === '') {
                 setFilteredData(data);
@@ -41,6 +44,7 @@ function Payroll() {
             }
             const res = await searchPayroll(filter.trim());
             setFilteredData(res.data.data);
+            setIsLoading(false)
         };
 
         fetchData();
@@ -72,7 +76,7 @@ function Payroll() {
         if (!isConfirmed) {
             return;
         }
-        
+
         try {
             await removePayroll(id)
             toast("Successfull", {
@@ -85,7 +89,7 @@ function Payroll() {
         }
     }
 
-    
+
     const handleExcelDownload = (data) => {
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
@@ -93,6 +97,7 @@ function Payroll() {
         XLSX.writeFile(wb, "payroll.xlsx");
     };
 
+    if (isLoading) return <Loader />
 
     return (
         <div className="w-full">
@@ -102,10 +107,10 @@ function Payroll() {
                     onChange={(event) => setFilter(event.target.value)}
                     className="max-w-sm"
                 />
-                                       <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
-                        <FileDown className="h-3.5 w-3.5" />
-                        Export
-                    </Button>
+                <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                    <FileDown className="h-3.5 w-3.5" />
+                    Export
+                </Button>
             </div>
             <div className="border rounded-md">
                 {filterData && filterData.length ? <Table>

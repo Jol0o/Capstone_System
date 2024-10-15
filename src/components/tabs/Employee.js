@@ -24,6 +24,7 @@ import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/hooks/useStore';
 import { removeEmployee, searchEmployee, sendEmailToEmployee } from '@/lib/api';
+import Loader from '../Loader';
 
 function Employee({ setTab }) {
     const [data, setData] = useState([])
@@ -34,6 +35,7 @@ function Employee({ setTab }) {
     const { employee, totalPages } = useEmployee(page, limit)
     const { token } = useAuth()
     const setUser = useStore(state => state.setUser)
+    const [isLoading, setIsloading] = useState(false)
 
     useEffect(() => {
         if (employee) {
@@ -47,6 +49,7 @@ function Employee({ setTab }) {
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
     useEffect(() => {
+        setIsloading(false)
         const fetchData = async () => {
             if (filter.trim() === '') {
                 setFilteredData(data);
@@ -54,6 +57,7 @@ function Employee({ setTab }) {
             }
             const res = await searchEmployee(filter.trim());
             setFilteredData(res.data.data);
+            setIsloading(true)
         };
 
         fetchData();
@@ -111,6 +115,8 @@ function Employee({ setTab }) {
             });
         }
     };
+
+    if (isLoading) return <Loader />
 
     return (
         <div className="w-full">
@@ -210,7 +216,7 @@ function Employee({ setTab }) {
                 </Table>}
             </div>
             {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-           
+
                 <div className="flex items-center gap-2">
                     {totalPages === '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
                         <ChevronLeft className="w-4 h-4" />

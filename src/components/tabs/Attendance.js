@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import generate from '../pdf_template/generatePDF';
 import { getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
 import * as XLSX from 'xlsx';
+import Loader from '../Loader';
 
 function Attendance() {
     const [data, setData] = useState([])
@@ -31,8 +32,10 @@ function Attendance() {
     const { token } = useAuth()
     const router = useRouter()
     const [filter, setFilter] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
+        setIsLoading(true)
         const fetchData = async () => {
             if (filter.trim() === '') {
                 setFilteredData(data);
@@ -40,6 +43,7 @@ function Attendance() {
             }
             const res = await searchAttendance(filter.trim());
             setFilteredData(res.data.data);
+            setIsLoading(false)
         };
 
         fetchData();
@@ -103,6 +107,7 @@ function Attendance() {
         XLSX.writeFile(wb, "attendance.xlsx");
     };
 
+    if (isLoading) return <Loader />
 
     return (
         <div className="w-full">
@@ -113,7 +118,7 @@ function Attendance() {
                     className="max-w-sm"
                 />
                 <div className="flex gap-2">
-                <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                    <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
                         <FileDown className="h-3.5 w-3.5" />
                         Export
                     </Button>
@@ -185,7 +190,7 @@ function Attendance() {
                 </Table>}
             </div>
             {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-        
+
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
                         <ChevronLeft className="w-4 h-4" />
