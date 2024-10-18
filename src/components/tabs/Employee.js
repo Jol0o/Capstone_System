@@ -51,7 +51,6 @@ function Employee({ setTab }) {
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
     useEffect(() => {
-        setIsloading(false)
         const fetchData = async () => {
             if (filter.trim() === '') {
                 setFilteredData(data);
@@ -59,7 +58,6 @@ function Employee({ setTab }) {
             }
             const res = await searchEmployee(filter.trim());
             setFilteredData(res.data.data);
-            setIsloading(true)
         };
 
         fetchData();
@@ -143,7 +141,7 @@ function Employee({ setTab }) {
                     <TableHeader>
                         <TableRow>
                             {Object.keys(filterData[0]).map((key) => {
-                                if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password') {
+                                if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id') {
                                     // Replace all occurrences of "_" with a space
                                     let formattedKey = key.replace(/_/g, ' ');
                                     return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
@@ -155,7 +153,6 @@ function Employee({ setTab }) {
                         {
                             filterData.map(item =>
                                 <TableRow key={item.id}>
-                                    <TableCell className="font-medium max-w-[200px] whitespace-nowrap truncate overflow-hidden">{item.employee_id}</TableCell>
                                     <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
                                         {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
                                             height={36}

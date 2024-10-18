@@ -35,7 +35,6 @@ function Attendance() {
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
-        setIsLoading(true)
         const fetchData = async () => {
             if (filter.trim() === '') {
                 setFilteredData(data);
@@ -43,7 +42,6 @@ function Attendance() {
             }
             const res = await searchAttendance(filter.trim());
             setFilteredData(res.data.data);
-            setIsLoading(false)
         };
 
         fetchData();
@@ -134,7 +132,6 @@ function Attendance() {
                 {filterData && filterData.length ? <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="capitalize">Id</TableHead>
                             <TableHead className="capitalize">Name</TableHead>
                             <TableHead className="capitalize">Date</TableHead>
                             <TableHead className="capitalize">Time In</TableHead>
@@ -145,7 +142,6 @@ function Attendance() {
                         {
                             filterData.map(item =>
                                 <TableRow key={item.id}>
-                                    <TableCell className="font-medium max-w-[200px] whitespace-nowrap truncate overflow-hidden">{item.employee_id}</TableCell>
                                     <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
                                         {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
                                             height={36}
