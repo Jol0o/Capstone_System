@@ -50,14 +50,21 @@ function Employee({ setTab }) {
 
     useEffect(() => {
         const fetchEmployee = async () => {
-            const res = await getEmployeeRequest(limit, page)
-            console.log('data', res)
-            if (res.status === 200) {
-                setEmployeeData(res.data.data)
+            try {
+                const res = await getEmployeeRequest(limit, page);
+                if (res.status === 200) {
+                    console.log(res.data)
+                    setEmployeeData(res.data.data);
+                } else {
+                    console.error('Failed to fetch employee data:', res.status, res.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching employee data:', error);
             }
-        }
-        fetchEmployee()
-    }, [])
+        };
+
+        fetchEmployee();
+    }, [limit, page]);
 
     function formatDate(dateString) {
         const options = { year: "numeric", month: "long", day: "numeric" };
@@ -264,7 +271,7 @@ function Employee({ setTab }) {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            {item.status !== 'confirmed' &&  <ApproveEmployee data={item} />}
+                                            {item.status !== 'confirmed' && <ApproveEmployee data={item} />}
                                             <DropdownMenuItem >
                                                 Reject
                                             </DropdownMenuItem>
