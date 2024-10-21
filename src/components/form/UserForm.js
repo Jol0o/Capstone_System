@@ -20,25 +20,24 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { toast } from 'sonner';
 import createUser from '@/hooks/useCreateUser';
-import { getEmployeeById } from '@/lib/api';
+import { approveEmployeeRequest, getEmployeeById } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
-function UserForm({ id , setIsDialogOpen }) {
+function UserForm({ id, setIsDialogOpen, data }) {
     const qrCodeRef = useRef(null);
     const [userForm, setUserForm] = useState({
         name: '',
         email: '',
-        salary_date: null,
         department: '',
         position: '',
-        qrcode: "",
         employee_id: "",
-        phone_number: 0,
-        salary: 0,
-        day_off: 0
+        phone_number: '',
+        baseSalary: 0,
+        password: '',
+        hierarchy: 'Rank & File',
+        qrcode: "",
     });
     const [qrcode, setQrcode] = useState("")
-    const [date, setDate] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -57,23 +56,19 @@ function UserForm({ id , setIsDialogOpen }) {
     }, [id])
 
     useEffect(() => {
-        console.log(userForm)
-        if (date) {
-            const newDate = new Date(date.getTime());
-            newDate.setDate(newDate.getDate() + 1);
-            const dateOnly = newDate.toISOString().slice(0, 10);
-            setUserForm(prevState => ({
-                ...prevState,
-                salary_date: dateOnly,
-                employee_id: id ? prevState.employee_id : uuidv4()
-            }))
+        if (data) {
+            setUserForm({ ...userForm, ...data, employee_id: uuidv4() })
         }
-    }, [date])
+
+    }, [data])
+
+    console.log(userForm)
 
     const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
         setUserForm({
             ...userForm,
-            [e.target.name]: e.target.value
+            [name]: type === 'checkbox' ? checked : value
         });
     };
 
@@ -84,17 +79,17 @@ function UserForm({ id , setIsDialogOpen }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-    
+
         try {
             // Wait for the QR code to be downloaded and uploaded
             const image = await downloadQRCode();
             if (!image && !userForm.qrcode) {
                 throw new Error("QR code generation failed");
             }
-            
+
             // Update the userForm with the QR code image only if the image is generated
             const updatedForm = image ? { ...userForm, qrcode: image } : { ...userForm };
-    
+
             // Now check the form fields
             for (let key of Object.keys(updatedForm)) {
                 if (key === 'avatar' || key === 'day_off') continue;
@@ -106,7 +101,7 @@ function UserForm({ id , setIsDialogOpen }) {
                     return;
                 }
             }
-    
+
             // Proceed with creating the employee first
             const url = id ? `${API_URL}/api/employees/${id}` : `${API_URL}/api/create_employee`;
             const method = id ? 'put' : 'post';
@@ -118,17 +113,17 @@ function UserForm({ id , setIsDialogOpen }) {
                 position: updatedForm.position,
                 qrcode: updatedForm.qrcode,
                 phone_number: updatedForm.phone_number,
-                password: updatedForm.phone_number.toString().slice(-4),
-                salary: updatedForm.salary,
+                password: updatedForm.password || updatedForm.phone_number.toString().slice(-4),
+                baseSalary: updatedForm.baseSalary,
                 employee_id: updatedForm.employee_id,
-                day_off: updatedForm.day_off
+                hierarchy: updatedForm.hierarchy,
             });
-    
+
             // Now create the user only if the employee creation is successful
             if (!id) {
-                await createUser({ email: updatedForm.email, password: updatedForm.phone_number.toString().slice(-4), id: updatedForm.employee_id });
+                await createUser({ email: updatedForm.email, password: updatedForm.password || updatedForm.phone_number.toString().slice(-4), id: updatedForm.employee_id });
             }
-    
+
             toast("Successful", {
                 description: "Employee added successfully!",
             });
@@ -141,17 +136,65 @@ function UserForm({ id , setIsDialogOpen }) {
                 position: '',
                 qrcode: '',
                 phone_number: '',
-                employee_id: "",
-                salary: 0
+                baseSalary: 0,
+                hierarchy: 'employee',
             });
+            setIsDialogOpen(false);
         } catch (error) {
             console.error('Error:', error);
             toast("Error", {
-                description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again." ,
+                description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again.",
             });
         } finally {
             setIsLoading(false);
+
+        }
+    };
+
+    const handleApproved = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        console.log('running');
+        try {
+            const image = await downloadQRCode();
+            if (!image && !userForm.qrcode) {
+                throw new Error("QR code generation failed");
+            }
+
+            // Update the userForm with the QR code image only if the image is generated
+            const updatedForm = image ? { ...userForm, qrcode: image } : { ...userForm };
+
+            for (let key of Object.keys(updatedForm)) {
+                if (!updatedForm[key]) {
+                    toast("Error", {
+                        description: `Please fill in the ${key} field.`,
+                    });
+                    setIsLoading(false);
+                    return;
+                }
+            }
+
+            const response = await approveEmployeeRequest(
+                data.id,
+                userForm.employee_id,
+                userForm.department,
+                userForm.position,
+                userForm.baseSalary,
+                updatedForm.qrcode, // Ensure qrcode is passed correctly
+                userForm.hierarchy
+            );
+            toast("Successful", {
+                description: "Employee request approved successfully!",
+            });
+            console.log('Approval successful:', response);
             setIsDialogOpen(false);
+        } catch (error) {
+            console.error('Approval failed:', error);
+            toast("Error", {
+                description: "Failed to approve employee request. Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -184,6 +227,7 @@ function UserForm({ id , setIsDialogOpen }) {
         }
     };
 
+
     const uploadFile = async (file) => {
         const storageRef = ref(storage, `qrCode/${userForm.name}.png`);
         const uploadTaskSnapshot = await uploadBytesResumable(storageRef, file);
@@ -193,7 +237,7 @@ function UserForm({ id , setIsDialogOpen }) {
     };
 
     return (
-        <form className='flex flex-col gap-3' onSubmit={handleSubmit}>
+        <form className='flex flex-col gap-3' onSubmit={data ? handleApproved : handleSubmit}>
             <div className="grid gap-4">
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="name">Name</Label>
@@ -216,43 +260,25 @@ function UserForm({ id , setIsDialogOpen }) {
                         required
                     /></div>
                 <div className="grid items-center grid-cols-1 gap-2">
-                    <Label htmlFor="salary">Salary</Label>
+                    <Label htmlFor="password">Password</Label>
                     <Input
-                        id="salary"
-                        type="number"
-                        name="salary"
-                        value={userForm.salary} onChange={handleChange}
-                        placeholder="Enter salary"
-                        required
+                        id="password"
+                        type="text"
+                        name="password"
+                        value={userForm.password}
+                        placeholder="*****"
+                        readOnly
                     /></div>
                 <div className="grid items-center grid-cols-1 gap-2">
-                    <Label htmlFor="date">Date</Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                id="date"
-                                variant={"outline"}
-                                className={cn(
-                                    " justify-start text-left font-normal",
-                                    !userForm.salary_date && "text-muted-foreground"
-                                )}
-                            >
-                                <CalendarIcon className="w-4 h-4 mr-2" />
-                                {userForm.salary_date ? format(userForm.salary_date, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={date}
-                                onSelect={(date) => {
-                                    setDate(date);
-                                    console.log(date);
-                                }}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover></div>
+                    <Label htmlFor="baseSalary">Base Salary</Label>
+                    <Input
+                        id="baseSalary"
+                        type="number"
+                        name="baseSalary"
+                        value={userForm.baseSalary} onChange={handleChange}
+                        placeholder="Enter base salary"
+                        required
+                    /></div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="department">Department</Label>
                     <Input
@@ -277,15 +303,27 @@ function UserForm({ id , setIsDialogOpen }) {
                     <Label htmlFor="phone_number">Phone Number</Label>
                     <Input
                         id="phone_number"
-                        type="number"
+                        type="text"
                         name="phone_number"
                         value={userForm.phone_number} onChange={handleChange}
                         placeholder="Enter phone number"
                         required
                     />
                 </div>
+                <div className="grid items-center grid-cols-1 gap-2">
+                    <Label htmlFor="hierarchy">Hierarchy</Label>
+                    <Input
+                        id="hierarchy"
+                        type="text"
+                        name="hierarchy"
+                        value={userForm.hierarchy} onChange={handleChange}
+                        placeholder="Enter hierarchy"
+                        required
+                    />
+                </div>
+
                 <Button type="submit" className="w-full">
-                {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
+                    {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
                 </Button>
             </div>
             {userForm.employee_id && (

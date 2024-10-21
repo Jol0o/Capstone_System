@@ -17,17 +17,21 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import useAuth from "@/hooks/useAuth"
-import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUserAdmin } from "@/lib/api"
+import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUser } from "@/lib/api"
+import { LoaderCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
 function LoginAdmin() {
     const [userForm, setUserForm] = useState({
+        name: "",
         email: "",
         password: "",
+        phone: "",
     })
     const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
     const { auth, user } = useAuth();
     const router = useRouter()
 
@@ -35,24 +39,34 @@ function LoginAdmin() {
     if (auth) return router.push('/dashboard');
 
     const login = async () => {
+        setLoading(true)
         if (!userForm.email || !userForm.password) {
             toast("Error", {
                 description: 'Email and password are required',
             })
+            setLoading(false)
             return;
         }
 
         try {
             const response = await loginAdmin(userForm)
-            // localStorage.setItem('token', response.data.token)
-            localStorage.setItem('admin', JSON.stringify(response.data.admin))
-            router.push('/dashboard')
+            if (response.status === 200) {
+                if (response.data.userType === 'employee') {
+                    localStorage.setItem('user', JSON.stringify(response.data.user))
+                    router.push('/dashboard')
+                } else if (response.data.userType === 'admin') {
+                    localStorage.setItem('admin', JSON.stringify(response.data.user))
+                    router.push('/dashboard')
+                }
+            }
             setError("")
         } catch (error) {
             console.error('Login failed:', error.message)
             toast("Error", {
-                description: error.response.data.message,
+                description: error?.response?.data.message || error.message,
             })
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -79,23 +93,29 @@ function LoginAdmin() {
     }
 
     const register = async (e) => {
+        setLoading(true);
         e.preventDefault();
         try {
-            const response = await registerUserAdmin(userForm)
-                .then(() => {
-                    toast("Successfull", {
-                        description: "Success creating an account!",
-                    })
-                    setError("")
-                })
-                .catch(error => {
-                    toast("Error", {
-                        description: error.response.data.errors[0].msg,
-                    })
-                });
+            const response = await registerUser(userForm);
+            toast("Successfull", {
+                description: "Success creating an account!",
+            });
+            setError("");
         } catch (error) {
-            console.error('Login failed:', error)
-            setError(error.message)
+            if (error.response && error.response.data && error.response.data.message) {
+                toast("Error", {
+                    description: error.response.data.message,
+                });
+                console.error('Registration failed:', error.response.data.message);
+            } else {
+                toast("Error", {
+                    description: "An unexpected error occurred",
+                });
+                console.error('Registration failed:', error.message);
+            }
+            setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -133,8 +153,8 @@ function LoginAdmin() {
     return (
         <Tabs defaultValue="account" className="w-[400px]">
             <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="account">Admin</TabsTrigger>
-                <TabsTrigger value="password">Employee</TabsTrigger>
+                <TabsTrigger value="account">Sign In</TabsTrigger>
+                <TabsTrigger value="password">Sign Up</TabsTrigger>
             </TabsList>
             <TabsContent value="account">
                 <Card>
@@ -155,22 +175,40 @@ function LoginAdmin() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button onClick={login}>Login</Button>
+                        <Button disable={loading} onClick={login}>
+                            {loading ? <LoaderCircle className="animate-spin" /> : 'Login'}
+                        </Button>
                     </CardFooter>
                 </Card>
             </TabsContent>
             <TabsContent value="password">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Login</CardTitle>
+                        <CardTitle>Register</CardTitle>
                         <CardDescription>
                             Enter your employee credentials
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <div className="space-y-1">
+                            <Label htmlFor="name">Full Name</Label>
+                            <Input type="name" required id="name" value={userForm.name} onChange={handleChange} name="name" placeholder="Enter full name" />
+                        </div>
+                        <div className="space-y-1">
                             <Label htmlFor="email">Email</Label>
                             <Input type="email" required id="email" value={userForm.email} onChange={handleChange} name="email" placeholder="a@gmail.com" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="phone">Phone Number</Label>
+                            <Input
+                                type="tel"
+                                required
+                                id="phone"
+                                value={userForm.phone}
+                                onChange={handleChange}
+                                name="phone"
+                                placeholder="Phone Number"
+                            />
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="password">Password</Label>
@@ -178,7 +216,9 @@ function LoginAdmin() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button onClick={loginEmployee}>Login</Button>
+                        <Button disable={loading} onClick={register}>
+                            {loading ? <LoaderCircle className="animate-spin" /> : 'Register'}
+                        </Button>
                     </CardFooter>
                 </Card>
             </TabsContent>

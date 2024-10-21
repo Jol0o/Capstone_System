@@ -23,11 +23,13 @@ import useAuth from '@/hooks/useAuth';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/hooks/useStore';
-import { removeEmployee, searchEmployee, sendEmailToEmployee } from '@/lib/api';
+import { removeEmployee, searchEmployee, sendEmailToEmployee, getEmployeeRequest, removeEmployeeRequest } from '@/lib/api';
 import Loader from '../Loader';
+import ApproveEmployee from '../modal/ApproveEmployee';
 
 function Employee({ setTab }) {
     const [data, setData] = useState([])
+    const [employeeData, setEmployeeData] = useState([])
     const [filterData, setFilteredData] = useState([])
     const [filter, setFilter] = useState(' ')
     const [page, setPage] = useState(1)
@@ -45,6 +47,17 @@ function Employee({ setTab }) {
             setIsloading(false)
         }
     }, [employee]);
+
+    useEffect(() => {
+        const fetchEmployee = async () => {
+            const res = await getEmployeeRequest(limit, page)
+            console.log('data', res)
+            if (res.status === 200) {
+                setEmployeeData(res.data.data)
+            }
+        }
+        fetchEmployee()
+    }, [])
 
     function formatDate(dateString) {
         const options = { year: "numeric", month: "long", day: "numeric" };
@@ -116,6 +129,10 @@ function Employee({ setTab }) {
         }
     };
 
+    const handleApprove = () => {
+
+    }
+
     if (isLoading) return <Loader />
 
     return (
@@ -159,13 +176,14 @@ function Employee({ setTab }) {
                                             className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                         {item.name}
                                     </TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{formatDate(item.salary_date)}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.department}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
-                                    <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.email}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.salary}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.day_off === 1 ? 'Off Duty' : 'On Duty'}</TableCell>
+                                    <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.day_off === 1 ? 'Off Duty' : 'On Duty'}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.basesalary}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.hierarchy}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.totalSalary}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="w-8 h-8 p-0">
@@ -214,6 +232,64 @@ function Employee({ setTab }) {
                     </TableBody>
                 </Table>}
             </div>
+            <div className="mt-5 border rounded-md">
+                {employeeData && employeeData.length ? <Table >
+                    <TableHeader>
+                        <TableRow>
+                            {Object.keys(employeeData[0]).map((key) => {
+                                if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id') {
+                                    // Replace all occurrences of "_" with a space
+                                    let formattedKey = key.replace(/_/g, ' ');
+                                    return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
+                                }
+                            })}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {
+                            employeeData.map(item =>
+                                <TableRow key={item.id}>
+                                    <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
+                                        {item.name}
+                                    </TableCell>
+                                    <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.email}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.status}</TableCell>
+                                    <TableCell className="max-w-[30px]"> <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="w-8 h-8 p-0">
+                                                <span className="sr-only">Open menu</span>
+                                                <MoreHorizontal className="w-4 h-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                            {item.status !== 'confirmed' &&  <ApproveEmployee data={item} />}
+                                            <DropdownMenuItem >
+                                                Reject
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => removeEmployeeRequest(item.id)}>
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu></TableCell>
+                                </TableRow>
+                            )
+                        }
+                    </TableBody>
+                </Table> : <Table>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell
+                                colSpan={data.length}
+                                className="h-24 text-center"
+                            >
+                                No results.
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>}
+            </div>
             {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
 
                 <div className="flex items-center gap-2">
@@ -226,6 +302,8 @@ function Employee({ setTab }) {
                     </Button>}
                 </div>
             </div>}
+
+
         </div>
     )
 }

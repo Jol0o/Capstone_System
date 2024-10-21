@@ -48,13 +48,12 @@ function Profile() {
         position: '',
         phone_number: '',
         qrcode: '',
-        salary: 0,
-        salary_date: ''
+        baseSalary: 0,
+        totalSalary: 0,
     })
     const [originalData, setOriginalData] = useState(null)
     const [image, setImage] = useState(null)
-    const [date, setDate] = useState(null)
-    const [isLoading , setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
     const userEmail = useStore(state => state.userEmail)
 
@@ -112,9 +111,9 @@ function Profile() {
     const handleSave = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-    
+
         let data = { ...userData };
-    
+
         if (userData.avatar && typeof userData.avatar !== 'string') {
             try {
                 const url = await uploadAvatar(userData.avatar);
@@ -130,10 +129,10 @@ function Profile() {
                 return;
             }
         }
-    
+
         for (let key of Object.keys(data)) {
             if (!data.avatar && key === 'avatar') continue;
-            if (key === 'day_off') continue;
+            if (key === 'day_off' || key === 'totalSalary') continue;
             if (!data[key]) {
                 toast("Error", {
                     description: `${key} is required`,
@@ -142,7 +141,7 @@ function Profile() {
                 return;
             }
         }
-    
+
         try {
             await editEmployeeData(data);
             toast("Successful", {
@@ -151,11 +150,10 @@ function Profile() {
             setOriginalData(data);
             setUserData(data);
             setImage(null);
-            setDate(null);
         } catch (error) {
             console.error(error);
             toast("Error", {
-                description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again." ,
+                description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again.",
             });
         } finally {
             setIsLoading(false);
@@ -171,22 +169,9 @@ function Profile() {
         return downloadURL;
     };
 
-    useEffect(() => {
-        if (date) {
-            const newDate = new Date(date.getTime());
-            newDate.setDate(newDate.getDate() + 1);
-            const dateOnly = newDate.toISOString().slice(0, 10);
-            setUserData(prevState => ({
-                ...prevState,
-                salary_date: dateOnly,
-            }))
-        }
-    }, [date])
-
     const handleDiscard = () => {
         setUserData(originalData)
         setImage(null)
-        setDate(null)
     }
 
     const handleChange = (e) => {
@@ -239,6 +224,10 @@ function Profile() {
                         </CardHeader>
                         <CardContent className="flex flex-col gap-3">
                             <div className="space-y-1">
+                                <Label htmlFor="employee_id">Employee ID</Label>
+                                <Input type="tet" required id="employee_id" value={userData?.employee_id} name="employee_id" readOnly />
+                            </div>
+                            <div className="space-y-1">
                                 <Label htmlFor="name">Username</Label>
                                 <Input type="tet" required id="name" value={userData?.name} name="name" onChange={handleChange} />
                             </div>
@@ -256,7 +245,7 @@ function Profile() {
                             </div>
                         </CardContent>
                     </Card>
-                                       <Card className="rounded-xl">
+                    <Card className="rounded-xl">
                         <CardHeader>
                             <CardTitle className="text-md">Employment Details</CardTitle>
                             <CardDescription>User Employment Information here</CardDescription>
@@ -272,38 +261,11 @@ function Profile() {
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="salary">Salary</Label>
-                                <Input type="text" id="salary" value={userData?.salary} name="salary" readOnly />
+                                <Input type="text" id="salary" value={userData?.baseSalary} name="salary" readOnly />
                             </div>
                             <div className="grid items-center grid-cols-1 gap-2">
-                                <Label htmlFor="date">Date</Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            id="date"
-                                            variant={"outline"}
-                                            className={cn(
-                                                " justify-start text-left font-normal",
-                                                !userData.salary_date && "text-muted-foreground"
-                                            )}
-                                            disabled
-                                        >
-                                            <CalendarIcon className="w-4 h-4 mr-2" />
-                                            {userData.salary_date ? format(userData.salary_date, "PPP") : <span>Pick a date</span>}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0">
-                                        <Calendar
-                                            mode="single"
-                                            selected={date}
-                                            onSelect={(date) => {
-                                                setDate(date);
-                                                console.log(date);
-                                            }}
-                                            initialFocus
-                                            disabled
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                                <Label htmlFor="Hierarchy">Hierarchy</Label>
+                                <Input type="text" id="Hierarchy" value={userData?.hierarchy} name="salary" readOnly />
                             </div>
                         </CardContent>
                     </Card>
@@ -337,13 +299,13 @@ function Profile() {
                             <Input className="hidden" id="avatar" type="file" accept="image/png, image/jpeg, image/jpg" onChange={handleImageChange} />
                         </CardContent>
                     </Card>
-                    <Card className="rounded-xl">
+                    <Card className="bg-white rounded-xl">
                         <CardHeader >
-                            <CardTitle className="text-md">QR Code</CardTitle>
-                            <CardDescription>User QR Code Here!</CardDescription>
+                            <CardTitle className="text-gray-700 text-md">QR Code</CardTitle>
+                            <CardDescription className="text-gray-700">User QR Code Here!</CardDescription>
                         </CardHeader>
                         <CardContent className="flex flex-col w-full">
-                            {userData?.qrcode && 
+                            {userData?.qrcode &&
                                 <a href={userData.qrcode} target="_blank" download>
                                     <Image
                                         src={userData.qrcode}

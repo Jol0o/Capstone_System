@@ -201,16 +201,17 @@ export const loginEmployeeApi = async (userForm) => {
     }
 };
 
-export const registerUserAdmin = async (userForm) => {
+export const registerUser = async (userForm) => {
     const response = await axiosInstance.post(`${API_URL}/api/auth/register`, {
         email: userForm.email,
         password: userForm.password,
-        user_id: userForm.user_id,
+        phone_number: userForm.phone,
+        name: userForm.name,
     });
     if (response.status === 200) {
         return response;
     } else {
-        return null;
+        return response;
     }
 };
 
@@ -300,3 +301,28 @@ export const searchLeaveRequest = cacheWrapper(async (search) => {
     const response = await axiosInstance.get(`${API_URL}/api/search_leave_request?q=${search}`);
     return response;
 });
+
+// employee requests route
+export const getEmployeeRequest = cacheWrapper(async (limit, page) => {
+    const response = await axiosInstance.get(`${API_URL}/api/employee-requests?page=${page}&limit=${limit}`);
+    return response;
+});
+
+export const approveEmployeeRequest = async (id, employee_id, department, position, baseSalary, qrcode , hierarchy) => {
+    try {
+        console.log(id, employee_id, department, position, baseSalary, hierarchy, qrcode)
+        const response = await axiosInstance.post(`${API_URL}/api/employee-requests/${id}/approve`, {
+            employee_id,
+            qrcode,
+            department,
+            position,
+            baseSalary,
+            hierarchy
+        });
+        console.log('Employee request approved:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error approving employee request:', error);
+        throw error;
+    }
+};

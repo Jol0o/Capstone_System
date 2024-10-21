@@ -1,4 +1,4 @@
-import { registerUserAdmin } from "@/lib/api";
+import { registerUser } from "@/lib/api";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -10,7 +10,7 @@ async function createUser({ email, password, id }) {
         user_id: id
     };
     try {
-        const response = await registerUserAdmin(userForm);
+        const response = await registerUser(userForm);
         toast("Successful", {
             description: "Success creating an account!",
         });

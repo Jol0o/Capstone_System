@@ -143,23 +143,23 @@ function LeaveRequest() {
                         <CardTitle className="text-md">Leave Request Form</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
-                        <div className="p-4 border border-gray-300">
+                        <div className="p-4 border border-gray-600">
                             <div className="p-2 mb-4 text-center bg-yellow-400">
                                 <h1 className="text-2xl font-bold">GASBEE POS</h1>
                                 <p className="text-sm">BEE GAS GANDA! • PRESYONG BODEGA!</p>
                             </div>
                             <h2 className="py-2 mb-4 text-xl font-bold text-center text-white bg-black">APPLICATION FOR LEAVE FORM</h2>
                             <form className="space-y-2">
-                                <div className="flex flex-wrap border border-gray-300">
-                                    <div className="flex-1 min-w-[50%] p-1 border-r border-b border-gray-300">
+                                <div className="flex flex-wrap border border-gray-600">
+                                    <div className="flex-1 min-w-[50%] p-1 border-r border-b border-gray-600">
                                         <Label htmlFor="name" className="text-xs font-bold">NAME:</Label>
                                         <Input type="text" id="name" className="h-6 p-0 text-sm border-none" required />
                                     </div>
-                                    <div className="flex-1 min-w-[50%] p-1 border-b border-gray-300">
+                                    <div className="flex-1 min-w-[50%] p-1 border-b border-gray-600">
                                         <Label htmlFor="date-filed" className="text-xs font-bold">DATE FILED:</Label>
                                         <Input type="date" id="date-filed" className="h-6 p-0 text-sm border-none" required />
                                     </div>
-                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
+                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
                                         <Label htmlFor="position" className="text-xs font-bold">POSITION:</Label>
                                         <Input type="text" id="position" className="h-6 p-0 text-sm border-none" required />
                                     </div>
@@ -169,12 +169,12 @@ function LeaveRequest() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-300">
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                <div className="flex flex-wrap border border-gray-600">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label htmlFor="inclusive-dates" className="text-xs font-bold">INCLUSIVE DATES</Label>
                                         <Input type="text" id="inclusive-dates" className="h-6 p-0 text-sm border-none" required />
                                     </div>
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label htmlFor="to-date" className="text-xs font-bold">TO:</Label>
                                         <Input type="text" id="to-date" className="h-6 p-0 text-sm border-none" required />
                                     </div>
@@ -184,22 +184,22 @@ function LeaveRequest() {
                                     </div>
                                 </div>
 
-                                <div className="p-1 border border-gray-300">
+                                <div className="p-1 border border-gray-600">
                                     <Label htmlFor="reason" className="text-xs font-bold">REASON:</Label>
                                     <Input type="text" id="reason" className="h-6 p-0 text-sm border-none" required />
                                 </div>
 
-                                <div className="p-1 border border-gray-300">
+                                <div className="p-1 border border-gray-600">
                                     <Label htmlFor="person-to-takeover" className="text-xs font-bold">PERSON TO HAND OVER THE TASK:</Label>
                                     <Input type="text" id="person-to-takeover" className="h-6 p-0 text-sm border-none" required />
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-300">
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                <div className="flex flex-wrap border border-gray-600">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label className="text-xs font-bold">Requested by:</Label>
                                         <Input type="text" className="h-6 p-0 text-sm border-none" />
                                     </div>
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label className="text-xs font-bold">Approved by:</Label>
                                         <Input type="text" className="h-6 p-0 text-sm border-none" readOnly />
                                     </div>
@@ -209,12 +209,12 @@ function LeaveRequest() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-300">
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                <div className="flex flex-wrap border border-gray-600">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label className="text-xs font-bold">Date:</Label>
                                         <Input type="date" className="h-6 p-0 text-sm border-none" />
                                     </div>
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label className="block mb-4 text-xs font-bold">DEPARTMENT HEAD</Label>
                                         <Label className="text-xs font-bold">Date:</Label>
                                         <Input type="date" className="h-6 p-0 text-sm border-none" readOnly />
@@ -226,7 +226,7 @@ function LeaveRequest() {
                                     </div>
                                 </div>
 
-                                <div className="border border-gray-300">
+                                <div className="border border-gray-600">
                                     <div className="p-1 text-xs font-bold text-center text-white bg-black">FOR HRD&apos;S USE</div>
                                     <div className="flex flex-wrap p-2">
                                         <div className="flex-1 min-w-[50%]">
@@ -251,23 +251,23 @@ function LeaveRequest() {
                                             <div className="space-y-1">
                                                 <div className="flex justify-between text-xs">
                                                     <span>Available leave credits</span>
-                                                    <Input type="text" className="w-16 h-6 p-0 border border-gray-300" readOnly />
+                                                    <Input type="text" className="w-16 h-6 p-0 border border-gray-600" readOnly />
                                                 </div>
                                                 <div className="flex justify-between text-xs">
                                                     <span>Less: Requested leave</span>
-                                                    <Input type="text" className="w-16 h-6 p-0 border border-gray-300" readOnly />
+                                                    <Input type="text" className="w-16 h-6 p-0 border border-gray-600" readOnly />
                                                 </div>
                                                 <div className="flex justify-between text-xs">
                                                     <span>Balance</span>
-                                                    <Input type="text" className="w-16 h-6 p-0 border border-gray-300" readOnly />
+                                                    <Input type="text" className="w-16 h-6 p-0 border border-gray-600" readOnly />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-300">
-                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
+                                <div className="flex flex-wrap border border-gray-600">
+                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
                                         <Label htmlFor="supporting-document" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
                                         <Input type="text" id="supporting-document" placeholder="Please specify" className="h-6 p-0 text-sm border-none" />
                                     </div>
@@ -277,8 +277,8 @@ function LeaveRequest() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-300">
-                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
+                                <div className="flex flex-wrap border border-gray-600">
+                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
                                         <Label className="text-xs font-bold">Date:</Label>
                                         <Input type="date" className="h-6 p-0 text-sm border-none" />
                                     </div>
@@ -289,7 +289,7 @@ function LeaveRequest() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between p-1 space-x-4 border border-gray-300">
+                                <div className="flex items-center justify-between p-1 space-x-4 border border-gray-600">
                                     <span className="text-xs font-bold">DISTRIBUTION COPY</span>
                                     <div className="flex items-center">
                                         <Checkbox id="employee-copy" className="mr-1" />

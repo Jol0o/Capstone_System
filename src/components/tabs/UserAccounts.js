@@ -33,8 +33,6 @@ function UserAccounts() {
     const [page, setPage] = useState(1)
     const limit = 15
     const { users, userTotal } = useEmployee(page, limit)
-    const { token } = useAuth()
-    const setUser = useStore(state => state.setUser)
 
     useEffect(() => {
         if (users) {
