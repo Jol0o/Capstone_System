@@ -1,51 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "../ui/select"
-import { format, isBefore, isEqual, startOfDay } from "date-fns"
-import { Calendar as CalendarIcon, Divide, LoaderCircle } from "lucide-react"
-import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
 import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
+import { Checkbox } from '../ui/checkbox';
 import useAuth from '@/hooks/useAuth';
 import { toast } from "sonner"
-import { getEmployeebyEmail, getEmployeeById, leaveRequest, userRequests } from '@/lib/api';
+import { getEmployeeById, leaveRequest, userRequests } from '@/lib/api';
 import { Badge } from "@/components/ui/badge"
-import SubmitDialog from '../modal/SubmitDialog';
-import { Checkbox } from '../ui/checkbox';
-
 
 function LeaveRequest() {
     const { user } = useAuth()
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
+        dateFiled: '',
+        position: '',
+        department: '',
+        inclusiveDates: '',
+        toDate: '',
+        daysRequested: '',
+        reason: '',
+        personToTakeover: '',
+        requestedBy: '',
+        date: '',
+        supportingDocument: '',
+        distributionCopy: { employeeCopy: false, file201: false },
         leaveType: '',
-        startDate: '',
-        endDate: '',
-        reason: ''
     });
+
     const [isLoading, setIsloading] = useState(false)
     const [data, setData] = useState([])
     const [request, setRequest] = useState(false)
@@ -95,7 +83,7 @@ function LeaveRequest() {
         fetchUser()
     }, [user])
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async () => {
         try {
             setIsloading(true)
             for (let key of Object.keys(formData)) {
@@ -126,6 +114,10 @@ function LeaveRequest() {
         }
     };
 
+    useEffect(() => {
+        console.log(formData)
+    }, [formData])
+
     return (
         <div className="w-full min-h-screen">
             <div className="max-w-[1000px] m-auto flex flex-col gap-5">
@@ -153,76 +145,76 @@ function LeaveRequest() {
                                 <div className="flex flex-wrap border border-gray-600">
                                     <div className="flex-1 min-w-[50%] p-1 border-r border-b border-gray-600">
                                         <Label htmlFor="name" className="text-xs font-bold">NAME:</Label>
-                                        <Input type="text" id="name" className="h-6 p-0 text-sm border-none" required />
+                                        <Input type="text" id="name" className="h-6 p-0 text-sm border-none" name='name' value={formData.name} onChange={handleChange} required />
                                     </div>
-                                    <div className="flex-1 min-w-[50%] p-1 border-b border-gray-600">
-                                        <Label htmlFor="date-filed" className="text-xs font-bold">DATE FILED:</Label>
-                                        <Input type="date" id="date-filed" className="h-6 p-0 text-sm border-none" required />
+                                    <div className="flex-1 min-w-[50%] p-1 border-b border-gray-300">
+                                        <Label htmlFor="dateFiled" className="text-xs font-bold">DATE FILED:</Label>
+                                        <Input type="date" id="dateFiled" className="h-6 p-0 text-sm border-none" name='dateFiled' value={formData.dateFiled} onChange={handleChange} required />
                                     </div>
                                     <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
                                         <Label htmlFor="position" className="text-xs font-bold">POSITION:</Label>
-                                        <Input type="text" id="position" className="h-6 p-0 text-sm border-none" required />
+                                        <Input type="text" id="position" className="h-6 p-0 text-sm border-none" name='position' value={formData.position} onChange={handleChange} required />
                                     </div>
                                     <div className="flex-1 min-w-[50%] p-1">
                                         <Label htmlFor="department" className="text-xs font-bold">DEPARTMENT:</Label>
-                                        <Input type="text" id="department" className="h-6 p-0 text-sm border-none" required />
+                                        <Input type="text" id="department" className="h-6 p-0 text-sm border-none" name='department' value={formData.department} onChange={handleChange} required />
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-600">
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
-                                        <Label htmlFor="inclusive-dates" className="text-xs font-bold">INCLUSIVE DATES</Label>
-                                        <Input type="text" id="inclusive-dates" className="h-6 p-0 text-sm border-none" required />
+                                <div className="flex flex-wrap border border-gray-300">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                        <Label htmlFor="inclusiveDates" className="text-xs font-bold">INCLUSIVE DATES</Label>
+                                        <Input type="text" id="inclusiveDates" className="h-6 p-0 text-sm border-none" name='inclusiveDates' value={formData.inclusiveDates} onChange={handleChange} required />
                                     </div>
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
-                                        <Label htmlFor="to-date" className="text-xs font-bold">TO:</Label>
-                                        <Input type="text" id="to-date" className="h-6 p-0 text-sm border-none" required />
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                        <Label htmlFor="toDate" className="text-xs font-bold">TO:</Label>
+                                        <Input type="text" id="toDate" className="h-6 p-0 text-sm border-none" name='toDate' value={formData.toDate} onChange={handleChange} required />
                                     </div>
                                     <div className="flex-1 min-w-[33%] p-1">
-                                        <Label htmlFor="days-requested" className="text-xs font-bold">No. of Days Requested:</Label>
-                                        <Input type="number" id="days-requested" className="h-6 p-0 text-sm border-none" required />
+                                        <Label htmlFor="daysRequested" className="text-xs font-bold">No. of Days Requested:</Label>
+                                        <Input type="number" id="daysRequested" className="h-6 p-0 text-sm border-none" name='daysRequested' value={formData.daysRequested} onChange={handleChange} required />
                                     </div>
                                 </div>
 
                                 <div className="p-1 border border-gray-600">
                                     <Label htmlFor="reason" className="text-xs font-bold">REASON:</Label>
-                                    <Input type="text" id="reason" className="h-6 p-0 text-sm border-none" required />
+                                    <Input type="text" id="reason" className="h-6 p-0 text-sm border-none" name='reason' value={formData.reason} onChange={handleChange} required />
                                 </div>
 
-                                <div className="p-1 border border-gray-600">
-                                    <Label htmlFor="person-to-takeover" className="text-xs font-bold">PERSON TO HAND OVER THE TASK:</Label>
-                                    <Input type="text" id="person-to-takeover" className="h-6 p-0 text-sm border-none" required />
+                                <div className="p-1 border border-gray-300">
+                                    <Label htmlFor="personToTakeover" className="text-xs font-bold">PERSON TO HAND OVER THE TASK:</Label>
+                                    <Input type="text" id="personToTakeover" className="h-6 p-0 text-sm border-none" name='personToTakeover' value={formData.personToTakeover} onChange={handleChange} required />
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-600">
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
-                                        <Label className="text-xs font-bold">Requested by:</Label>
-                                        <Input type="text" className="h-6 p-0 text-sm border-none" />
+                                <div className="flex flex-wrap border border-gray-300">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                        <Label htmlFor="requestedBy" className="text-xs font-bold">Requested by:</Label>
+                                        <Input type="text" id="requestedBy" className="h-6 p-0 text-sm border-none" name='requestedBy' value={formData.requestedBy} onChange={handleChange} />
                                     </div>
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
-                                        <Label className="text-xs font-bold">Approved by:</Label>
-                                        <Input type="text" className="h-6 p-0 text-sm border-none" readOnly />
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                        <Label htmlFor="approvedBy" className="text-xs font-bold">Approved by:</Label>
+                                        <Input type="text" id="approvedBy" className="h-6 p-0 text-sm border-none" name='approvedBy' value={formData.approvedBy} onChange={handleChange} readOnly />
                                     </div>
                                     <div className="flex-1 min-w-[33%] p-1">
-                                        <Label className="text-xs font-bold">Received by:</Label>
-                                        <Input type="text" className="h-6 p-0 text-sm border-none" readOnly />
+                                        <Label htmlFor="receivedBy" className="text-xs font-bold">Received by:</Label>
+                                        <Input type="text" id="receivedBy" className="h-6 p-0 text-sm border-none" name='receivedBy' value={formData.receivedBy} onChange={handleChange} readOnly />
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-600">
-                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
-                                        <Label className="text-xs font-bold">Date:</Label>
-                                        <Input type="date" className="h-6 p-0 text-sm border-none" />
+                                <div className="flex flex-wrap border border-gray-300">
+                                    <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
+                                        <Label htmlFor="date" className="text-xs font-bold">Date:</Label>
+                                        <Input type="date" id="date" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} />
                                     </div>
                                     <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label className="block mb-4 text-xs font-bold">DEPARTMENT HEAD</Label>
-                                        <Label className="text-xs font-bold">Date:</Label>
-                                        <Input type="date" className="h-6 p-0 text-sm border-none" readOnly />
+                                        <Label htmlFor="departmentHeadDate" className="text-xs font-bold">Date:</Label>
+                                        <Input type="date" id="departmentHeadDate" className="h-6 p-0 text-sm border-none" name='departmentHeadDate' value={formData.departmentHeadDate} onChange={handleChange} readOnly />
                                     </div>
                                     <div className="flex-1 min-w-[33%] p-1">
                                         <Label className="block mb-4 text-xs font-bold">HR DEPARTMENT</Label>
-                                        <Label className="text-xs font-bold">Date:</Label>
-                                        <Input type="date" className="h-6 p-0 text-sm border-none" readOnly />
+                                        <Label htmlFor="hrDepartmentDate" className="text-xs font-bold">Date:</Label>
+                                        <Input type="date" id="hrDepartmentDate" className="h-6 p-0 text-sm border-none" name='hrDepartmentDate' value={formData.hrDepartmentDate} onChange={handleChange} readOnly />
                                     </div>
                                 </div>
 
@@ -233,18 +225,25 @@ function LeaveRequest() {
                                             <div className="mb-1 text-xs font-bold">TYPE OF LEAVE APPLIED FOR</div>
                                             {['Vacation Leave', 'Sick Leave', 'Emergency Leave', 'Maternity Leave', 'Paternity Leave', 'Solo Parent Act/Leave', 'Others:'].map((type) => (
                                                 <div key={type} className="flex items-center">
-                                                    <Checkbox id={type.replace(/\s+/g, '-').toLowerCase()} className="mr-1" />
+                                                    <input
+                                                        type="radio"
+                                                        id={type.replace(/\s+/g, '-').toLowerCase()}
+                                                        name="leaveType"
+                                                        value={type}
+                                                        className="mr-1"
+                                                        onChange={handleChange}
+                                                    />
                                                     <Label htmlFor={type.replace(/\s+/g, '-').toLowerCase()} className="text-xs">{type}</Label>
                                                 </div>
                                             ))}
                                         </div>
                                         <div className="flex-1 min-w-[50%]">
                                             <div className="flex items-center mb-1">
-                                                <Checkbox id="with-pay" className="mr-1" />
+                                                <Checkbox id="with-pay" disabled className="mr-1" />
                                                 <Label htmlFor="with-pay" className="text-xs">With Pay</Label>
                                             </div>
                                             <div className="flex items-center mb-1">
-                                                <Checkbox id="without-pay" className="mr-1" />
+                                                <Checkbox id="without-pay" disabled className="mr-1" />
                                                 <Label htmlFor="without-pay" className="text-xs">Without Pay</Label>
                                             </div>
                                             <div className="mt-2 mb-1 text-xs font-bold">DETAILS OF LEAVE MONITORING</div>
@@ -266,26 +265,25 @@ function LeaveRequest() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-600">
-                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
-                                        <Label htmlFor="supporting-document" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
-                                        <Input type="text" id="supporting-document" placeholder="Please specify" className="h-6 p-0 text-sm border-none" />
+                                <div className="flex flex-wrap border border-gray-300">
+                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
+                                        <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
+                                        <Input type="text" id="supportingDocument" placeholder="Please specify" className="h-6 p-0 text-sm border-none" name='supportingDocument' value={formData.supportingDocument} onChange={handleChange} />
                                     </div>
                                     <div className="flex-1 min-w-[50%] p-1">
-                                        <Label className="text-xs font-bold">Recorded by:</Label>
-                                        <Input type="text" className="h-6 p-0 text-sm border-none" readOnly />
+                                        <Label htmlFor="recordedBy" className="text-xs font-bold">Recorded by:</Label>
+                                        <Input type="text" id="recordedBy" className="h-6 p-0 text-sm border-none" readOnly />
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap border border-gray-600">
-                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
-                                        <Label className="text-xs font-bold">Date:</Label>
-                                        <Input type="date" className="h-6 p-0 text-sm border-none" />
+                                <div className="flex flex-wrap border border-gray-300">
+                                    <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
+                                        <Label htmlFor="date" className="text-xs font-bold">Date:</Label>
+                                        <Input type="date" id="date" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} />
                                     </div>
                                     <div className="flex-1 min-w-[50%] p-1">
                                         <Label className="block mb-4 text-xs font-bold">HRD</Label>
-                                        <Label className="text-xs font-bold">Date:</Label>
-                                        <Input type="date" className="h-6 p-0 text-sm border-none" readOnly />
+                                        <Label htmlFor="hrDepartmentDate" className="text-xs font-bold">Date:</Label>
                                     </div>
                                 </div>
 
