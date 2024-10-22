@@ -308,7 +308,7 @@ export const getEmployeeRequest = cacheWrapper(async (limit, page) => {
     return response;
 });
 
-export const approveEmployeeRequest = async (id, employee_id, department, position, baseSalary, qrcode , hierarchy) => {
+export const approveEmployeeRequest = async (id, employee_id, department, position, baseSalary, qrcode, hierarchy) => {
     try {
         console.log(id, employee_id, department, position, baseSalary, hierarchy, qrcode)
         const response = await axiosInstance.post(`${API_URL}/api/employee-requests/${id}/approve`, {
@@ -326,3 +326,12 @@ export const approveEmployeeRequest = async (id, employee_id, department, positi
         throw error;
     }
 };
+
+export const removeEmployeeRequest = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`${API_URL}/api/employee-requests/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.message;
+    }
+}

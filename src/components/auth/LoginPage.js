@@ -103,24 +103,24 @@ export default function LoginPage() {
     }
   };
 
-  useEffect(() => {
-    let timer;
-    if (user && result) {
-      timer = setTimeout(() => {
-        // Reset user and result here
-        setUser(null);
-        setResult(null);
-        window.location.reload()
-      }, 5000); // 5000 milliseconds = 5 seconds
-    }
+  // useEffect(() => {
+  //   let timer;
+  //   if (user && result) {
+  //     timer = setTimeout(() => {
+  //       // Reset user and result here
+  //       setUser(null);
+  //       setResult(null);
+  //       window.location.reload()
+  //     }, 5000); // 5000 milliseconds = 5 seconds
+  //   }
 
-    // Cleanup function
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [user, result]);
+  //   // Cleanup function
+  //   return () => {
+  //     if (timer) {
+  //       clearTimeout(timer);
+  //     }
+  //   };
+  // }, [user, result]);
 
   return (
     <div className="grid w-full min-h-screen grid-cols-1 ">

@@ -59,7 +59,6 @@ function UserForm({ id, setIsDialogOpen, data }) {
         if (data) {
             setUserForm({ ...userForm, ...data, employee_id: uuidv4() })
         }
-
     }, [data])
 
     console.log(userForm)
@@ -138,6 +137,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 phone_number: '',
                 baseSalary: 0,
                 hierarchy: 'employee',
+                employee_id: ''
             });
             setIsDialogOpen(false);
         } catch (error) {
@@ -147,7 +147,6 @@ function UserForm({ id, setIsDialogOpen, data }) {
             });
         } finally {
             setIsLoading(false);
-
         }
     };
 
@@ -180,7 +179,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 userForm.department,
                 userForm.position,
                 userForm.baseSalary,
-                updatedForm.qrcode, // Ensure qrcode is passed correctly
+                updatedForm.qrcode,
                 userForm.hierarchy
             );
             toast("Successful", {
@@ -188,10 +187,24 @@ function UserForm({ id, setIsDialogOpen, data }) {
             });
             console.log('Approval successful:', response);
             setIsDialogOpen(false);
+            setUserForm({
+                name: '',
+                email: '',
+                password: '',
+                salary_date: '',
+                department: '',
+                position: '',
+                qrcode: '',
+                phone_number: '',
+                baseSalary: 0,
+                hierarchy: 'employee',
+                employee_id: ''
+            });
+            setQrcode("");
         } catch (error) {
             console.error('Approval failed:', error);
             toast("Error", {
-                description: "Failed to approve employee request. Please try again.",
+                description: error?.response?.data?.message || error?.message || "Failed to approve employee request. Please try again.",
             });
         } finally {
             setIsLoading(false);
@@ -229,7 +242,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
 
 
     const uploadFile = async (file) => {
-        const storageRef = ref(storage, `qrCode/${userForm.name}.png`);
+        const storageRef = ref(storage, `qrCode/${userForm.employee_id}.png`);
         const uploadTaskSnapshot = await uploadBytesResumable(storageRef, file);
         const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
         setQrcode(downloadURL);

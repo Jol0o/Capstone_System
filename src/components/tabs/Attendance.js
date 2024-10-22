@@ -136,6 +136,7 @@ function Attendance() {
                             <TableHead className="capitalize">Date</TableHead>
                             <TableHead className="capitalize">Time In</TableHead>
                             <TableHead className="capitalize">Time Out</TableHead>
+                            <TableHead className="capitalize">Total Hours</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -151,6 +152,7 @@ function Attendance() {
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.time_in}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.time_out}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.hours}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="w-8 h-8 p-0">
