@@ -18,10 +18,10 @@ import {
 } from "@/components/ui/tabs"
 import useAuth from "@/hooks/useAuth"
 import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUser } from "@/lib/api"
-import { LoaderCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 
 function LoginAdmin() {
     const [userForm, setUserForm] = useState({
@@ -34,6 +34,11 @@ function LoginAdmin() {
     const [loading, setLoading] = useState(false)
     const { auth, user } = useAuth();
     const router = useRouter()
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
 
     if (auth) return router.push('/dashboard');
@@ -157,7 +162,7 @@ function LoginAdmin() {
                 <TabsTrigger value="password">Sign Up</TabsTrigger>
             </TabsList>
             <TabsContent value="account">
-                <Card>
+                <Card className="max-w-sm mx-auto">
                     <CardHeader>
                         <CardTitle>Login</CardTitle>
                         <CardDescription>
@@ -212,7 +217,24 @@ function LoginAdmin() {
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="password">Password</Label>
-                            <Input type="password" required id="password" value={userForm.password} onChange={handleChange} name="password" placeholder="password" />
+                            <div className="relative">
+                                <Input
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    id="password"
+                                    value={userForm.password}
+                                    onChange={handleChange}
+                                    name="password"
+                                    placeholder="Password"
+                                />
+                                <Button
+                                    type="button"
+                                    onClick={togglePasswordVisibility}
+                                    className="absolute inset-y-0 right-0 flex items-center px-2"
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
                     <CardFooter>
