@@ -12,57 +12,94 @@ import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import useAuth from '@/hooks/useAuth';
 import { toast } from "sonner"
-import { getEmployeeById, leaveRequest, userRequests } from '@/lib/api';
+import { getEmployeeById, submitRequest, userRequests } from '@/lib/api';
 import { Badge } from "@/components/ui/badge"
+import { LoaderCircle } from 'lucide-react';
+import { io } from 'socket.io-client';
+import { format, parseISO } from 'date-fns';
+import generate from '../pdf_template/generatePDF';
+
+const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
+const socket = io(`${API_URL}`);
 
 function LeaveRequest() {
     const { user } = useAuth()
     const [formData, setFormData] = useState({
         name: '',
-        dateFiled: '',
         position: '',
         department: '',
         inclusiveDates: '',
         toDate: '',
         daysRequested: '',
         reason: '',
+        date: '',
         personToTakeover: '',
         requestedBy: '',
-        date: '',
         supportingDocument: '',
         distributionCopy: { employeeCopy: false, file201: false },
         leaveType: '',
     });
 
     const [isLoading, setIsloading] = useState(false)
+    const [loadGenerate, setLoadGenerate] = useState(false)
     const [data, setData] = useState([])
     const [request, setRequest] = useState(false)
 
-    useEffect(() => {
-        const getRequests = async () => {
-            try {
-                const res = await userRequests()
-                if (res) {
-                    console.log(res.data.data)
-                    setData(res.data.data)
-                    if (res.data.data.length === 0) {
-                        setRequest(true)
-                    }
+    const getRequests = async () => {
+        try {
+            const res = await userRequests()
+            if (res) {
+                console.log(res.data.data)
+                setData(res.data.data)
+                if (res.data.data.length === 0) {
+                    setRequest(true)
                 }
-            } catch (e) {
-                console.log(e)
             }
+        } catch (e) {
+            console.log(e)
         }
+    }
 
+    useEffect(() => {
         getRequests()
     }, [])
 
+    useEffect(() => {
+        // Listen for real-time updates
+        socket.on('leaveRequestUpdate', (update) => {
+            console.log('Update received:', update);
+            getRequests()
+        });
+
+        // Cleanup on unmount
+        return () => {
+            socket.off('leaveRequestUpdate');
+        };
+    }, []);
+
+    const calculateDaysRequested = (startDate, endDate) => {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        return diffDays;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
+        let updatedFormData = {
             ...formData,
             [name]: value
-        });
+        };
+
+        if (name === 'inclusiveDates' || name === 'toDate') {
+            const { inclusiveDates, toDate } = updatedFormData;
+            if (inclusiveDates && toDate) {
+                updatedFormData.daysRequested = calculateDaysRequested(inclusiveDates, toDate);
+            }
+        }
+
+        setFormData(updatedFormData);
     };
 
     useEffect(() => {
@@ -70,10 +107,9 @@ function LeaveRequest() {
         const fetchUser = async () => {
             try {
                 const res = await getEmployeeById(user.user_id);
-                console.log(res)
                 if (res) {
                     if (res.data.length > 0) {
-                        setFormData({ ...formData, name: res.data[0].name, email: user?.email })
+                        setFormData({ ...formData, name: res.data[0].name, email: user?.email, position: res.data[0].position, department: res.data[0].department, requestedBy: res.data[0].name })
                     }
                 }
             } catch (e) {
@@ -83,7 +119,8 @@ function LeaveRequest() {
         fetchUser()
     }, [user])
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
             setIsloading(true)
             for (let key of Object.keys(formData)) {
@@ -91,25 +128,39 @@ function LeaveRequest() {
                     toast("Error", {
                         description: `${key} is required`,
                     });
+                    setIsloading(false)
                     return;
                 }
             }
 
-            const res = await leaveRequest(formData)
+            const res = await submitRequest(formData)
             if (res) {
-                console.log(isLoading)
+                toast("Success", {
+                    description: res.data.message,
+                })
                 setIsloading(false)
                 setFormData({
                     name: '',
-                    email: '',
+                    position: '',
+                    department: '',
+                    inclusiveDates: '',
+                    toDate: '',
+                    daysRequested: '',
+                    reason: '',
+                    date: '',
+                    personToTakeover: '',
+                    requestedBy: '',
+                    supportingDocument: '',
+                    distributionCopy: { employeeCopy: false, file201: false },
                     leaveType: '',
-                    startDate: '',
-                    endDate: '',
-                    reason: ''
                 })
             }
+            setIsloading(false)
         } catch (e) {
             console.log(e)
+            toast("Error", {
+                description: e?.response?.data.message || e.message || 'An error occured please try again.',
+            })
             setIsloading(false)
         }
     };
@@ -117,6 +168,23 @@ function LeaveRequest() {
     useEffect(() => {
         console.log(formData)
     }, [formData])
+
+    const handleGenerate = async (data) => {
+        setLoadGenerate(true)
+        try {
+            const link = await generate({ data });
+            if (link) {
+                window.open(link, '_blank');
+                setLoadGenerate(false)
+                toast("Success", {
+                    description: 'PDF Generated Successfully!',
+                })
+            }
+        } catch (e) {
+            console.log(e)
+            setLoadGenerate(false)
+        }
+    }
 
     return (
         <div className="w-full min-h-screen">
@@ -141,7 +209,7 @@ function LeaveRequest() {
                                 <p className="text-sm">BEE GAS GANDA! • PRESYONG BODEGA!</p>
                             </div>
                             <h2 className="py-2 mb-4 text-xl font-bold text-center text-white bg-black">APPLICATION FOR LEAVE FORM</h2>
-                            <form className="space-y-2">
+                            <form className="space-y-2" onSubmit={handleSubmit}>
                                 <div className="flex flex-wrap border border-gray-600">
                                     <div className="flex-1 min-w-[50%] p-1 border-r border-b border-gray-600">
                                         <Label htmlFor="name" className="text-xs font-bold">NAME:</Label>
@@ -149,7 +217,7 @@ function LeaveRequest() {
                                     </div>
                                     <div className="flex-1 min-w-[50%] p-1 border-b border-gray-300">
                                         <Label htmlFor="dateFiled" className="text-xs font-bold">DATE FILED:</Label>
-                                        <Input type="date" id="dateFiled" className="h-6 p-0 text-sm border-none" name='dateFiled' value={formData.dateFiled} onChange={handleChange} required />
+                                        <Input type="date" id="dateFiled" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} required />
                                     </div>
                                     <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
                                         <Label htmlFor="position" className="text-xs font-bold">POSITION:</Label>
@@ -164,15 +232,24 @@ function LeaveRequest() {
                                 <div className="flex flex-wrap border border-gray-300">
                                     <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
                                         <Label htmlFor="inclusiveDates" className="text-xs font-bold">INCLUSIVE DATES</Label>
-                                        <Input type="text" id="inclusiveDates" className="h-6 p-0 text-sm border-none" name='inclusiveDates' value={formData.inclusiveDates} onChange={handleChange} required />
+                                        <Input
+                                            type="date"
+                                            id="inclusiveDates"
+                                            className="h-6 p-0 text-sm border-none"
+                                            name='inclusiveDates'
+                                            value={formData.inclusiveDates}
+                                            onChange={handleChange}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            required
+                                        />
                                     </div>
                                     <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
                                         <Label htmlFor="toDate" className="text-xs font-bold">TO:</Label>
-                                        <Input type="text" id="toDate" className="h-6 p-0 text-sm border-none" name='toDate' value={formData.toDate} onChange={handleChange} required />
+                                        <Input type="date" id="toDate" className="h-6 p-0 text-sm border-none" name='toDate' value={formData.toDate} onChange={handleChange} required min={formData.inclusiveDates} />
                                     </div>
                                     <div className="flex-1 min-w-[33%] p-1">
                                         <Label htmlFor="daysRequested" className="text-xs font-bold">No. of Days Requested:</Label>
-                                        <Input type="number" id="daysRequested" className="h-6 p-0 text-sm border-none" name='daysRequested' value={formData.daysRequested} onChange={handleChange} required />
+                                        <Input type="number" id="daysRequested" className="h-6 p-0 text-sm border-none" name='daysRequested' value={formData.daysRequested} onChange={handleChange} required readOnly />
                                     </div>
                                 </div>
 
@@ -209,12 +286,12 @@ function LeaveRequest() {
                                     <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                         <Label className="block mb-4 text-xs font-bold">DEPARTMENT HEAD</Label>
                                         <Label htmlFor="departmentHeadDate" className="text-xs font-bold">Date:</Label>
-                                        <Input type="date" id="departmentHeadDate" className="h-6 p-0 text-sm border-none" name='departmentHeadDate' value={formData.departmentHeadDate} onChange={handleChange} readOnly />
+
                                     </div>
                                     <div className="flex-1 min-w-[33%] p-1">
                                         <Label className="block mb-4 text-xs font-bold">HR DEPARTMENT</Label>
                                         <Label htmlFor="hrDepartmentDate" className="text-xs font-bold">Date:</Label>
-                                        <Input type="date" id="hrDepartmentDate" className="h-6 p-0 text-sm border-none" name='hrDepartmentDate' value={formData.hrDepartmentDate} onChange={handleChange} readOnly />
+
                                     </div>
                                 </div>
 
@@ -268,7 +345,7 @@ function LeaveRequest() {
                                 <div className="flex flex-wrap border border-gray-300">
                                     <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
                                         <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
-                                        <Input type="text" id="supportingDocument" placeholder="Please specify" className="h-6 p-0 text-sm border-none" name='supportingDocument' value={formData.supportingDocument} onChange={handleChange} />
+                                        <Input type="text" id="supportingDocument" placeholder="Please specify" className="h-6 p-0 text-sm border-none" name='supportingDocument' value={formData.supportingDocument} onChange={handleChange} required />
                                     </div>
                                     <div className="flex-1 min-w-[50%] p-1">
                                         <Label htmlFor="recordedBy" className="text-xs font-bold">Recorded by:</Label>
@@ -298,6 +375,9 @@ function LeaveRequest() {
                                         <Label htmlFor="201-file" className="text-xs">201 file</Label>
                                     </div>
                                 </div>
+                                <Button disabled={isLoading}>
+                                    {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
+                                </Button>
                             </form>
                         </div>
                     </CardContent>
@@ -307,15 +387,18 @@ function LeaveRequest() {
                         <CardHeader>
                             <CardTitle className="flex justify-between capitalize text-md">
                                 Leave Type: {item.leave_type}
-                                <Badge>{item.status}</Badge>
+                                <div className="flex items-center gap-2">
+                                    <Badge>{item.status}</Badge>
+                                    {item.status === 'Pending' && <Button size="sm" disabled={loadGenerate} variant="outline" onClick={() => handleGenerate(item)} className="flex items-center h-7">{loadGenerate ? <LoaderCircle className="animate-spin" /> : 'Generate'}</Button>}
+                                </div>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-3">
-                            <p>{item.reason}</p>
-                            <CardDescription className="flex justify-between">
-                                <p>Start Date: {format(new Date(item.start_date), "PPP")}</p>
-                                <p>End Date: {format(new Date(item.end_date), "PPP")}</p>
-                            </CardDescription>
+                            <div className="flex justify-between">
+                                <div>Reason: {item.reason}</div>
+                                <div>Start Date: {format(parseISO(item.inclusive_dates), "PPP")}</div>
+                                <div>End Date: {format(parseISO(item.to_date), "PPP")}</div>
+                            </div>
                         </CardContent>
                     </Card>
                 ))}

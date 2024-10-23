@@ -95,11 +95,6 @@ function Attendance() {
         }
     }
 
-    const handleGenerate = async () => {
-        const link = await generate();
-        console.log(link);
-        window.open(link, '_blank');
-    }
 
     const handleExcelDownload = (data) => {
         const ws = XLSX.utils.json_to_sheet(data);
@@ -119,7 +114,6 @@ function Attendance() {
                     className="max-w-sm"
                 />
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleGenerate} className="flex items-center gap-2">Genarate</Button>
                     <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
                         <FileDown className="h-3.5 w-3.5" />
                         Export
