@@ -241,7 +241,7 @@ export const logoutUser = async () => {
 };
 
 // leave request route
-export const leaveRequest = async (data) => {
+export const submitRequest = async (data) => {
     const response = await axiosInstance.post(`${API_URL}/api/leave_request`, data);
     return response;
 };

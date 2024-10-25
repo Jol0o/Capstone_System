@@ -141,7 +141,7 @@ function Employee({ setTab }) {
                         <FileDown className="h-3.5 w-3.5" />
                         Export
                     </Button>
-                    <AddEmployee />
+                    {/* <AddEmployee /> */}
                 </div>
 
             </div>
