@@ -33,8 +33,9 @@ function Employee({ setTab }) {
     const [filterData, setFilteredData] = useState([])
     const [filter, setFilter] = useState(' ')
     const [page, setPage] = useState(1)
+    const [employeePage, setEmployeePage] = useState(1)
     const limit = 15
-    const { employee, totalPages } = useEmployee(page, limit)
+    const { employee, totalPages, requests, employeeTotal } = useEmployee(page, limit, employeePage)
     const { token } = useAuth()
     const setUser = useStore(state => state.setUser)
     const [isLoading, setIsloading] = useState(false)
@@ -45,26 +46,10 @@ function Employee({ setTab }) {
             setData(employee);
             setFilteredData(employee)
             setIsloading(false)
+            setEmployeeData(requests)
         }
-    }, [employee]);
+    }, [employee, requests]);
 
-    useEffect(() => {
-        const fetchEmployee = async () => {
-            try {
-                const res = await getEmployeeRequest(limit, page);
-                if (res.status === 200) {
-                    console.log(res.data)
-                    setEmployeeData(res.data.data);
-                } else {
-                    console.error('Failed to fetch employee data:', res.status, res.statusText);
-                }
-            } catch (error) {
-                console.error('Error fetching employee data:', error);
-            }
-        };
-
-        fetchEmployee();
-    }, [limit, page]);
 
     function formatDate(dateString) {
         const options = { year: "numeric", month: "long", day: "numeric" };
@@ -238,6 +223,18 @@ function Employee({ setTab }) {
                     </TableBody>
                 </Table>}
             </div>
+            {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
+
+                <div className="flex items-center gap-2">
+                    {totalPages !== '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
+                        <ChevronLeft className="w-4 h-4" />
+                    </Button>}
+                    <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
+                    {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
+                        <ChevronRight className="w-4 h-4" />
+                    </Button>}
+                </div>
+            </div>}
             <div className="mt-5 border rounded-md">
                 {employeeData && employeeData.length ? <Table >
                     <TableHeader>
@@ -296,20 +293,17 @@ function Employee({ setTab }) {
                     </TableBody>
                 </Table>}
             </div>
-            {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-
+            {employeeData.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
                 <div className="flex items-center gap-2">
-                    {totalPages === '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
+                    {employeeTotal !== '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={() => setEmployeePage(prevPage => Math.max(prevPage - 1, 1))}>
                         <ChevronLeft className="w-4 h-4" />
                     </Button>}
-                    <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
-                    {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
+                    <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{employeePage}</p>
+                    {employeeTotal !== employeePage && <Button variant="ghost" className="w-8 h-8 p-0" onClick={() => setEmployeePage(prevPage => prevPage + 1)}>
                         <ChevronRight className="w-4 h-4" />
                     </Button>}
                 </div>
             </div>}
-
-
         </div>
     )
 }

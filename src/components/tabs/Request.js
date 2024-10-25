@@ -140,7 +140,7 @@ function Request() {
                                         {item.name}s
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.created_at)}</TableCell>
-                                    <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item.start_date)} / {formatDate(item.end_date)}</TableCell>
+                                    <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item.inclusive_dates)} / {formatDate(item.to_date)}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.leave_type}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.status}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
