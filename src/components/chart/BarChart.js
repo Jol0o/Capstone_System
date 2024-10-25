@@ -21,10 +21,10 @@ export const description = "A bar chart with a label"
 
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "Employees",
     color: "hsl(var(--chart-1))",
   },
-} 
+}
 
 export function BarChartComponent({ data }) {
   const chartData = data?.map((item) => ({

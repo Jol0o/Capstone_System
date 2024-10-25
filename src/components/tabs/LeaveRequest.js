@@ -177,7 +177,7 @@ function LeaveRequest() {
                 window.open(link, '_blank');
                 setLoadGenerate(false)
                 toast("Success", {
-                    description: 'PDF Generated Successfully!',
+                    description: 'PDF Generated Successfully!', link,
                 })
             }
         } catch (e) {

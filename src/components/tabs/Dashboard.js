@@ -7,7 +7,9 @@ import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, BarElement } from 'chart.js';
 import { LineChart } from '../chart/LinceChart';
 import { BarChartComponent } from '../chart/BarChart';
-import { Card } from '../ui/card';
+import { Card, CardTitle, CardContent, CardHeader } from '../ui/card';
+import { ScrollArea } from '../ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, BarElement);
 
@@ -17,58 +19,8 @@ function Dashboard() {
   const formattedTime = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const date = time.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
+  console.log(off)
 
-  const options = {
-    plugins: {
-      tooltip: {
-        enabled: true,
-        callbacks: {
-          title: function (context) {
-            return 'Title: ' + context[0].label;
-          },
-          label: function (context) {
-            return 'Value: ' + context.parsed.y;
-          }
-        }
-      }
-    },
-    scales: {
-      yAxes: [
-        {
-          ticks: {
-            beginAtZero: true,
-          },
-        },
-      ],
-    },
-  };
-
-  const dataYearly = {
-    labels: yearly && yearly.map((item) => item.month),
-    datasets: [
-      {
-        label: 'My First dataset',
-        fill: false,
-        lineTension: 0.1,
-        backgroundColor: 'rgba(75,192,192,0.4)',
-        borderColor: 'rgba(75,192,192,1)',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
-        pointBorderColor: 'rgba(75,192,192,1)',
-        pointBackgroundColor: '#fff',
-        pointBorderWidth: 1,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        pointHoverBorderColor: 'rgba(220,220,220,1)',
-        pointHoverBorderWidth: 2,
-        pointRadius: 1,
-        pointHitRadius: 10,
-        data: yearly && yearly.map((item) => item.attendance_count)
-      }
-    ]
-  };
   return (
     <div className="w-full h-full overflow-hidden">
       <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -184,8 +136,30 @@ function Dashboard() {
         </div>
       </div>
       <div className="grid w-full grid-cols-1 gap-5 mt-5 lg:grid-cols-2">
-           <LineChart data={monthly}/>
-           <BarChartComponent data={yearly}/>
+        <LineChart data={monthly} />
+        <BarChartComponent data={yearly} />
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Absent Today</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-4">
+                {absents?.absentToday.map((name, index) => (
+                  <div key={index} className="flex items-center space-x-4">
+                    <Avatar>
+                      <AvatarFallback>{name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium leading-none">{name}</p>
+                      <p className="text-sm text-muted-foreground">Absent</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
