@@ -174,19 +174,16 @@ function Payroll() {
                 </Table>}
             </div>
             {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {filterData.length} of{" "}
-                    {data.length} row(s) selected.
-                </div>
-                {data.length > limit && <div className="flex items-center gap-2">
+
+                <div className="flex items-center gap-2">
                     <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
                         <ChevronLeft className="w-4 h-4" />
                     </Button>
                     <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
-                    <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
+                    {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
                         <ChevronRight className="w-4 h-4" />
-                    </Button>
-                </div>}
+                    </Button>}
+                </div>
             </div>}
         </div>
     )
