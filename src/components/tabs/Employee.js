@@ -150,7 +150,7 @@ function Employee({ setTab }) {
                     <TableHeader>
                         <TableRow>
                             {Object.keys(filterData[0]).map((key) => {
-                                if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id' && key !== 'totalSalary') {
+                                if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id') {
                                     // Replace all occurrences of "_" with a space
                                     let formattedKey = key.replace(/_/g, ' ');
                                     return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
@@ -173,6 +173,7 @@ function Employee({ setTab }) {
                                     <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
                                     <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.baseSalary}</TableCell>
+                                    <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.totalSalary}</TableCell>
                                     <TableCell className=" whitespace-nowrap">{item.hierarchy}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.day_off === 0 ? 'On Duty' : "Off Duty"}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
@@ -195,7 +196,6 @@ function Employee({ setTab }) {
                                             }}>
                                                 View
                                             </DropdownMenuItem>
-                                            <EditEmployee id={item.id} />
                                             <DropdownMenuItem onClick={() => handleEmail(item)}>
                                                 Send Email
                                             </DropdownMenuItem>

@@ -253,19 +253,47 @@ function Profile() {
                         <CardContent className="flex flex-col gap-3">
                             <div className="space-y-1">
                                 <Label htmlFor="position">Position / Job Title</Label>
-                                <Input type="text" id="position" value={userData?.position} name="position" readOnly />
+                                <Input
+                                    type="text"
+                                    id="position"
+                                    value={userData?.position}
+                                    name="position"
+                                    onChange={handleChange}
+                                    disabled={user?.status === 'user' ? true : false}
+                                />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="department">Department</Label>
-                                <Input type="text" id="department" value={userData?.department} name="department" readOnly />
+                                <Input
+                                    type="text"
+                                    id="department"
+                                    value={userData?.department}
+                                    name="department"
+                                    onChange={handleChange}
+                                    disabled={user?.status === 'user' ? true : false}
+                                />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="salary">Salary</Label>
-                                <Input type="text" id="salary" value={userData?.baseSalary} name="salary" readOnly />
+                                <Input
+                                    type="text"
+                                    id="salary"
+                                    value={userData?.baseSalary}
+                                    name="baseSalary"
+                                    onChange={handleChange}
+                                    disabled={user?.status === 'user' ? true : false}
+                                />
                             </div>
                             <div className="grid items-center grid-cols-1 gap-2">
-                                <Label htmlFor="Hierarchy">Hierarchy</Label>
-                                <Input type="text" id="Hierarchy" value={userData?.hierarchy} name="salary" readOnly />
+                                <Label htmlFor="hierarchy">Hierarchy</Label>
+                                <Input
+                                    type="text"
+                                    id="hierarchy"
+                                    value={userData?.hierarchy}
+                                    name="hierarchy"
+                                    onChange={handleChange}
+                                    disabled={user?.status === 'user' ? true : false}
+                                />
                             </div>
                         </CardContent>
                     </Card>

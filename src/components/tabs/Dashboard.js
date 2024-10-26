@@ -138,7 +138,7 @@ function Dashboard() {
       <div className="grid w-full grid-cols-1 gap-5 mt-5 lg:grid-cols-2">
         <LineChart data={monthly} />
         <BarChartComponent data={yearly} />
-        <Card className="md:col-span-2">
+        {absents?.absentToday.length > 0 && <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Absent Today</CardTitle>
           </CardHeader>
@@ -159,7 +159,7 @@ function Dashboard() {
               </div>
             </ScrollArea>
           </CardContent>
-        </Card>
+        </Card>}
       </div>
     </div>
   )
