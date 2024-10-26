@@ -27,6 +27,7 @@ function Payroll() {
     const [page, setPage] = useState(1)
     const [filter, setFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [totalPages, setTotalPages] = useState(0)
     const limit = 15
 
     function formatDate(dateString) {
@@ -53,8 +54,9 @@ function Payroll() {
         const fetchpayroll = async () => {
             const response = await getPayrolls(page, limit)
             if (response) {
-                console.table('Payroll', response.data.data)
+                console.table('Payroll', response.data)
                 setData(response.data.data)
+                setTotalPages(response.data.totalPages)
                 setFilteredData(response.data.data)
                 setIsLoading(false)
             }
