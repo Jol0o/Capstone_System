@@ -172,7 +172,7 @@ function Page() {
                                 <DialogTitle>Create New Admin Account</DialogTitle>
                                 <DialogDescription>Fill in the details for the new admin account.</DialogDescription>
                             </DialogHeader>
-                            <AdminAccountForm userForm={userForm} handleChange={handleChange} submit={registerAdmin} />
+                            <AdminAccountForm userForm={userForm} handleChange={handleChange} setUserForm={setUserForm}  submit={registerAdmin} />
                         </DialogContent>
                     </Dialog>
                 </CardFooter>
@@ -195,7 +195,9 @@ function Page() {
 function AdminAccountForm({ account = {}, handleChange, userForm, submit, setUserForm }) {
 
     useEffect(() => {
-        setUserForm({ ...userForm, email: account.email, password: account.password })
+        if(account && account.email && account.password){
+            setUserForm({ ...userForm, email: account.email, password: account.password })
+        }
     }, [account])
 
     return (
