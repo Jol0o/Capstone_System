@@ -432,32 +432,33 @@ export default function Page() {
 
                         </BreadcrumbList>
                     </Breadcrumb>
-                    
+
                     <div className="flex items-center justify-center gap-4">
-                    <ModeToggle />
-                    {user.status === 'admin' && <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="overflow-hidden rounded-full"
-                            >
-                                <Image
-                                    src="https://res.cloudinary.com/dkibnftac/image/upload/v1696743505/wp8137478_ei7mcp.jpg"
-                                    width={36}
-                                    height={36}
-                                    alt="Avatar"
+                        <ModeToggle />
+                        {user.status === 'admin' && <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
                                     className="overflow-hidden rounded-full"
-                                />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    
-                    }</div>
+                                >
+                                    <Image
+                                        src="https://res.cloudinary.com/dkibnftac/image/upload/v1696743505/wp8137478_ei7mcp.jpg"
+                                        width={36}
+                                        height={36}
+                                        alt="Avatar"
+                                        className="overflow-hidden rounded-full"
+                                    />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => router.push('/settings')}>Settings</DropdownMenuItem>
+                                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        }</div>
                 </header>
                 <main className="p-5">
                     {renderComponent()}

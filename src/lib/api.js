@@ -335,3 +335,32 @@ export const removeEmployeeRequest = async (id) => {
         throw error.message;
     }
 }
+
+//admin function
+export const getAdmins = cacheWrapper(async (limit, page) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/admins?page=${page}&limit=${limit}`);
+        return response;
+    } catch (error) {
+        console.error('Error fetching admins:', error);
+        throw error; // Re-throw the error to be handled by the calling function
+    }
+});
+
+export const updateAdmin = async (id, data) => {
+    try {
+        const response = await axiosInstance.put(`${API_URL}/api/admin/${id}`, data);
+        return response;
+    } catch (e) {
+        throw e;
+    }
+};
+
+export const removeAdmin = async (id) => {
+    try {
+        const res = await axiosInstance.delete(`${API_URL}/api/admin/${id}`);
+        return res
+    } catch (e) {
+        throw e;
+    }
+}

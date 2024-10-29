@@ -176,11 +176,28 @@ function LoginAdmin() {
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="password">Password</Label>
-                            <Input type="password" required id="password" value={userForm.password} onChange={handleChange} name="password" placeholder="password" />
+                            <div className="relative">
+                                <Input
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    id="password"
+                                    value={userForm.password}
+                                    onChange={handleChange}
+                                    name="password"
+                                    placeholder="Password"
+                                />
+                                <Button
+                                    type="button"
+                                    onClick={togglePasswordVisibility}
+                                    className="absolute inset-y-0 right-0 flex items-center px-2"
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button disable={loading} onClick={login}>
+                        <Button disabled={loading} onClick={login}>
                             {loading ? <LoaderCircle className="animate-spin" /> : 'Login'}
                         </Button>
                     </CardFooter>
@@ -238,7 +255,7 @@ function LoginAdmin() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button disable={loading} onClick={register}>
+                        <Button disabled={loading} onClick={register}>
                             {loading ? <LoaderCircle className="animate-spin" /> : 'Register'}
                         </Button>
                     </CardFooter>
