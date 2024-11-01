@@ -29,8 +29,9 @@ import { toast } from "sonner"
 import QRCode from "qrcode.react"
 import { useRouter } from "next/navigation"
 import { useStore } from '@/hooks/useStore';
-import { editEmployeeData, getEmployeebyEmail, getEmployeeById, logoutUser } from "@/lib/api"
+import { editEmployeeData, getEmployeebyEmail, getEmployeeById, getUserAttendance, logoutUser } from "@/lib/api"
 import io from 'socket.io-client';
+import EmployeeAttendance from "../chart/Attendance-Chart"
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
@@ -58,6 +59,7 @@ function Profile() {
     const userEmail = useStore(state => state.userEmail)
 
 
+
     const fetchUser = useCallback(async () => {
         const id = userEmail ? userEmail : user?.user_id;
         try {
@@ -65,7 +67,6 @@ function Profile() {
                 const response = await getEmployeeById(id);
                 if (response.data) {
                     const userData = response.data[0];
-                    console.log(userData);
                     setUserData(userData);
                     setOriginalData(userData);
                 }
@@ -103,10 +104,6 @@ function Profile() {
             setUserData({ ...userData, avatar: "" });
         }
     };
-
-    useEffect(() => {
-        console.log(userData);
-    }, [userData])
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -202,153 +199,157 @@ function Profile() {
 
 
     return (
-        <div className="grid items-start max-w-[1000px] m-auto flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-            <div className="flex items-center justify-between">
-                <h1 className="flex-1 text-xl font-semibold tracking-tight shrink-0 whitespace-nowrap sm:grow-0">
-                    Profile
-                </h1>
+        <>
+            <div className="grid items-start max-w-[1000px] m-auto flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+                <div className="flex items-center justify-between">
+                    <h1 className="flex-1 text-xl font-semibold tracking-tight shrink-0 whitespace-nowrap sm:grow-0">
+                        Profile
+                    </h1>
 
-                <div className="flex gap-2">
-                    <Button onClick={handleDiscard} className="rounded-lg" variant="outline" size="sm"> Discard </Button>
-                    <Button onClick={handleSave} className="rounded-lg" size="sm">     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Save'} </Button>
+                    <div className="flex gap-2">
+                        <Button onClick={handleDiscard} className="rounded-lg" variant="outline" size="sm"> Discard </Button>
+                        <Button onClick={handleSave} className="rounded-lg" size="sm">     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Save'} </Button>
+                    </div>
                 </div>
-            </div>
 
 
-            <div className="grid md:grid-cols-3 gap-7">
-                <div className="flex flex-col gap-7 md:col-span-2">
-                    <Card className="rounded-xl">
-                        <CardHeader>
-                            <CardTitle className="text-md">User Details</CardTitle>
-                            <CardDescription> User credentials here.  </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col gap-3">
-                            <div className="space-y-1">
-                                <Label htmlFor="employee_id">Employee ID</Label>
-                                <Input type="tet" required id="employee_id" value={userData?.employee_id} name="employee_id" readOnly />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="name">Username</Label>
-                                <Input type="tet" required id="name" value={userData?.name} name="name" onChange={handleChange} />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="email">Email</Label>
-                                <Input type="email" required id="email" value={userData?.email} name="email" onChange={handleChange} />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="phone_number">phone_number</Label>
-                                <Input type="number" required id="phone_number" value={userData?.phone_number} name="phone_number" onChange={handleChange} />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="password">Password</Label>
-                                <Input type="password" placeholder="*******" required id="password" value={userData?.password} name="password" onChange={handleChange} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="rounded-xl">
-                        <CardHeader>
-                            <CardTitle className="text-md">Employment Details</CardTitle>
-                            <CardDescription>User Employment Information here</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col gap-3">
-                            <div className="space-y-1">
-                                <Label htmlFor="position">Position / Job Title</Label>
-                                <Input
-                                    type="text"
-                                    id="position"
-                                    value={userData?.position}
-                                    name="position"
-                                    onChange={handleChange}
-                                    disabled={user?.status === 'user' ? true : false}
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="department">Department</Label>
-                                <Input
-                                    type="text"
-                                    id="department"
-                                    value={userData?.department}
-                                    name="department"
-                                    onChange={handleChange}
-                                    disabled={user?.status === 'user' ? true : false}
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="salary">Salary</Label>
-                                <Input
-                                    type="text"
-                                    id="salary"
-                                    value={userData?.baseSalary}
-                                    name="baseSalary"
-                                    onChange={handleChange}
-                                    disabled={user?.status === 'user' ? true : false}
-                                />
-                            </div>
-                            <div className="grid items-center grid-cols-1 gap-2">
-                                <Label htmlFor="hierarchy">Hierarchy</Label>
-                                <Input
-                                    type="text"
-                                    id="hierarchy"
-                                    value={userData?.hierarchy}
-                                    name="hierarchy"
-                                    onChange={handleChange}
-                                    disabled={user?.status === 'user' ? true : false}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-                <div className="flex flex-col gap-7">
-                    <Card className="rounded-xl">
-                        <CardHeader >
-                            <CardTitle className="text-md">User Profile Picture</CardTitle>
-                            <CardDescription>User Profile Picture Here!</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col w-full">
-                            {userData.avatar || image ?
-                                <>
+                <div className="grid md:grid-cols-3 gap-7">
+                    <div className="flex flex-col gap-7 md:col-span-2">
+                        <Card className="rounded-xl">
+                            <CardHeader>
+                                <CardTitle className="text-md">User Details</CardTitle>
+                                <CardDescription> User credentials here.  </CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex flex-col gap-3">
+                                <div className="space-y-1">
+                                    <Label htmlFor="employee_id">Employee ID</Label>
+                                    <Input type="tet" required id="employee_id" value={userData?.employee_id} name="employee_id" readOnly />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="name">Username</Label>
+                                    <Input type="tet" required id="name" value={userData?.name} name="name" onChange={handleChange} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input type="email" required id="email" value={userData?.email} name="email" onChange={handleChange} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="phone_number">phone_number</Label>
+                                    <Input type="number" required id="phone_number" value={userData?.phone_number} name="phone_number" onChange={handleChange} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input type="password" placeholder="*******" required id="password" value={userData?.password} name="password" onChange={handleChange} />
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className="rounded-xl">
+                            <CardHeader>
+                                <CardTitle className="text-md">Employment Details</CardTitle>
+                                <CardDescription>User Employment Information here</CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex flex-col gap-3">
+                                <div className="space-y-1">
+                                    <Label htmlFor="position">Position / Job Title</Label>
+                                    <Input
+                                        type="text"
+                                        id="position"
+                                        value={userData?.position}
+                                        name="position"
+                                        onChange={handleChange}
+                                        disabled={user?.status === 'user' ? true : false}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="department">Department</Label>
+                                    <Input
+                                        type="text"
+                                        id="department"
+                                        value={userData?.department}
+                                        name="department"
+                                        onChange={handleChange}
+                                        disabled={user?.status === 'user' ? true : false}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="salary">Salary</Label>
+                                    <Input
+                                        type="text"
+                                        id="salary"
+                                        value={userData?.baseSalary}
+                                        name="baseSalary"
+                                        onChange={handleChange}
+                                        disabled={user?.status === 'user' ? true : false}
+                                    />
+                                </div>
+                                <div className="grid items-center grid-cols-1 gap-2">
+                                    <Label htmlFor="hierarchy">Hierarchy</Label>
+                                    <Input
+                                        type="text"
+                                        id="hierarchy"
+                                        value={userData?.hierarchy}
+                                        name="hierarchy"
+                                        onChange={handleChange}
+                                        disabled={user?.status === 'user' ? true : false}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <div className="flex flex-col gap-7">
+                        <Card className="rounded-xl">
+                            <CardHeader >
+                                <CardTitle className="text-md">User Profile Picture</CardTitle>
+                                <CardDescription>User Profile Picture Here!</CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex flex-col w-full">
+                                {userData.avatar || image ?
+                                    <>
+                                        <Label htmlFor="avatar">
+                                            <Image
+                                                src={image ? image : userData.avatar}
+                                                width={300}
+                                                height={500}
+                                                alt="Avatar"
+                                                className="self-center max-h-[320px] overflow-hidden object-cover rounded-lg"
+                                            />
+                                            <div className="flex items-center justify-center w-full p-3 mt-2 border rounded-md hover:bg-muted"> Change Profile </div>
+                                        </Label>
+                                    </> :
                                     <Label htmlFor="avatar">
+                                        <div className=" flex items-center justify-center h-[230px] w-full max-w-[500px] rounded-md border border-dashed">
+                                            <p className="text-xs font-normal text-gray-400 capitalize">Click here to upload image!</p>
+                                        </div>
+                                    </Label>
+                                }
+                                <Input className="hidden" id="avatar" type="file" accept="image/png, image/jpeg, image/jpg" onChange={handleImageChange} />
+                            </CardContent>
+                        </Card>
+                        <Card className="bg-white rounded-xl">
+                            <CardHeader >
+                                <CardTitle className="text-gray-700 text-md">QR Code</CardTitle>
+                                <CardDescription className="text-gray-700">User QR Code Here!</CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex flex-col w-full">
+                                {userData?.qrcode &&
+                                    <a href={userData.qrcode} target="_blank" download>
                                         <Image
-                                            src={image ? image : userData.avatar}
-                                            width={300}
+                                            src={userData.qrcode}
+                                            width={500}
                                             height={500}
                                             alt="Avatar"
-                                            className="self-center max-h-[320px] overflow-hidden object-cover rounded-lg"
+                                            className="self-center max-h-[230px] overflow-hidden object-fit rounded-lg"
                                         />
-                                        <div className="flex items-center justify-center w-full p-3 mt-2 border rounded-md hover:bg-muted"> Change Profile </div>
-                                    </Label>
-                                </> :
-                                <Label htmlFor="avatar">
-                                    <div className=" flex items-center justify-center h-[230px] w-full max-w-[500px] rounded-md border border-dashed">
-                                        <p className="text-xs font-normal text-gray-400 capitalize">Click here to upload image!</p>
-                                    </div>
-                                </Label>
-                            }
-                            <Input className="hidden" id="avatar" type="file" accept="image/png, image/jpeg, image/jpg" onChange={handleImageChange} />
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-white rounded-xl">
-                        <CardHeader >
-                            <CardTitle className="text-gray-700 text-md">QR Code</CardTitle>
-                            <CardDescription className="text-gray-700">User QR Code Here!</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col w-full">
-                            {userData?.qrcode &&
-                                <a href={userData.qrcode} target="_blank" download>
-                                    <Image
-                                        src={userData.qrcode}
-                                        width={500}
-                                        height={500}
-                                        alt="Avatar"
-                                        className="self-center max-h-[230px] overflow-hidden object-fit rounded-lg"
-                                    />
-                                </a>}
-                        </CardContent>
-                    </Card>
+                                    </a>}
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
+
+                {user?.status === 'user' && <Button variant="ghost" onClick={logout} className="text-xs font-medium text-red-400">Log out</Button>}
             </div>
-            {user?.status === 'user' && <Button variant="ghost" onClick={logout} className="text-xs font-medium text-red-400">Log out</Button>}
-        </div>
+            <EmployeeAttendance id={userData?.employee_id} />
+        </>
     )
 }
 

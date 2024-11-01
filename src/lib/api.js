@@ -66,6 +66,16 @@ export const getAttendance = cacheWrapper(async (page, limit) => {
     }
 });
 
+export const getUserAttendance = cacheWrapper(async (id) => {
+    const response = await axiosInstance.get(`${API_URL}/api/user-attendance/${id}`);
+    console.log(response)
+    if (response.status === 200) {
+        return response;
+    } else {
+        return null;
+    }
+})
+
 export const removeAttendance = async (id) => {
     await axiosInstance.delete(`${API_URL}/api/attendance/${id}`);
 };
