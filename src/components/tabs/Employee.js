@@ -26,6 +26,8 @@ import { useStore } from '@/hooks/useStore';
 import { removeEmployee, searchEmployee, sendEmailToEmployee, getEmployeeRequest, removeEmployeeRequest } from '@/lib/api';
 import Loader from '../Loader';
 import ApproveEmployee from '../modal/ApproveEmployee';
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 function Employee({ setTab }) {
     const [data, setData] = useState([])
@@ -39,6 +41,8 @@ function Employee({ setTab }) {
     const { token } = useAuth()
     const setUser = useStore(state => state.setUser)
     const [isLoading, setIsloading] = useState(false)
+    const [selectedData, setSelectedData] = useState(null)
+    const [open, setOpen] = useState(false)
 
     useEffect(() => {
         setIsloading(true)
@@ -121,190 +125,232 @@ function Employee({ setTab }) {
         }
     };
 
-    const handleApprove = () => {
+    const InfoRow = ({ label, value }) => (
+        <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
+            <div className="text-sm font-medium text-gray-400">{label}</div>
+            <div className="col-span-2 text-sm text-white">{value}</div>
+        </div>
+    )
 
-    }
 
     if (isLoading) return <Loader />
 
     return (
-        <div className="w-full">
-            <div className="flex items-center justify-between py-4">
-                <Input
-                    placeholder="Filter Employee Name..."
-                    onChange={(event) => setFilter(event.target.value)}
-                    className="max-w-sm"
-                />
-                <div className="flex gap-3">
+        <>
+            <div className="w-full">
+                <div className="flex items-center justify-between py-4">
+                    <Input
+                        placeholder="Filter Employee Name..."
+                        onChange={(event) => setFilter(event.target.value)}
+                        className="max-w-sm"
+                    />
+                    <div className="flex gap-3">
 
-                    <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" size="sm" className="gap-1 h-7">
-                        <FileDown className="h-3.5 w-3.5" />
-                        Export
-                    </Button>
-                    {/* <AddEmployee /> */}
-                </div>
+                        <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" size="sm" className="gap-1 h-7">
+                            <FileDown className="h-3.5 w-3.5" />
+                            Export
+                        </Button>
+                        {/* <AddEmployee /> */}
+                    </div>
 
-            </div>
-            <div className="border rounded-md">
-                {filterData && filterData.length ? <Table >
-                    <TableHeader>
-                        <TableRow>
-                            {Object.keys(filterData[0]).map((key) => {
-                                if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id') {
-                                    // Replace all occurrences of "_" with a space
-                                    let formattedKey = key.replace(/_/g, ' ');
-                                    return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
-                                }
-                            })}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {
-                            filterData.map(item =>
-                                <TableRow key={item.id}>
-                                    <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
-                                        {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
-                                            height={36}
-                                            className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
-                                        {item.name}
-                                    </TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.department}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
-                                    <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.baseSalary}</TableCell>
-                                    <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.totalSalary}</TableCell>
-                                    <TableCell className=" whitespace-nowrap">{item.hierarchy}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.day_off === 0 ? 'On Duty' : "Off Duty"}</TableCell>
-                                    <TableCell className="max-w-[30px]"> <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="w-8 h-8 p-0">
-                                                <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="w-4 h-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem
-                                                onClick={() => navigator.clipboard.writeText(item.employee_id)}
-                                            >
-                                                Copy Candidate ID
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => {
-                                                setTab("profile")
-                                                setUser(item.employee_id)
-                                            }}>
-                                                View
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleEmail(item)}>
-                                                Send Email
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => deleteEmployee(item.employee_id)}
-                                            >
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu></TableCell>
-                                </TableRow>
-                            )
-                        }
-                    </TableBody>
-                </Table> : <Table>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell
-                                colSpan={data.length}
-                                className="h-24 text-center"
-                            >
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>}
-            </div>
-            {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
+                </div>
+                <div className="border rounded-md">
+                    <h1 className="p-5">Employee Table</h1>
+                    {filterData && filterData.length ? <Table >
+                        <TableHeader>
+                            <TableRow>
+                                {Object.keys(filterData[0]).map((key) => {
+                                    if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id' && key !== 'monthSalary') {
+                                        // Replace all occurrences of "_" with a space
+                                        let formattedKey = key.replace(/_/g, ' ');
+                                        return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
+                                    }
+                                })}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {
+                                filterData.map(item =>
+                                    <TableRow key={item.id}>
+                                        <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
+                                            {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
+                                                height={36}
+                                                className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
+                                            {item.name}
+                                        </TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.department}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
+                                        <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.baseSalary}</TableCell>
+                                        <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.totalSalary}</TableCell>
+                                        <TableCell className=" whitespace-nowrap">{item.hierarchy}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.day_off === 0 ? 'On Duty' : "Off Duty"}</TableCell>
+                                        <TableCell className="max-w-[30px]"> <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="w-8 h-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="w-4 h-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuItem
+                                                    onClick={() => navigator.clipboard.writeText(item.employee_id)}
+                                                >
+                                                    Copy Candidate ID
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => {
+                                                    setTab("profile")
+                                                    setUser(item.employee_id)
+                                                }}>
+                                                    View
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleEmail(item)}>
+                                                    Send Email
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => deleteEmployee(item.employee_id)}
+                                                >
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu></TableCell>
+                                    </TableRow>
+                                )
+                            }
+                        </TableBody>
+                    </Table> : <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell
+                                    colSpan={data.length}
+                                    className="h-24 text-center"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>}
+                </div>
+                {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
 
-                <div className="flex items-center gap-2">
-                    {totalPages !== '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
-                        <ChevronLeft className="w-4 h-4" />
-                    </Button>}
-                    <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
-                    {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
-                        <ChevronRight className="w-4 h-4" />
-                    </Button>}
+                    <div className="flex items-center gap-2">
+                        {totalPages !== '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
+                            <ChevronLeft className="w-4 h-4" />
+                        </Button>}
+                        <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
+                        {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
+                            <ChevronRight className="w-4 h-4" />
+                        </Button>}
+                    </div>
+                </div>}
+                <div className="mt-5 border rounded-md">
+                    <h1 className="p-5">Employee Request Table</h1>
+                    {employeeData && employeeData.length ? <Table >
+                        <TableHeader>
+                            <TableRow>
+                                {Object.keys(employeeData[0]).map((key) => {
+                                    if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id') {
+                                        // Replace all occurrences of "_" with a space
+                                        let formattedKey = key.replace(/_/g, ' ');
+                                        return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
+                                    }
+                                })}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {
+                                employeeData.map(item =>
+                                    <TableRow key={item.id}>
+                                        <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
+                                            {item.name}
+                                        </TableCell>
+                                        <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.email}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.status}</TableCell>
+                                        <TableCell className="max-w-[30px]"> <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="w-8 h-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="w-4 h-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <ApproveEmployee data={item} />
+                                                <DropdownMenuItem onClick={() => {
+                                                    setSelectedData(item)
+                                                    setOpen(true)
+                                                }}>View</DropdownMenuItem>
+                                                <DropdownMenuItem >
+                                                    Reject
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => removeEmployeeRequest(item.id)}>
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu></TableCell>
+                                    </TableRow>
+                                )
+                            }
+                        </TableBody>
+                    </Table> : <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell
+                                    colSpan={data.length}
+                                    className="h-24 text-center"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>}
                 </div>
-            </div>}
-            <div className="mt-5 border rounded-md">
-                {employeeData && employeeData.length ? <Table >
-                    <TableHeader>
-                        <TableRow>
-                            {Object.keys(employeeData[0]).map((key) => {
-                                if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id') {
-                                    // Replace all occurrences of "_" with a space
-                                    let formattedKey = key.replace(/_/g, ' ');
-                                    return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
-                                }
-                            })}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {
-                            employeeData.map(item =>
-                                <TableRow key={item.id}>
-                                    <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
-                                        {item.name}
-                                    </TableCell>
-                                    <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.email}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.status}</TableCell>
-                                    <TableCell className="max-w-[30px]"> <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="w-8 h-8 p-0">
-                                                <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="w-4 h-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <ApproveEmployee data={item} />
-                                            <DropdownMenuItem >
-                                                Reject
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => removeEmployeeRequest(item.id)}>
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu></TableCell>
-                                </TableRow>
-                            )
-                        }
-                    </TableBody>
-                </Table> : <Table>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell
-                                colSpan={data.length}
-                                className="h-24 text-center"
-                            >
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>}
+                {employeeData.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
+                    <div className="flex items-center gap-2">
+                        {employeeTotal !== '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={() => setEmployeePage(prevPage => Math.max(prevPage - 1, 1))}>
+                            <ChevronLeft className="w-4 h-4" />
+                        </Button>}
+                        <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{employeePage}</p>
+                        {employeeTotal !== employeePage && <Button variant="ghost" className="w-8 h-8 p-0" onClick={() => setEmployeePage(prevPage => prevPage + 1)}>
+                            <ChevronRight className="w-4 h-4" />
+                        </Button>}
+                    </div>
+                </div>}
             </div>
-            {employeeData.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-                <div className="flex items-center gap-2">
-                    {employeeTotal !== '1' && <Button variant="ghost" className="w-8 h-8 p-0" onClick={() => setEmployeePage(prevPage => Math.max(prevPage - 1, 1))}>
-                        <ChevronLeft className="w-4 h-4" />
-                    </Button>}
-                    <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{employeePage}</p>
-                    {employeeTotal !== employeePage && <Button variant="ghost" className="w-8 h-8 p-0" onClick={() => setEmployeePage(prevPage => prevPage + 1)}>
-                        <ChevronRight className="w-4 h-4" />
-                    </Button>}
-                </div>
-            </div>}
-        </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="max-w-2xl bg-black border-gray-800">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-semibold text-white">Employee Request Details</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="max-h-[80vh] pr-4">
+                        <div className="space-y-0">
+                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
+                                <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
+                                <InfoRow label="Name" value={selectedData?.name} />
+                                <InfoRow label="Email" value={selectedData?.email} />
+                                <InfoRow label="Phone Number" value={selectedData?.phone_number} />
+                                <InfoRow
+                                    label="Status"
+                                    value={
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium
+                      ${selectedData?.status === 'approved' ? 'bg-green-500/20 text-green-500' :
+                                                selectedData?.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' :
+                                                    'bg-red-500/20 text-red-500'}`}
+                                        >
+                                            {selectedData?.status}
+                                        </span>
+                                    }
+                                />
+                            </div>
+
+                        </div>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
+        </>
     )
 }
 

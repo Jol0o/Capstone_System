@@ -18,6 +18,7 @@ import { LoaderCircle } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { format, parseISO } from 'date-fns';
 import generate from '../pdf_template/generatePDF';
+import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
@@ -44,6 +45,7 @@ function LeaveRequest() {
     const [loadGenerate, setLoadGenerate] = useState(false)
     const [data, setData] = useState([])
     const [request, setRequest] = useState(false)
+    const [link, setLink] = useState('')
 
     const getRequests = async () => {
         try {
@@ -154,6 +156,7 @@ function LeaveRequest() {
                     distributionCopy: { employeeCopy: false, file201: false },
                     leaveType: '',
                 })
+                setRequest(false)
             }
             setIsloading(false)
         } catch (e) {
@@ -177,8 +180,9 @@ function LeaveRequest() {
                 window.open(link, '_blank');
                 setLoadGenerate(false)
                 toast("Success", {
-                    description: 'PDF Generated Successfully!', link,
+                    description: `PDF Generated Successfully!`,
                 })
+                setLink(link)
             }
         } catch (e) {
             console.log(e)
@@ -387,18 +391,23 @@ function LeaveRequest() {
                         <CardHeader>
                             <CardTitle className="flex justify-between capitalize text-md">
                                 Leave Type: {item.leave_type}
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center flex-wrap gap-2">
                                     <Badge>{item.status}</Badge>
                                     {item.status === 'Pending' && <Button size="sm" disabled={loadGenerate} variant="outline" onClick={() => handleGenerate(item)} className="flex items-center h-7">{loadGenerate ? <LoaderCircle className="animate-spin" /> : 'Generate'}</Button>}
                                 </div>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-3">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between flex-wrap">
                                 <div>Reason: {item.reason}</div>
                                 <div>Start Date: {format(parseISO(item.inclusive_dates), "PPP")}</div>
                                 <div>End Date: {format(parseISO(item.to_date), "PPP")}</div>
                             </div>
+                            {link && <div className="text-sm text-gray-500 max-w-[1000px] truncate whitespace-nowrap">
+                                <Link href={link} target='_blank'>
+                                    {link}
+                                </Link>
+                            </div>}
                         </CardContent>
                     </Card>
                 ))}

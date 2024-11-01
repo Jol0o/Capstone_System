@@ -21,6 +21,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import createUser from '@/hooks/useCreateUser';
 import { approveEmployeeRequest, getEmployeeById } from '@/lib/api';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 function UserForm({ id, setIsDialogOpen, data }) {
@@ -323,18 +324,16 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         required
                     />
                 </div>
-                <div className="grid items-center grid-cols-1 gap-2">
-                    <Label htmlFor="hierarchy">Hierarchy</Label>
-                    <Input
-                        id="hierarchy"
-                        type="text"
-                        name="hierarchy"
-                        value={userForm.hierarchy} onChange={handleChange}
-                        placeholder="Enter hierarchy"
-                        required
-                    />
-                </div>
-
+                <Select className="w-full" defaultValue={userForm.hierarchy} onValueChange={(value) => setUserForm({ ...userForm, hierarchy: value })}>
+                    <SelectTrigger className="w-[180px] bg-transparent border-gray-800 text-white">
+                        <SelectValue placeholder="Select hierarchy" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {["Managerial", "Supervisor", "Rank & File"].map((hierarchy) => (
+                            <SelectItem key={hierarchy} value={hierarchy}>{hierarchy}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <Button type="submit" className="w-full">
                     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
                 </Button>

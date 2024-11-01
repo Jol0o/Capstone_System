@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Image from 'next/image';
-import { getLeaveRequests } from '@/lib/api';
+import { getLeaveRequests, searchPayroll } from '@/lib/api';
 import UpdateLeaveStatus from '../modal/UpdateLeaveStatus';
 import { io } from 'socket.io-client';
 import * as XLSX from 'xlsx';

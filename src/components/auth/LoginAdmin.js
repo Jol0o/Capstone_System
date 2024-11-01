@@ -105,6 +105,12 @@ function LoginAdmin() {
             toast("Successfull", {
                 description: "Success creating an account!",
             });
+            setUserForm({
+                name: "",
+                email: "",
+                password: "",
+                phone: "",
+            })
             setError("");
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {

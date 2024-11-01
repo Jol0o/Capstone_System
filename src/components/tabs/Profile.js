@@ -1,44 +1,35 @@
 'use client'
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import useAuth from "@/hooks/useAuth"
-import axios from "axios"
-import React, { useEffect, useRef, useState, useCallback } from 'react'
-import Image from "next/image"
-import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage"
-import { storage } from "@/lib/firebase"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { CalendarIcon, LoaderCircle } from "lucide-react"
-import { format } from "date-fns"
-import { toast } from "sonner"
-import QRCode from "qrcode.react"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import useAuth from "@/hooks/useAuth";
+import Image from "next/image";
+import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
+import { storage } from "@/lib/firebase";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useStore } from '@/hooks/useStore';
-import { editEmployeeData, getEmployeebyEmail, getEmployeeById, getUserAttendance, logoutUser } from "@/lib/api"
+import { editEmployeeData, getEmployeeById, getUserAttendance, logoutUser } from "@/lib/api";
 import io from 'socket.io-client';
-import EmployeeAttendance from "../chart/Attendance-Chart"
+import HeatMap from '@uiw/react-heat-map';
+import { Tooltip } from 'react-tooltip';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
 
 function Profile() {
     const qrCodeRef = useRef(null);
-    const { user } = useAuth()
+    const { user } = useAuth();
     const [userData, setUserData] = useState({
         name: '',
         email: '',
@@ -51,14 +42,13 @@ function Profile() {
         qrcode: '',
         baseSalary: 0,
         totalSalary: 0,
-    })
-    const [originalData, setOriginalData] = useState(null)
-    const [image, setImage] = useState(null)
-    const [isLoading, setIsLoading] = useState(false)
-    const router = useRouter()
-    const userEmail = useStore(state => state.userEmail)
-
-
+    });
+    const [originalData, setOriginalData] = useState(null);
+    const [image, setImage] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [yearData, setYearData] = useState([]);
+    const router = useRouter();
+    const userEmail = useStore(state => state.userEmail);
 
     const fetchUser = useCallback(async () => {
         const id = userEmail ? userEmail : user?.user_id;
@@ -98,9 +88,9 @@ function Profile() {
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
             setUserData({ ...userData, avatar: e.target.files[0] });
-            setImage(URL.createObjectURL(e.target.files[0]))
+            setImage(URL.createObjectURL(e.target.files[0]));
         } else {
-            setImage(null)
+            setImage(null);
             setUserData({ ...userData, avatar: "" });
         }
     };
@@ -157,7 +147,6 @@ function Profile() {
         }
     };
 
-
     const uploadAvatar = async (file) => {
         if (!file) return;
         const storageRef = ref(storage, `avatars/${file.name}`);
@@ -167,9 +156,9 @@ function Profile() {
     };
 
     const handleDiscard = () => {
-        setUserData(originalData)
-        setImage(null)
-    }
+        setUserData(originalData);
+        setImage(null);
+    };
 
     const handleChange = (e) => {
         if (e.target.name === "name") {
@@ -191,10 +180,49 @@ function Profile() {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             localStorage.removeItem('admin');
-            router.push("/")
+            router.push("/");
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
+    }
+
+    useEffect(() => {
+        const id = userData?.employee_id;
+        if (!id) return;
+        const fetchAttendance = async () => {
+            try {
+                const res = await getUserAttendance(id);
+                if (res.status === 200) {
+                    setYearData(res.data.data);
+                }
+            } catch (error) {
+                console.error('Error fetching attendance:', error);
+            }
+        };
+
+        fetchAttendance();
+    }, [userData]);
+
+    const value = yearData.map((item) => {
+        return ({
+            date: item.date,
+            status: item.status
+        });
+    });
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'present': return '#4caf50'; // Green
+            case 'late': return '#ffeb3b'; // Yellow
+            case 'absent': return '#f44336'; // Red
+            case 'no-data': return '#9e9e9e'; // Gray
+            default: return '#9e9e9e'; // Gray
+        }
+    };
+
+       const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' }
+        return new Date(dateString).toLocaleDateString(undefined, options)
     }
 
 
@@ -211,7 +239,6 @@ function Profile() {
                         <Button onClick={handleSave} className="rounded-lg" size="sm">     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Save'} </Button>
                     </div>
                 </div>
-
 
                 <div className="grid md:grid-cols-3 gap-7">
                     <div className="flex flex-col gap-7 md:col-span-2">
@@ -282,6 +309,17 @@ function Profile() {
                                         disabled={user?.status === 'user' ? true : false}
                                     />
                                 </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="salary">Salary</Label>
+                                    <Input
+                                        type="text"
+                                        id="salary"
+                                        value={userData?.totalSalary}
+                                        name="baseSalary"
+                                        onChange={handleChange}
+                                        disabled
+                                    />
+                                </div>
                                 <div className="grid items-center grid-cols-1 gap-2">
                                     <Label htmlFor="hierarchy">Hierarchy</Label>
                                     <Input
@@ -345,12 +383,29 @@ function Profile() {
                         </Card>
                     </div>
                 </div>
-
+            </div>
+            <div className="max-w-[1000px] m-auto p-5">
+            <Card className="border-gray-800 p-3">
+                <ScrollArea className="w-full rounded-md">
+                    <HeatMap
+                        value={value}
+                        width={900}
+                        legendCellSize={0}
+                        startDate={new Date()}
+                        rectRender={(props, data) => {
+                            return (
+                                <rect {...props} fill={getStatusColor(data.status)} data-tooltip-id="my-tooltip" data-tooltip-content={`${formatDate(data.date)}: ${data.status || 'no-data'}`} />
+                            );
+                        }}
+                    />
+                    <Tooltip id="my-tooltip" />
+                </ScrollArea>
+            </Card></div>
+            <div className="m-auto max-w-[100px]">
                 {user?.status === 'user' && <Button variant="ghost" onClick={logout} className="text-xs font-medium text-red-400">Log out</Button>}
             </div>
-            <EmployeeAttendance id={userData?.employee_id} />
         </>
-    )
+    );
 }
 
-export default Profile
+export default Profile;
