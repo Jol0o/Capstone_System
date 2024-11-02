@@ -15,7 +15,7 @@ import Image from "next/image";
 import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle , FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useStore } from '@/hooks/useStore';
@@ -23,6 +23,9 @@ import { editEmployeeData, getEmployeeById, getUserAttendance, logoutUser } from
 import io from 'socket.io-client';
 import HeatMap from '@uiw/react-heat-map';
 import { Tooltip } from 'react-tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import * as XLSX from 'xlsx';
+
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
@@ -46,7 +49,8 @@ function Profile() {
     const [originalData, setOriginalData] = useState(null);
     const [image, setImage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [yearData, setYearData] = useState([]);
+    const [yearData, setYearData] = useState([])
+    const [selectedYear, setSelectedYear] = useState('2024');
     const router = useRouter();
     const userEmail = useStore(state => state.userEmail);
 
@@ -220,10 +224,17 @@ function Profile() {
         }
     };
 
-       const formatDate = (dateString) => {
+    const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
         return new Date(dateString).toLocaleDateString(undefined, options)
     }
+
+    const handleExcelDownload = (data) => {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, "attendance.xlsx");
+    };
 
 
     return (
@@ -385,22 +396,47 @@ function Profile() {
                 </div>
             </div>
             <div className="max-w-[1000px] m-auto p-5">
-            <Card className="border-gray-800 p-3">
-                <ScrollArea className="w-full rounded-md">
-                    <HeatMap
-                        value={value}
-                        width={900}
-                        legendCellSize={0}
-                        startDate={new Date()}
-                        rectRender={(props, data) => {
-                            return (
-                                <rect {...props} fill={getStatusColor(data.status)} data-tooltip-id="my-tooltip" data-tooltip-content={`${formatDate(data.date)}: ${data.status || 'no-data'}`} />
-                            );
-                        }}
-                    />
-                    <Tooltip id="my-tooltip" />
-                </ScrollArea>
-            </Card></div>
+                <Card className="p-3 border-gray-800">
+                    <CardHeader>
+                        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                            <div>
+                                <CardTitle className="text-white">Employee Attendance</CardTitle>
+                                <CardDescription className="text-gray-400">Attendance overview</CardDescription>
+                            </div>
+                            <div>
+                                <Button disabled={yearData.length === 0 ? true : false} onClick={() => handleExcelDownload(yearData)} variant="outline" size="sm" className="gap-1 h-7">
+                                    <FileDown className="h-3.5 w-3.5" />
+                                    Export
+                                </Button>
+                                <Select defaultValue={selectedYear} onValueChange={setSelectedYear}>
+                                    <SelectTrigger className="w-[180px] bg-transparent border-gray-800 text-white">
+                                        <SelectValue placeholder="Select year" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="2023">2023</SelectItem>
+                                        <SelectItem value="2024">2024</SelectItem>
+                                        <SelectItem value="2025">2025</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <ScrollArea className="w-full rounded-md">
+                        <HeatMap
+                            value={value}
+                            width={900}
+                            legendCellSize={0}
+                            startDate={new Date(`${selectedYear}-01-01`)}
+                            rectSize={15}
+                            rectRender={(props, data) => {
+                                return (
+                                    <rect {...props} fill={getStatusColor(data.status)} data-tooltip-id="my-tooltip" data-tooltip-content={`${formatDate(data.date)}: ${data.status || 'no-data'}`} />
+                                );
+                            }}
+                        />
+                        <Tooltip id="my-tooltip" />
+                    </ScrollArea>
+                </Card></div>
             <div className="m-auto max-w-[100px]">
                 {user?.status === 'user' && <Button variant="ghost" onClick={logout} className="text-xs font-medium text-red-400">Log out</Button>}
             </div>
