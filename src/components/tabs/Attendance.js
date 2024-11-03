@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import generate from '../pdf_template/generatePDF';
-import { getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
+import { exportData, getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
 import * as XLSX from 'xlsx';
 import Loader from '../Loader';
 
@@ -33,6 +33,7 @@ function Attendance() {
     const router = useRouter()
     const [filter, setFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const table = "attendance"
 
     useEffect(() => {
         const fetchData = async () => {
@@ -96,12 +97,31 @@ function Attendance() {
     }
 
 
-    const handleExcelDownload = (data) => {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, "attendance.xlsx");
-    };
+        const handleExcelDownload = async () => {
+            try {
+                const res = await exportData(table);
+                console.log('Response:', res); // Log the response
+
+                if (res.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const url = window.URL.createObjectURL(res.data);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${table}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (e) {
+                console.error('Error:', e); // Log the error
+                toast.error("Error", {
+                    description: e.message,
+                });
+            }
+        };
+
 
     if (isLoading) return <Loader />
 

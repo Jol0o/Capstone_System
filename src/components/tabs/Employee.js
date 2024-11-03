@@ -23,7 +23,7 @@ import useAuth from '@/hooks/useAuth';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/hooks/useStore';
-import { removeEmployee, searchEmployee, sendEmailToEmployee, getEmployeeRequest, removeEmployeeRequest } from '@/lib/api';
+import { removeEmployee, searchEmployee, sendEmailToEmployee, getEmployeeRequest, removeEmployeeRequest, exportData } from '@/lib/api';
 import Loader from '../Loader';
 import ApproveEmployee from '../modal/ApproveEmployee';
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -43,6 +43,7 @@ function Employee({ setTab }) {
     const [isLoading, setIsloading] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [open, setOpen] = useState(false)
+    const table = "employees"
 
     useEffect(() => {
         setIsloading(true)
@@ -95,12 +96,31 @@ function Employee({ setTab }) {
         }
     };
 
-    const handleExcelDownload = (data) => {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, "employee.xlsx");
+    const handleExcelDownload = async () => {
+        try {
+            const res = await exportData(table);
+            console.log('Response:', res); // Log the response
+
+            if (res.status !== 200) {
+                throw new Error('Network response was not ok');
+            }
+
+            const url = window.URL.createObjectURL(res.data);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${table}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error('Error:', e); // Log the error
+            toast.error("Error", {
+                description: e.message,
+            });
+        }
     };
+
 
     const handleNext = () => {
         setPage(prevPage => prevPage + 1);

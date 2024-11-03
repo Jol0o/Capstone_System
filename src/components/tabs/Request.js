@@ -13,13 +13,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Image from 'next/image';
-import { getLeaveRequests, searchPayroll } from '@/lib/api';
+import { exportData, getLeaveRequests, removeLeaveRequest, searchPayroll, updateLeaveStatus } from '@/lib/api';
 import UpdateLeaveStatus from '../modal/UpdateLeaveStatus';
 import { io } from 'socket.io-client';
 import * as XLSX from 'xlsx';
 import Loader from '../Loader';
 import { format } from "date-fns"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { toast } from 'sonner';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
@@ -33,6 +43,8 @@ function Request() {
     const [page, setPage] = useState(1)
     const [open, setOpen] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
+    const [status, setStatus] = useState('')
+    const table = "leaveRequest"
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,11 +106,56 @@ function Request() {
         };
     }, [fetch]);
 
-    const handleExcelDownload = (data) => {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, "leavereaquest.xlsx");
+    const handleExcelDownload = async () => {
+        try {
+            const res = await exportData(table);
+            console.log('Response:', res); // Log the response
+
+            if (res.status !== 200) {
+                throw new Error('Network response was not ok');
+            }
+
+            const url = window.URL.createObjectURL(res.data);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${table}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error('Error:', e); // Log the error
+            toast.error("Error", {
+                description: e.message,
+            });
+        }
+    };
+
+    const handleRemove = async (id) => {
+        try {
+            const res = await removeLeaveRequest(id)
+            if (res) {
+                toast.success('Success removed leave request!');
+                fetch()
+            }
+        } catch (e) {
+            console.error('Error:', e); // Log the error
+        }
+    }
+    const handleUpdate = async () => {
+        if (status === "" && !selectedData.id) return
+        try {
+            const res = await updateLeaveStatus(selectedData.id, status)
+            if (res.status === 200) {
+                toast(`Successfully updated the status`);
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const handleChange = (value) => {
+        setStatus(value);
     };
 
     if (isLoading) return <Loader />
@@ -163,10 +220,14 @@ function Request() {
                                                 >
                                                     Copy Employee ID
                                                 </DropdownMenuItem>
-                                                <UpdateLeaveStatus data={item} />
-                                                <DropdownMenuItem onClick={() => { setOpen(true); setSelectedData(item); }}>
+                                                <DropdownMenuItem onClick={() => { setOpen(true); setSelectedData(item); setStatus(item.status) }}>
                                                     View
                                                 </DropdownMenuItem>
+                                                {/* <UpdateLeaveStatus data={item} /> */}
+                                                <DropdownMenuItem onClick={() => handleRemove(item.id)}>
+                                                    Delete
+                                                </DropdownMenuItem>
+
                                             </DropdownMenuContent>
                                         </DropdownMenu></TableCell>
                                     </TableRow>
@@ -240,18 +301,19 @@ function Request() {
 
                             <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Request Status</h3>
-                                <InfoRow
-                                    label="Status"
-                                    value={
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium
-                      ${selectedData?.status === 'Approved' ? 'bg-green-500/20 text-green-500' :
-                                                selectedData?.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-500' :
-                                                    'bg-red-500/20 text-red-500'}`}
-                                        >
-                                            {selectedData?.status}
-                                        </span>
-                                    }
-                                />
+                                <Select value={status} onValueChange={handleChange}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder={status === "" ? data?.status : status} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="Pending">Pending</SelectItem>
+                                            <SelectItem value="Process">Process</SelectItem>
+                                            <SelectItem value="Approved">Approved</SelectItem>
+                                            <SelectItem value="Rejected">Rejected</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                                 <InfoRow
                                     label="Requested By"
                                     value={selectedData?.requested_by}
@@ -286,6 +348,9 @@ function Request() {
                                     </div>
                                 </div>
                             </div>
+                            <Button onClick={handleUpdate} className="w-full mt-3">
+                                Submit
+                            </Button>
                         </div>
                     </ScrollArea>
                 </DialogContent>

@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useAuth from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import { getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
+import { exportData, getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
 import * as XLSX from 'xlsx';
 import Loader from '../Loader';
 
@@ -29,6 +29,7 @@ function Payroll() {
     const [isLoading, setIsLoading] = useState(false)
     const [totalPages, setTotalPages] = useState(0)
     const limit = 15
+    const table = "payroll"
 
     function formatDate(dateString) {
         const options = { year: "numeric", month: "long", day: "numeric" };
@@ -92,12 +93,30 @@ function Payroll() {
     }
 
 
-    const handleExcelDownload = (data) => {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, "payroll.xlsx");
-    };
+        const handleExcelDownload = async () => {
+            try {
+                const res = await exportData(table);
+                console.log('Response:', res); // Log the response
+
+                if (res.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const url = window.URL.createObjectURL(res.data);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${table}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (e) {
+                console.error('Error:', e); // Log the error
+                toast.error("Error", {
+                    description: e.message,
+                });
+            }
+        };
 
     if (isLoading) return <Loader />
 

@@ -23,7 +23,7 @@ import useAuth from '@/hooks/useAuth';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/hooks/useStore';
-import { removeEmployee, removeUserById } from '@/lib/api';
+import { exportData, removeEmployee, removeUserById } from '@/lib/api';
 import EditUserAccount from '../modal/EditUserAccount';
 
 function UserAccounts() {
@@ -33,6 +33,7 @@ function UserAccounts() {
     const [page, setPage] = useState(1)
     const limit = 15
     const { users, userTotal } = useEmployee(page, limit)
+    const table = "user"
 
     useEffect(() => {
         if (users) {
@@ -81,12 +82,30 @@ function UserAccounts() {
         }
     };
 
-    const handleExcelDownload = (data) => {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, "csv.xlsx");
-    };
+        const handleExcelDownload = async () => {
+            try {
+                const res = await exportData(table);
+                console.log('Response:', res); // Log the response
+
+                if (res.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const url = window.URL.createObjectURL(res.data);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${table}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (e) {
+                console.error('Error:', e); // Log the error
+                toast.error("Error", {
+                    description: e.message,
+                });
+            }
+        };
 
     const handleNext = () => {
         setPage(prevPage => prevPage + 1);

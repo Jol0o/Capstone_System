@@ -8,6 +8,9 @@ console.log(API_URL);
 
 const axiosInstance = axios.create({
     withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
 const cacheWrapper = (fn) => cache(async (...args) => {
@@ -261,8 +264,12 @@ export const getLeaveRequests = cacheWrapper(async (limit, page) => {
     return response;
 });
 
+export const removeLeaveRequest = async (id) => {
+    const res = await axiosInstance.delete(`${API_URL}/api/leave_request/${id}`)
+    return res
+}
+
 export const updateLeaveStatus = async (id, status) => {
-    console.log(id, status);
     const response = await axiosInstance.put(`${API_URL}/api/leave_request/${id}/status`, { status });
     return response;
 };
@@ -374,3 +381,14 @@ export const removeAdmin = async (id) => {
         throw e;
     }
 }
+
+export const exportData = async (table) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/export/${table}`, {
+            responseType: 'blob', // Set the response type to 'blob'
+        });
+        return response; // Return the blob data
+    } catch (error) {
+        throw error;
+    }
+};
