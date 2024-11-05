@@ -17,11 +17,18 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import useAuth from "@/hooks/useAuth"
-import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUser } from "@/lib/api"
+import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUser , forgatPassword } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle, Mail } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 function LoginAdmin() {
     const [userForm, setUserForm] = useState({
@@ -35,6 +42,29 @@ function LoginAdmin() {
     const { auth, user } = useAuth();
     const router = useRouter()
     const [showPassword, setShowPassword] = useState(false);
+    const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
+    const [resetSuccess, setResetSuccess] = useState(false)
+    const [loadReset, setLoadReset] = useState(false)
+    const [email, setEmail] = useState("")
+
+    const handleForgotPassword = async (e) => {
+        e.preventDefault()
+        setLoadReset(true)
+        if (!email) return
+        try {
+            const res = await forgatPassword(email)
+            if (res.status === 200) {
+                setResetSuccess(true)
+                setLoadReset(false)
+            }
+        } catch (e) {
+            console.log(e)
+            toast("Error", {
+                description: e?.response?.data.message || e.message,
+            })
+            setLoadReset(false)
+        }
+    }
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -162,112 +192,168 @@ function LoginAdmin() {
     }
 
     return (
-        <Tabs defaultValue="account" className="w-[400px]">
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="account">Sign In</TabsTrigger>
-                <TabsTrigger value="password">Sign Up</TabsTrigger>
-            </TabsList>
-            <TabsContent value="account">
-                <Card className="max-w-sm mx-auto">
-                    <CardHeader>
-                        <CardTitle>Login</CardTitle>
-                        <CardDescription>
-                            Enter your admin credentials
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <div className="space-y-1">
-                            <Label htmlFor="email">Email</Label>
-                            <Input type="email" required id="email" value={userForm.email} onChange={handleChange} name="email" placeholder="a@gmail.com" />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="password">Password</Label>
-                            <div className="relative">
-                                <Input
-                                    type={showPassword ? "text" : "password"}
-                                    required
-                                    id="password"
-                                    value={userForm.password}
-                                    onChange={handleChange}
-                                    name="password"
-                                    placeholder="Password"
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={togglePasswordVisibility}
-                                    className="absolute inset-y-0 right-0 flex items-center px-2"
-                                >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </Button>
+        <>
+            <Tabs defaultValue="account" className="w-[400px]">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="account">Sign In</TabsTrigger>
+                    <TabsTrigger value="password">Sign Up</TabsTrigger>
+                </TabsList>
+                <TabsContent value="account">
+                    <Card className="max-w-sm mx-auto">
+                        <CardHeader>
+                            <CardTitle>Login</CardTitle>
+                            <CardDescription>
+                                Enter your admin credentials
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                            <div className="space-y-1">
+                                <Label htmlFor="email">Email</Label>
+                                <Input type="email" required id="email" value={userForm.email} onChange={handleChange} name="email" placeholder="a@gmail.com" />
                             </div>
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <Button disabled={loading} onClick={login}>
-                            {loading ? <LoaderCircle className="animate-spin" /> : 'Login'}
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </TabsContent>
-            <TabsContent value="password">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Register</CardTitle>
-                        <CardDescription>
-                            Enter your employee credentials
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <div className="space-y-1">
-                            <Label htmlFor="name">Full Name</Label>
-                            <Input type="name" required id="name" value={userForm.name} onChange={handleChange} name="name" placeholder="Enter full name" />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="email">Email</Label>
-                            <Input type="email" required id="email" value={userForm.email} onChange={handleChange} name="email" placeholder="a@gmail.com" />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="phone">Phone Number</Label>
-                            <Input
-                                type="tel"
-                                required
-                                id="phone"
-                                value={userForm.phone}
-                                onChange={handleChange}
-                                name="phone"
-                                placeholder="Phone Number"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <Label htmlFor="password">Password</Label>
-                            <div className="relative">
-                                <Input
-                                    type={showPassword ? "text" : "password"}
-                                    required
-                                    id="password"
-                                    value={userForm.password}
-                                    onChange={handleChange}
-                                    name="password"
-                                    placeholder="Password"
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={togglePasswordVisibility}
-                                    className="absolute inset-y-0 right-0 flex items-center px-2"
-                                >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </Button>
+                            <div className="space-y-1">
+                                <Label htmlFor="password">Password</Label>
+                                <div className="relative">
+                                    <Input
+                                        type={showPassword ? "text" : "password"}
+                                        required
+                                        id="password"
+                                        value={userForm.password}
+                                        onChange={handleChange}
+                                        name="password"
+                                        placeholder="Password"
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={togglePasswordVisibility}
+                                        className="absolute inset-y-0 right-0 flex items-center px-2"
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <Button disabled={loading} onClick={register}>
-                            {loading ? <LoaderCircle className="animate-spin" /> : 'Register'}
+                        </CardContent>
+                        <CardFooter>
+                            <div className="flex flex-col items-center justify-center w-full gap-3">
+                            <Button disabled={loading} className="w-full" onClick={login}>
+                                {loading ? <LoaderCircle className="animate-spin" /> : 'Login'}
+                            </Button>
+                            <button
+                  onClick={() => setForgotPasswordOpen(true)}
+                  className="w-full text-sm text-center text-gray-400 hover:text-white"
+                >
+                  Forgot password?
+                </button>
+                </div>
+                        </CardFooter>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="password">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Register</CardTitle>
+                            <CardDescription>
+                                Enter your employee credentials
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                            <div className="space-y-1">
+                                <Label htmlFor="name">Full Name</Label>
+                                <Input type="name" required id="name" value={userForm.name} onChange={handleChange} name="name" placeholder="Enter full name" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="email">Email</Label>
+                                <Input type="email" required id="email" value={userForm.email} onChange={handleChange} name="email" placeholder="a@gmail.com" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="phone">Phone Number</Label>
+                                <Input
+                                    type="tel"
+                                    required
+                                    id="phone"
+                                    value={userForm.phone}
+                                    onChange={handleChange}
+                                    name="phone"
+                                    placeholder="Phone Number"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="password">Password</Label>
+                                <div className="relative">
+                                    <Input
+                                        type={showPassword ? "text" : "password"}
+                                        required
+                                        id="password"
+                                        value={userForm.password}
+                                        onChange={handleChange}
+                                        name="password"
+                                        placeholder="Password"
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={togglePasswordVisibility}
+                                        className="absolute inset-y-0 right-0 flex items-center px-2"
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button disabled={loading} onClick={register}>
+                                {loading ? <LoaderCircle className="animate-spin" /> : 'Register'}
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+            <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+                <DialogContent className="text-white bg-gray-900">
+                    <DialogHeader>
+                        <DialogTitle>Reset Password</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            {!resetSuccess
+                                ? "Enter your email address and we'll send you instructions to reset your password."
+                                : "Password reset instructions have been sent to your email. Please check your inbox."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {!resetSuccess ? (
+                        <form onSubmit={handleForgotPassword} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="reset-email">Email address</Label>
+                                <div className="relative">
+                                    <Input
+                                        id="reset-email"
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="pl-10 bg-transparent border-gray-700"
+                                        required
+                                    />
+                                    <Mail className="absolute text-gray-400 -translate-y-1/2 left-3 top-1/2" size={20} />
+                                </div>
+                            </div>
+                            <Button disabled={loadReset} type="submit" className="w-full">
+                                {loadReset ?  <LoaderCircle className="animate-spin" /> : "Send Reset Instructions"}
+                            </Button>
+                        </form>
+                    ) : (
+                        <Button
+                            onClick={() => {
+                                setForgotPasswordOpen(false)
+                                setResetSuccess(false)
+                                setEmail('')
+                            }}
+                            className="w-full"
+                        >
+                            Close
                         </Button>
-                    </CardFooter>
-                </Card>
-            </TabsContent>
-        </Tabs>
+                    )}
+                </DialogContent>
+            </Dialog>
+        </>
     )
 }
 

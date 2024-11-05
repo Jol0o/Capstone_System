@@ -392,3 +392,12 @@ export const exportData = async (table) => {
         throw error;
     }
 };
+
+export const forgatPassword = async (email) => {
+    try {
+        const res = await axiosInstance.post(`${API_URL}/api/auth/reset-password`, { email: email })
+        return res
+    } catch (e) {
+        throw e
+    }
+}

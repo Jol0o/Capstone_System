@@ -15,7 +15,7 @@ import Image from "next/image";
 import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LoaderCircle , FileDown } from "lucide-react";
+import { LoaderCircle, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useStore } from '@/hooks/useStore';
@@ -123,7 +123,7 @@ function Profile() {
 
         for (let key of Object.keys(data)) {
             if (!data.avatar && key === 'avatar') continue;
-            if (key === 'day_off' || key === 'totalSalary') continue;
+            if (key === 'day_off' || key === 'totalSalary' || key === 'monthSalary') continue;
             if (!data[key]) {
                 toast("Error", {
                     description: `${key} is required`,
@@ -219,6 +219,7 @@ function Profile() {
             case 'present': return '#4caf50'; // Green
             case 'late': return '#ffeb3b'; // Yellow
             case 'absent': return '#f44336'; // Red
+            case 'off duty': return '#ff9800'; // Orange
             case 'no-data': return '#9e9e9e'; // Gray
             default: return '#9e9e9e'; // Gray
         }
@@ -321,7 +322,7 @@ function Profile() {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="salary">Salary</Label>
+                                    <Label htmlFor="salary">Total Salary</Label>
                                     <Input
                                         type="text"
                                         id="salary"
