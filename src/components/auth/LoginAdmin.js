@@ -17,7 +17,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import useAuth from "@/hooks/useAuth"
-import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUser , forgatPassword } from "@/lib/api"
+import { loginAdmin, loginEmployeeApi, registerAdminAcc, registerUser, forgatPassword } from "@/lib/api"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -29,6 +29,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import Image from 'next/image';
 
 function LoginAdmin() {
     const [userForm, setUserForm] = useState({
@@ -192,7 +193,8 @@ function LoginAdmin() {
     }
 
     return (
-        <>
+        <div className="flex flex-col max-w-[300px] items-center justify-center m-auto">
+                <Image src="/Logo2.png" alt="logo" width={300} height={200} className="object-cover max-h-[150px]" />
             <Tabs defaultValue="account" className="w-[400px]">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="account">Sign In</TabsTrigger>
@@ -235,16 +237,16 @@ function LoginAdmin() {
                         </CardContent>
                         <CardFooter>
                             <div className="flex flex-col items-center justify-center w-full gap-3">
-                            <Button disabled={loading} className="w-full" onClick={login}>
-                                {loading ? <LoaderCircle className="animate-spin" /> : 'Login'}
-                            </Button>
-                            <button
-                  onClick={() => setForgotPasswordOpen(true)}
-                  className="w-full text-sm text-center text-gray-400 hover:text-white"
-                >
-                  Forgot password?
-                </button>
-                </div>
+                                <Button disabled={loading} className="w-full" onClick={login}>
+                                    {loading ? <LoaderCircle className="animate-spin" /> : 'Login'}
+                                </Button>
+                                <button
+                                    onClick={() => setForgotPasswordOpen(true)}
+                                    className="w-full text-sm text-center text-gray-400 hover:text-white"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
                         </CardFooter>
                     </Card>
                 </TabsContent>
@@ -336,7 +338,7 @@ function LoginAdmin() {
                                 </div>
                             </div>
                             <Button disabled={loadReset} type="submit" className="w-full">
-                                {loadReset ?  <LoaderCircle className="animate-spin" /> : "Send Reset Instructions"}
+                                {loadReset ? <LoaderCircle className="animate-spin" /> : "Send Reset Instructions"}
                             </Button>
                         </form>
                     ) : (
@@ -353,7 +355,7 @@ function LoginAdmin() {
                     )}
                 </DialogContent>
             </Dialog>
-        </>
+        </div>
     )
 }
 

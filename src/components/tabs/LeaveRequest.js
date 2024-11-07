@@ -19,6 +19,8 @@ import { io } from 'socket.io-client';
 import { format, parseISO } from 'date-fns';
 import generate from '../pdf_template/generatePDF';
 import Link from 'next/link';
+import Image from 'next/image';
+
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
@@ -209,8 +211,7 @@ function LeaveRequest() {
                     <CardContent className="flex flex-col gap-3">
                         <div className="p-4 border border-gray-600">
                             <div className="p-2 mb-4 text-center bg-yellow-400">
-                                <h1 className="text-2xl font-bold">GASBEE POS</h1>
-                                <p className="text-sm">BEE GAS GANDA! • PRESYONG BODEGA!</p>
+                                <Image src="/NEW.jpg" alt="logo" width={1000} height={200} className="object-fit max-h-[200px]" />
                             </div>
                             <h2 className="py-2 mb-4 text-xl font-bold text-center text-white bg-black">APPLICATION FOR LEAVE FORM</h2>
                             <form className="space-y-2" onSubmit={handleSubmit}>
@@ -391,14 +392,14 @@ function LeaveRequest() {
                         <CardHeader>
                             <CardTitle className="flex justify-between capitalize text-md">
                                 Leave Type: {item.leave_type}
-                                <div className="flex items-center flex-wrap gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
                                     <Badge>{item.status}</Badge>
                                     {item.status === 'Pending' && <Button size="sm" disabled={loadGenerate} variant="outline" onClick={() => handleGenerate(item)} className="flex items-center h-7">{loadGenerate ? <LoaderCircle className="animate-spin" /> : 'Generate'}</Button>}
                                 </div>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-3">
-                            <div className="flex justify-between flex-wrap">
+                            <div className="flex flex-wrap justify-between">
                                 <div>Reason: {item.reason}</div>
                                 <div>Start Date: {format(parseISO(item.inclusive_dates), "PPP")}</div>
                                 <div>End Date: {format(parseISO(item.to_date), "PPP")}</div>

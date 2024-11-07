@@ -9,7 +9,7 @@ export const PDFTemplate = ({ data }) => {
     <Tailwind>
       <div className="max-w-4xl p-4 mx-auto bg-white border border-gray-300">
         <div className="p-2 mb-4 text-center bg-yellow-400">
-          <h1 className="text-2xl font-bold">GASBEE POS</h1>
+          <h1 className="text-2xl font-bold">GASBEE PO!</h1>
           <p className="text-sm">BEE GAS GANDA! • PRESYONG BODEGA!</p>
         </div>
         <h2 className="py-2 mb-4 text-xl font-bold text-center text-white bg-black">APPLICATION FOR LEAVE FORM</h2>
