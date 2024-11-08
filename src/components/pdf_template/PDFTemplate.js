@@ -1,9 +1,12 @@
 import * as React from "react";
 import { Tailwind } from "@fileforge/react-print";
 import { format, parseISO } from "date-fns";
+import { PDFPayroll } from "./PDFPayroll";
 
-export const PDFTemplate = ({ data }) => {
+export const PDFTemplate = ({ data, type }) => {
   const distributionCopy = data?.distribution_copy ? JSON.parse(data.distribution_copy) : {};
+
+  if (type === "payroll") return <PDFPayroll data={data} />
 
   return (
     <Tailwind>

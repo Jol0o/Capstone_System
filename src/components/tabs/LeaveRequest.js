@@ -406,7 +406,7 @@ function LeaveRequest() {
                             </div>
                             {link && <div className="text-sm text-gray-500 max-w-[1000px] truncate whitespace-nowrap">
                                 <Link href={link} target='_blank'>
-                                    {link}
+                                    Form Link: {link}
                                 </Link>
                             </div>}
                         </CardContent>
