@@ -129,6 +129,9 @@ function UserPayroll() {
                                 readOnly
                                 className="font-mono text-sm text-gray-300 bg-gray-800 border-gray-700"
                             />
+                            <Button onClick={() => downloadPDF(link)} className="bg-blue-600 hover:bg-blue-700">
+                                Download
+                            </Button>
                         </div>}
                     </CardContent>
                 </Card>
