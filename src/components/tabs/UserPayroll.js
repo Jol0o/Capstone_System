@@ -104,17 +104,17 @@ function UserPayroll() {
                     <CardContent className="space-y-6">
                         <div className="flex items-start justify-between">
                             <div className="space-y-4">
-                                <div className="flex items-center space-x-2 text-gray-400">
+                                <div className="flex items-center space-x-2 text-[clamp(12px, 18px, 5vw)] text-gray-400">
                                     <Clock size={16} />
-                                    <span>Hours worked: {item.hours_worked} </span>
-                                    <span className="text-white">0</span>
+                                    <span>Hours worked: </span>
+                                    <span className="text-white">{item.hours_worked}</span>
                                 </div>
-                                <div className="flex items-center space-x-2 text-gray-400">
+                                <div className="flex items-center text-[clamp(12px, 18px, 5vw)] space-x-2 text-gray-400">
                                     <span>Amount: </span>
                                     <span className="text-white">{item.total_pay}</span>
                                 </div>
                             </div>
-                            <div className="text-sm text-gray-400">
+                            <div className="text-sm sm:text-[clamp(12px, 18px, 5vw)] text-gray-400">
                                 Sent Date: {format(new Date(item.created_at), "PPP")}
                             </div>
                         </div>
