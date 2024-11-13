@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import generate from '../pdf_template/generatePDF';
-import { exportData, getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
+import { exportData, getAllUserAttendances, getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
 import * as XLSX from 'xlsx';
 import Loader from '../Loader';
 
@@ -33,6 +33,7 @@ function Attendance() {
     const router = useRouter()
     const [filter, setFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [monthlyAttendance, setMonthlyAttendance] = useState([])
     const table = "attendance"
 
     useEffect(() => {
@@ -64,9 +65,20 @@ function Attendance() {
                 setFilteredData(response.data.data)
                 setIsLoading(false)
             }
-
         }
 
+        const fetchMonthlyAttendance = async () => {
+            try {
+                const res = await getAllUserAttendances()
+                if (res.status === 200) {
+                    setMonthlyAttendance(res.data.data)
+                }
+            } catch (e) {
+                toast.error("Error fetching monthly attendance")
+            }
+        }
+
+        fetchMonthlyAttendance()
         fetchpayroll()
     }, [page])
 
@@ -97,30 +109,55 @@ function Attendance() {
     }
 
 
-        const handleExcelDownload = async () => {
-            try {
-                const res = await exportData(table);
-                console.log('Response:', res); // Log the response
+    const handleExcelDownload = async () => {
+        try {
+            const res = await exportData(table);
+            console.log('Response:', res); // Log the response
 
-                if (res.status !== 200) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const url = window.URL.createObjectURL(res.data);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${table}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            } catch (e) {
-                console.error('Error:', e); // Log the error
-                toast.error("Error", {
-                    description: e.message,
-                });
+            if (res.status !== 200) {
+                throw new Error('Network response was not ok');
             }
-        };
+
+            const url = window.URL.createObjectURL(res.data);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${table}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error('Error:', e); // Log the error
+            toast.error("Error", {
+                description: e.message,
+            });
+        }
+    };
+
+    const exportToCSV = (data) => {
+        const csvRows = [];
+        const headers = Object.keys(data[0]);
+        csvRows.push(headers.join(','));
+
+        for (const row of data) {
+            const values = headers.map(header => {
+                const escaped = ('' + row[header]).replace(/"/g, '\\"');
+                return `"${escaped}"`;
+            });
+            csvRows.push(values.join(','));
+        }
+
+        const csvString = csvRows.join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'monthly_attendance.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
 
 
     if (isLoading) return <Loader />
@@ -134,6 +171,10 @@ function Attendance() {
                     className="max-w-sm"
                 />
                 <div className="flex gap-2">
+                    <Button disabled={filterData.length === 0} onClick={() => exportToCSV(monthlyAttendance)} variant="outline" className="gap-1">
+                        <FileDown className="h-3.5 w-3.5" />
+                        Monthly Attendance
+                    </Button>
                     <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
                         <FileDown className="h-3.5 w-3.5" />
                         Export

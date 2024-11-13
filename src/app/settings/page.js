@@ -131,11 +131,11 @@ function Page() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {data?.length > 0 ? data.map((account) => (
+                            {data?.length > 0 ? data.map((account, index) => (
                                 <TableRow key={account.id}>
                                     <TableCell>{account.id}</TableCell>
                                     <TableCell>{account.email}</TableCell>
-                                    <TableCell className="text-right">
+                                    {index !== 0 && <TableCell className="text-right">
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" size="sm" onClick={() => setSelectedAccount(account)}>
@@ -153,7 +153,7 @@ function Page() {
                                         <Button variant="outline" size="sm" onClick={() => handleRemove(account.id)} >
                                             Delete
                                         </Button>
-                                    </TableCell>
+                                    </TableCell>}
                                 </TableRow>
                             )) : <TableRow >
                                 <TableCell>No Data</TableCell>

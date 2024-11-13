@@ -79,6 +79,15 @@ export const getUserAttendance = cacheWrapper(async (id) => {
     }
 })
 
+export const getAllUserAttendances = cacheWrapper(async () => {
+    try {
+        const res = await axiosInstance.get(`${API_URL}/api//monthly-attendance`)
+        return res
+    } catch (err) {
+        return err
+    }
+})
+
 export const removeAttendance = async (id) => {
     await axiosInstance.delete(`${API_URL}/api/attendance/${id}`);
 };
@@ -399,5 +408,14 @@ export const forgatPassword = async (email) => {
         return res
     } catch (e) {
         throw e
+    }
+}
+
+export const checkPayroll = async () => {
+    try {
+        const res = await axiosInstance.post(`${API_URL}/api//run-payroll`)
+        return res
+    } catch (e) {
+        return e.message
     }
 }

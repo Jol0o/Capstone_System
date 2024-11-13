@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
+import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, FileDown, LoaderCircle, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useAuth from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import { exportData, getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
+import { checkPayroll, exportData, getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
 import * as XLSX from 'xlsx';
 import Loader from '../Loader';
 
@@ -28,6 +28,7 @@ function Payroll() {
     const [filter, setFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [totalPages, setTotalPages] = useState(0)
+    const [loadPayroll, setLoadPayroll] = useState(false)
     const limit = 15
     const table = "payroll"
 
@@ -93,30 +94,48 @@ function Payroll() {
     }
 
 
-        const handleExcelDownload = async () => {
-            try {
-                const res = await exportData(table);
-                console.log('Response:', res); // Log the response
+    const handleExcelDownload = async () => {
+        try {
+            const res = await exportData(table);
+            console.log('Response:', res); // Log the response
 
-                if (res.status !== 200) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const url = window.URL.createObjectURL(res.data);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${table}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            } catch (e) {
-                console.error('Error:', e); // Log the error
-                toast.error("Error", {
-                    description: e.message,
-                });
+            if (res.status !== 200) {
+                throw new Error('Network response was not ok');
             }
-        };
+
+            const url = window.URL.createObjectURL(res.data);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${table}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error('Error:', e); // Log the error
+            toast.error("Error", {
+                description: e.message,
+            });
+        }
+    };
+
+    const handlePayroll = async () => {
+        setLoadPayroll(true)
+        try {
+            const res = await checkPayroll();
+            console.log(res);
+            if (res.status === 200) {
+                toast.success("Payroll successful and ready to go!");
+            }
+            setLoadPayroll(false)
+        } catch (e) {
+            console.log(e)
+            setLoadPayroll(false)
+            toast.error("Error", {
+                description: e.response?.data?.message || e.message,
+            });
+        }
+    }
 
     if (isLoading) return <Loader />
 
@@ -128,10 +147,13 @@ function Payroll() {
                     onChange={(event) => setFilter(event.target.value)}
                     className="max-w-sm"
                 />
-                <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
-                    <FileDown className="h-3.5 w-3.5" />
-                    Export
-                </Button>
+                <div className="flex items-center gap-1">
+                    <Button disabled={filterData.length === 0 ? true : false} size="sm" onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                        <FileDown className="h-3.5 w-3.5" />
+                        Export
+                    </Button>
+                    {/* <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Send Payroll'}</Button> */}
+                </div>
             </div>
             <div className="border rounded-md">
                 {filterData && filterData.length ? <Table>
