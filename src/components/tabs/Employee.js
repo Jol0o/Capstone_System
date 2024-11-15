@@ -303,9 +303,6 @@ function Employee({ setTab }) {
                                                     setSelectedData(item)
                                                     setOpen(true)
                                                 }}>View</DropdownMenuItem>
-                                                <DropdownMenuItem >
-                                                    Reject
-                                                </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => removeEmployeeRequest(item.id)}>
                                                     Delete
                                                 </DropdownMenuItem>
