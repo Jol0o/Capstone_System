@@ -68,7 +68,7 @@ export const PDFPayroll = ({ data }) => {
                   <td className="p-2 text-right">₱{total_pay.toFixed(2)}</td>
                 </tr>
                 <tr className="font-bold">
-                  <td className="p-2">Total Earnings</td>
+                  <td className="p-2">Gross Pay</td>
                   <td className="p-2 text-right">₱{total_pay.toFixed(2)}</td>
                 </tr>
               </tbody>
@@ -88,19 +88,19 @@ export const PDFPayroll = ({ data }) => {
               <tbody>
                 <tr className="border-b">
                   <td className="p-2">SSS</td>
-                  <td className="p-2 text-right">₱{sssDeduction.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">₱{sssDeduction.toFixed(2)}</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-2">PhilHealth</td>
-                  <td className="p-2 text-right">₱{philHealthDeduction.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">₱{philHealthDeduction.toFixed(2)}</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-2">Pag-IBIG</td>
-                  <td className="p-2 text-right">₱{pagIbigDeduction.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">₱{pagIbigDeduction.toFixed(2)}</td>
                 </tr>
                 <tr className="font-bold">
                   <td className="p-2">Total Deductions</td>
-                  <td className="p-2 text-right">₱{totalDeductions.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">₱{totalDeductions.toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
@@ -124,7 +124,7 @@ export const PDFPayroll = ({ data }) => {
               </tr>
               <tr className="border-b">
                 <td className="p-2">Total Deductions</td>
-                <td className="p-2 text-right">₱{totalDeductions.toFixed(2)}</td>
+                <td className="p-2 text-right text-red-500">₱{totalDeductions.toFixed(2)}</td>
               </tr>
               <tr className="font-bold">
                 <td className="p-2">Net Pay</td>

@@ -66,7 +66,7 @@ function Dashboard() {
             <div className="flex flex-col gap-2">
               <h2 className="font-semibold text-md">Late Arrivals</h2>
               <div className="flex items-center gap-2">
-                {lates && lates.difference <= 0 ? <TrendingUp className={`w-4 h-4 ${lates ? (lates.difference >= 0 ? 'text-green-500' : 'text-red-500') : ''}`} /> : <TrendingDown className={`w-4 h-4 ${lates ? (lates.difference >= 0 ? 'text-green-500' : 'text-red-500') : ''}`} />}
+                {lates && lates.difference <= 0 ? <TrendingDown className={`w-4 h-4 ${lates ? (lates.difference >= 0 ? 'text-green-500' : 'text-red-500') : ''}`} /> : <TrendingUp className={`w-4 h-4 ${lates ? (lates.difference >= 0 ? 'text-green-500' : 'text-red-500') : ''}`} />}
                 {lates ? (lates.difference >= 0 ? <p className="text-xs text-green-500">+{lates.difference} Decrease than yesterday!</p> : <p className="text-xs text-red-500">{lates.difference} Increase than yesterday!</p>) : null}
               </div>
             </div>

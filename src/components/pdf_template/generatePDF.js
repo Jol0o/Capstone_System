@@ -13,7 +13,7 @@ const generate = async ({ data, type = 'request' }) => {
 
     let doc = {
         html: await compile(<PDFTemplate data={data} type={type} />),
-        title: "Hello",
+        title: "Gasbee",
         test: true, // if true, produce a PDF in test mode with a Onedoc's watermark
         save: true, // if true, host the document and provide a download link in the console and your Onedoc's dashboard
         expiresIn: 7, // the number of day you want to host your document

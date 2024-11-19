@@ -187,8 +187,8 @@ function Request() {
                             <TableRow>
                                 <TableHead className="capitalize">Name</TableHead>
                                 <TableHead className="capitalize">Created At</TableHead>
-                                <TableHead className="capitalize">Start/End Date</TableHead>
                                 <TableHead className="capitalize">Type</TableHead>
+                                <TableHead className="capitalize">Start/End Date</TableHead>
                                 <TableHead className="capitalize">Status</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -203,8 +203,8 @@ function Request() {
                                             {item.name}
                                         </TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{formatDate(item.created_at)}</TableCell>
-                                        <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item.inclusive_dates)} / {formatDate(item.to_date)}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.leave_type}</TableCell>
+                                        <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item.inclusive_dates)} / {formatDate(item.to_date)}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.status}</TableCell>
                                         <TableCell className="max-w-[30px]"> <DropdownMenu>
                                             <DropdownMenuTrigger asChild>

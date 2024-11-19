@@ -155,6 +155,13 @@ function Employee({ setTab }) {
 
     if (isLoading) return <Loader />
 
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(value);
+    };
+
     return (
         <>
             <div className="w-full">
@@ -202,8 +209,8 @@ function Employee({ setTab }) {
                                         <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
-                                        <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.baseSalary}</TableCell>
-                                        <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.totalSalary}</TableCell>
+                                        <TableCell className="capitalize max-w-[300px] text-right truncate whitespace-nowrap">{formatCurrency(item.baseSalary)}</TableCell>
+                                        <TableCell className="capitalize max-w-[300px] text-right truncate whitespace-nowrap">{formatCurrency(item.totalSalary)}</TableCell>
                                         <TableCell className=" whitespace-nowrap">{item.hierarchy}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.day_off === 0 ? 'On Duty' : "Off Duty"}</TableCell>
                                         <TableCell className="max-w-[30px]"> <DropdownMenu>
@@ -299,10 +306,10 @@ function Employee({ setTab }) {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                 <ApproveEmployee data={item} />
-                                                <DropdownMenuItem onClick={() => {
+                                                {/* <DropdownMenuItem onClick={() => {
                                                     setSelectedData(item)
                                                     setOpen(true)
-                                                }}>View</DropdownMenuItem>
+                                                }}>View</DropdownMenuItem> */}
                                                 <DropdownMenuItem onClick={() => removeEmployeeRequest(item.id)}>
                                                     Delete
                                                 </DropdownMenuItem>

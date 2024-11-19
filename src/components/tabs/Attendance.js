@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import generate from '../pdf_template/generatePDF';
 import { exportData, getAllUserAttendances, getAttendance, removeAttendance, searchAttendance } from '@/lib/api';
 import * as XLSX from 'xlsx';
+import { format, parse, differenceInMinutes } from 'date-fns';
 import Loader from '../Loader';
 
 function Attendance() {
@@ -159,7 +160,37 @@ function Attendance() {
         document.body.removeChild(a);
     };
 
+    const calculateLateTime = (timeIn) => {
+        const timeInDate = parse(timeIn, 'hh:mm a', new Date());
+        const eightAM = new Date();
+        eightAM.setHours(8, 0, 0, 0);
 
+        if (timeInDate > eightAM) {
+            const minutesLate = differenceInMinutes(timeInDate, eightAM);
+            const hoursLate = Math.floor(minutesLate / 60);
+            const remainingMinutesLate = minutesLate % 60;
+            return `${hoursLate > 0 ? `${hoursLate} hour(s) ` : ''}${remainingMinutesLate} minute(s) late`;
+        }
+        return 'On time';
+    };
+
+    const calculateEarlyLeaveOrOvertime = (timeOut) => {
+        const timeOutDate = parse(timeOut, 'hh:mm a', new Date());
+        const sevenPM = new Date();
+        sevenPM.setHours(19, 0, 0, 0);
+
+        if (timeOutDate < sevenPM) {
+            const minutesEarly = differenceInMinutes(sevenPM, timeOutDate);
+            const hoursEarly = Math.floor(minutesEarly / 60);
+            const remainingMinutesEarly = minutesEarly % 60;
+            return `${hoursEarly > 0 ? `${hoursEarly} hour(s) ` : ''}${remainingMinutesEarly} minute(s) early`;
+        } else if (timeOutDate > sevenPM) {
+            const minutesOvertime = differenceInMinutes(timeOutDate, sevenPM);
+            const hoursOvertime = Math.floor(minutesOvertime / 60);
+            return `Overtime: ${hoursOvertime > 0 ? `${hoursOvertime} hour(s)` : ''}`;
+        }
+        return 'On time';
+    };
     if (isLoading) return <Loader />
 
     return (
@@ -205,8 +236,8 @@ function Attendance() {
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.time_in}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.time_out}</TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.time_in} <span className="text-red-500">({calculateLateTime(item.time_in)})</span> </TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.time_out} <span className="text-red-500">({calculateEarlyLeaveOrOvertime(item.time_out)})</span></TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.hours}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

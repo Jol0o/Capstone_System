@@ -273,7 +273,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         placeholder="Enter email"
                         required
                     /></div>
-                <div className="grid items-center grid-cols-1 gap-2">
+                {/* <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
                         id="password"
@@ -282,7 +282,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         value={userForm.password}
                         placeholder="*****"
                         readOnly
-                    /></div>
+                    /></div> */}
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="baseSalary">Base Salary</Label>
                     <Input
@@ -325,7 +325,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                     />
                 </div>
                 <Select className="w-full" defaultValue={userForm.hierarchy} onValueChange={(value) => setUserForm({ ...userForm, hierarchy: value })}>
-                    <SelectTrigger className="w-[180px] bg-transparent border-gray-800 text-white">
+                    <SelectTrigger className="w-[180px] bg-transparent border-gray-800">
                         <SelectValue placeholder="Select hierarchy" />
                     </SelectTrigger>
                     <SelectContent>

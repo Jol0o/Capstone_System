@@ -140,7 +140,7 @@ function Payroll() {
     if (isLoading) return <Loader />
 
     return (
-        <div className="w-full">
+        <div className="w-full h-full overflow-hidden">
             <div className="flex items-center justify-between py-4">
                 <Input
                     placeholder="Filter Payrolls..."
@@ -152,7 +152,7 @@ function Payroll() {
                         <FileDown className="h-3.5 w-3.5" />
                         Export
                     </Button>
-                    {/* <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Send Payroll'}</Button> */}
+                    <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Send Payroll'}</Button>
                 </div>
             </div>
             <div className="border rounded-md">

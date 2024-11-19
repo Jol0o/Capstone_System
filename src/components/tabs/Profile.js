@@ -438,9 +438,6 @@ function Profile() {
                         <Tooltip id="my-tooltip" />
                     </ScrollArea>
                 </Card></div>
-            <div className="m-auto max-w-[100px]">
-                {user?.status === 'user' && <Button variant="ghost" onClick={logout} className="text-xs font-medium text-red-400">Log out</Button>}
-            </div>
         </>
     );
 }

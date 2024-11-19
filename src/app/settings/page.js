@@ -67,6 +67,7 @@ function Page() {
                     toast("Successfull", {
                         description: "Success creating an account!",
                     })
+                    window.location.reload();
                 })
                 .catch(error => {
                     toast("Error", {
@@ -88,7 +89,9 @@ function Page() {
                 toast("Successfull", {
                     description: "Success updating an account!",
                 })
+                window.location.reload();
             }
+            reload
         } catch (e) {
             toast("Error", {
                 description: e.response.data.errors[0].msg,
@@ -103,6 +106,7 @@ function Page() {
                 toast("Successfull", {
                     description: "Success deleting an account!",
                 })
+                window.location.reload();
             }
         } catch (e) {
             toast("Error", {
@@ -172,7 +176,7 @@ function Page() {
                                 <DialogTitle>Create New Admin Account</DialogTitle>
                                 <DialogDescription>Fill in the details for the new admin account.</DialogDescription>
                             </DialogHeader>
-                            <AdminAccountForm userForm={userForm} handleChange={handleChange} setUserForm={setUserForm}  submit={registerAdmin} />
+                            <AdminAccountForm userForm={userForm} handleChange={handleChange} setUserForm={setUserForm} submit={registerAdmin} />
                         </DialogContent>
                     </Dialog>
                 </CardFooter>
@@ -195,7 +199,7 @@ function Page() {
 function AdminAccountForm({ account = {}, handleChange, userForm, submit, setUserForm }) {
 
     useEffect(() => {
-        if(account && account.email && account.password){
+        if (account && account.email && account.password) {
             setUserForm({ ...userForm, email: account.email, password: account.password })
         }
     }, [account])
