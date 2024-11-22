@@ -25,6 +25,7 @@ import HeatMap from '@uiw/react-heat-map';
 import { Tooltip } from 'react-tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import * as XLSX from 'xlsx';
+import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
@@ -53,6 +54,12 @@ function Profile() {
     const [selectedYear, setSelectedYear] = useState('2024');
     const router = useRouter();
     const userEmail = useStore(state => state.userEmail);
+    const currentMonthStart = startOfMonth(new Date());
+    const currentMonthEnd = endOfMonth(new Date());
+
+    const filteredValue = yearData.filter(data =>
+        isWithinInterval(new Date(data.date), { start: currentMonthStart, end: currentMonthEnd })
+    );
 
     const fetchUser = useCallback(async () => {
         const id = userEmail ? userEmail : user?.user_id;
@@ -190,52 +197,53 @@ function Profile() {
         }
     }
 
-    useEffect(() => {
-        const id = userData?.employee_id;
-        if (!id) return;
-        const fetchAttendance = async () => {
-            try {
-                const res = await getUserAttendance(id);
-                if (res.status === 200) {
-                    setYearData(res.data.data);
-                }
-            } catch (error) {
-                console.error('Error fetching attendance:', error);
-            }
-        };
+    // useEffect(() => {
+    //     const id = userData?.employee_id;
+    //     if (!id) return;
+    //     const fetchAttendance = async () => {
+    //         try {
+    //             const res = await getUserAttendance(id);
+    //             if (res.status === 200) {
+    //                 setYearData(res.data.data);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching attendance:', error);
+    //         }
+    //     };
 
-        fetchAttendance();
-    }, [userData]);
+    //     fetchAttendance();
+    // }, [userData]);
 
-    const value = yearData.map((item) => {
-        return ({
-            date: item.date,
-            status: item.status
-        });
-    });
+    // const value = yearData.map((item) => {
+    //     return ({
+    //         date: item.date,
+    //         status: item.status
+    //     });
+    // });
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'present': return '#4caf50'; // Green
-            case 'late': return '#ffeb3b'; // Yellow
-            case 'absent': return '#f44336'; // Red
-            case 'off duty': return '#ff9800'; // Orange
-            case 'no-data': return '#9e9e9e'; // Gray
-            default: return '#9e9e9e'; // Gray
-        }
+    // const getStatusColor = (status) => {
+    //     switch (status) {
+    //         case 'present': return '#4caf50'; // Green
+    //         case 'late': return '#ffeb3b'; // Yellow
+    //         case 'absent': return '#f44336'; // Red
+    //         case 'off duty': return '#ff9800'; // Orange
+    //         case 'no-data': return '#9e9e9e'; // Gray
+    //         default: return '#9e9e9e'; // Gray
+    //     }
+    // };
+
+    // const formatDate = (dateString) => {
+    //     const options = { year: 'numeric', month: 'long', day: 'numeric' }
+    //     return new Date(dateString).toLocaleDateString(undefined, options)
+    // }
+
+        const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(value);
     };
 
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' }
-        return new Date(dateString).toLocaleDateString(undefined, options)
-    }
-
-    const handleExcelDownload = (data) => {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, "attendance.xlsx");
-    };
 
 
     return (
@@ -315,7 +323,7 @@ function Profile() {
                                     <Input
                                         type="text"
                                         id="salary"
-                                        value={userData?.baseSalary}
+                                        value={formatCurrency(userData?.baseSalary)}
                                         name="baseSalary"
                                         onChange={handleChange}
                                         disabled={user?.status === 'user' ? true : false}
@@ -326,7 +334,7 @@ function Profile() {
                                     <Input
                                         type="text"
                                         id="salary"
-                                        value={userData?.totalSalary}
+                                        value={formatCurrency(userData?.totalSalary)}
                                         name="baseSalary"
                                         onChange={handleChange}
                                         disabled
@@ -339,6 +347,17 @@ function Profile() {
                                         id="hierarchy"
                                         value={userData?.hierarchy}
                                         name="hierarchy"
+                                        onChange={handleChange}
+                                        disabled={user?.status === 'user' ? true : false}
+                                    />
+                                </div>
+                                <div className="grid items-center grid-cols-1 gap-2">
+                                    <Label htmlFor="leaveCredits">Leave Credits</Label>
+                                    <Input
+                                        type="text"
+                                        id="leaveCredits"
+                                        value={userData?.leaveCredits}
+                                        name="leaveCredits"
                                         onChange={handleChange}
                                         disabled={user?.status === 'user' ? true : false}
                                     />
@@ -396,7 +415,7 @@ function Profile() {
                     </div>
                 </div>
             </div>
-            <div className="max-w-[1000px] m-auto p-5">
+            {/* <div className="max-w-[1000px] m-auto p-5">
                 <Card className="p-3 border-gray-800">
                     <CardHeader>
                         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -422,22 +441,8 @@ function Profile() {
                             </div>
                         </div>
                     </CardHeader>
-                    <ScrollArea className="w-full rounded-md">
-                        <HeatMap
-                            value={value}
-                            width={900}
-                            legendCellSize={0}
-                            startDate={new Date(`${selectedYear}-01-01`)}
-                            rectSize={15}
-                            rectRender={(props, data) => {
-                                return (
-                                    <rect {...props} fill={getStatusColor(data.status)} data-tooltip-id="my-tooltip" data-tooltip-content={`${formatDate(data.date)}: ${data.status || 'no-data'}`} />
-                                );
-                            }}
-                        />
-                        <Tooltip id="my-tooltip" />
-                    </ScrollArea>
-                </Card></div>
+
+                </Card></div> */}
         </>
     );
 }

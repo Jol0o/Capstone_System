@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -23,19 +23,52 @@ import { exportData, getAllUserAttendances, getAttendance, removeAttendance, sea
 import * as XLSX from 'xlsx';
 import { format, parse, differenceInMinutes } from 'date-fns';
 import Loader from '../Loader';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar } from '../ui/calendar';
 
 function Attendance() {
     const [data, setData] = useState([])
     const [filterData, setFilteredData] = useState([])
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(0)
-    const limit = 15
+    const limit = 10
     const { token } = useAuth()
     const router = useRouter()
     const [filter, setFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [monthlyAttendance, setMonthlyAttendance] = useState([])
     const table = "attendance"
+
+    const defaultStartDate = new Date();
+    defaultStartDate.setDate(defaultStartDate.getDate() - 15);
+
+    // Format the dates to 'YYYY-MM-DD'
+    const formattedStartDate = format(defaultStartDate, 'yyyy-MM-dd');
+    const formattedEndDate = format(new Date(), 'yyyy-MM-dd');
+
+    const [startDate, setStartDate] = useState(formattedStartDate);
+    const [endDate, setEndDate] = useState(formattedEndDate);
+
+    const handleStartDateChange = (date) => {
+        const formattedDate = format(date, 'yyyy-MM-dd');
+        setStartDate(formattedDate);
+        if (formattedDate && (!endDate || date > new Date(endDate))) {
+            setEndDate(formattedDate);
+        }
+    };
+
+    const handleEndDateChange = (date) => {
+        const formattedDate = format(date, 'yyyy-MM-dd');
+        if (formattedDate && startDate && new Date(formattedDate) < new Date(startDate)) {
+            setEndDate(startDate);
+        } else {
+            setEndDate(formattedDate);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -58,7 +91,7 @@ function Attendance() {
     useEffect(() => {
         setIsLoading(true)
         const fetchpayroll = async () => {
-            const response = await getAttendance(page, limit, token)
+            const response = await getAttendance(page, limit, startDate, endDate)
             if (response) {
                 console.log(response.data)
                 setTotalPages(response.data.totalPages)
@@ -68,20 +101,8 @@ function Attendance() {
             }
         }
 
-        const fetchMonthlyAttendance = async () => {
-            try {
-                const res = await getAllUserAttendances()
-                if (res.status === 200) {
-                    setMonthlyAttendance(res.data.data)
-                }
-            } catch (e) {
-                toast.error("Error fetching monthly attendance")
-            }
-        }
-
-        fetchMonthlyAttendance()
         fetchpayroll()
-    }, [page])
+    }, [page, startDate, endDate])
 
     const handleNext = () => {
         setPage(prevPage => prevPage + 1);
@@ -90,6 +111,20 @@ function Attendance() {
     const handlePrev = () => {
         setPage(prevPage => Math.max(prevPage - 1, 1));
     };
+
+    const fetchMonthlyAttendance = async () => {
+        setIsLoading(true)
+        try {
+            const res = await getAllUserAttendances(startDate, endDate)
+            if (res.status === 200) {
+                exportToCSV(res.data.data)
+                setIsLoading(false)
+            }
+        } catch (e) {
+            toast.error("Error fetching monthly attendance")
+            setIsLoading(false)
+        }
+    }
 
     const deleteAttendance = async (id) => {
         const isConfirmed = window.confirm("Are you sure you want to delete this employee?");
@@ -108,32 +143,6 @@ function Attendance() {
             console.error('Error deleting payroll:', error);
         }
     }
-
-
-    const handleExcelDownload = async () => {
-        try {
-            const res = await exportData(table);
-            console.log('Response:', res); // Log the response
-
-            if (res.status !== 200) {
-                throw new Error('Network response was not ok');
-            }
-
-            const url = window.URL.createObjectURL(res.data);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${table}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (e) {
-            console.error('Error:', e); // Log the error
-            toast.error("Error", {
-                description: e.message,
-            });
-        }
-    };
 
     const exportToCSV = (data) => {
         const csvRows = [];
@@ -154,7 +163,7 @@ function Attendance() {
         const a = document.createElement('a');
         a.setAttribute('hidden', '');
         a.setAttribute('href', url);
-        a.setAttribute('download', 'monthly_attendance.csv');
+        a.setAttribute('download', 'attendance.csv');
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -195,18 +204,62 @@ function Attendance() {
 
     return (
         <div className="w-full">
-            <div className="flex items-center justify-between py-4">
-                <Input
-                    placeholder="Filter Attendance..."
-                    onChange={(event) => setFilter(event.target.value)}
-                    className="max-w-sm"
-                />
+            <div className="flex items-center flex-col md:flex-row justify-between py-4">
                 <div className="flex gap-2">
-                    <Button disabled={filterData.length === 0} onClick={() => exportToCSV(monthlyAttendance)} variant="outline" className="gap-1">
+                    <Input
+                        placeholder="Filter Attendance..."
+                        onChange={(event) => setFilter(event.target.value)}
+                        className="max-w-sm"
+                    />
+                    <div className="flex items-center gap-2">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8">
+                                    <CalendarIcon className="w-4 h-4 mr-2" />
+                                    {format(new Date(startDate), "MMM d")}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={new Date(startDate)}
+                                    onSelect={handleStartDateChange}
+                                    disabled={(date) =>
+                                        date > new Date() || date < new Date("1900-01-01")
+                                    }
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        <span className="text-gray-500">to</span>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8">
+                                    <CalendarIcon className="w-4 h-4 mr-2" />
+                                    {format(new Date(endDate), "MMM d")}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={new Date(endDate)}
+                                    onSelect={handleEndDateChange}
+                                    disabled={(date) =>
+                                        date > new Date() || date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
+                                    }
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                </div>
+
+                <div className="flex gap-2">
+                    {/* <Button disabled={filterData.length === 0} onClick={() => exportToCSV(monthlyAttendance)} variant="outline" className="gap-1">
                         <FileDown className="h-3.5 w-3.5" />
                         Monthly Attendance
-                    </Button>
-                    <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                    </Button> */}
+                    <Button disabled={filterData.length === 0} onClick={fetchMonthlyAttendance} variant="outline" className="gap-1">
                         <FileDown className="h-3.5 w-3.5" />
                         Export
                     </Button>

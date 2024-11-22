@@ -165,7 +165,7 @@ function Employee({ setTab }) {
     return (
         <>
             <div className="w-full">
-                <div className="flex items-center justify-between py-4">
+                <div className="flex items-center flex-col md:flex-row justify-between py-4">
                     <Input
                         placeholder="Filter Employee Name..."
                         onChange={(event) => setFilter(event.target.value)}
@@ -187,7 +187,7 @@ function Employee({ setTab }) {
                         <TableHeader>
                             <TableRow>
                                 {Object.keys(filterData[0]).map((key) => {
-                                    if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id' && key !== 'monthSalary') {
+                                    if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id' && key !== 'monthSalary' && key !== 'leaveCredits') {
                                         // Replace all occurrences of "_" with a space
                                         let formattedKey = key.replace(/_/g, ' ');
                                         return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;

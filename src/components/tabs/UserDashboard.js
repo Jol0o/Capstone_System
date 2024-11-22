@@ -1,0 +1,423 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import { Calendar as CalendarIcon, Clock, DollarSign, FileText, User, ChevronLeft, ChevronRight, Filter, LoaderCircle, FileDown } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import useAuth from '@/hooks/useAuth'
+import { useStore } from '@/hooks/useStore';
+import Loader from '../Loader'
+import { format, getDaysInMonth } from 'date-fns';
+import { getEmployeeById, getUserAttendance, getUserDataDashboard } from "@/lib/api";
+import { Calendar } from "@/components/ui/calendar"
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import cn from 'classnames';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import * as XLSX from 'xlsx';
+
+// Mock data - replace with actual API calls
+const userDatas = {
+  name: "John Doe",
+  position: "Software Engineer",
+  department: "Engineering",
+  avatar: "https://github.com/shadcn.png",
+}
+
+export default function UserDashboard() {
+  const { user } = useAuth();
+  const userEmail = useStore(state => state.userEmail);
+  const [userData, setUserData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [dashboardData, setDashboardData] = useState(null)
+  const [yearData, setYearData] = useState([])
+  const [totalPages, setTotalPages] = useState(1)
+  const [page, setPage] = useState(1)
+  const limit = 5
+
+  const defaultStartDate = new Date();
+  defaultStartDate.setDate(defaultStartDate.getDate() - 15);
+
+  // Format the dates to 'YYYY-MM-DD'
+  const formattedStartDate = format(defaultStartDate, 'yyyy-MM-dd');
+  const formattedEndDate = format(new Date(), 'yyyy-MM-dd');
+
+  const [startDate, setStartDate] = useState(formattedStartDate);
+  const [endDate, setEndDate] = useState(formattedEndDate);
+  const [loadingAttendance, setLoadingAttendance] = useState(false)
+
+  console.log(startDate, endDate)
+
+  const fetchDashboardData = async () => {
+    try {
+      const res = await getUserDataDashboard()
+      if (res.status === 200) {
+        console.log(res.data)
+        setDashboardData(res.data)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const fetchUser = useCallback(async () => {
+    const id = userEmail ? userEmail : user?.user_id;
+    setLoading(true)
+    try {
+      if (id) {
+        const response = await getEmployeeById(id);
+        if (response.data) {
+          const userData = response.data[0];
+          setUserData(userData);
+          setLoading(false)
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      setLoading(false)
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchUser();
+    fetchDashboardData()
+  }, [fetchUser]);
+
+  useEffect(() => {
+    const id = userData?.employee_id;
+    if (!id) return;
+    setLoadingAttendance(true)
+    const fetchAttendance = async () => {
+      try {
+        const res = await getUserAttendance(id, startDate, endDate, page, limit);
+        if (res.status === 200) {
+          setTotalPages(res.data.totalPages)
+          setYearData(res.data.data);
+          setLoadingAttendance(false)
+        }
+      } catch (error) {
+        setLoadingAttendance(false)
+        console.error('Error fetching attendance:', error);
+      }
+    };
+    fetchAttendance();
+  }, [userData, startDate, endDate, page]);
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
+  if (loading) return <Loader />
+
+  const getStatusVariant = (status) => {
+    switch (status) {
+      case "present":
+        return "success"; // Green
+      case "late":
+        return "warning"; // Yellow
+      case "absent":
+        return "destructive"; // Red
+      case "off duty":
+        return "secondary"; // Orange
+      default:
+        return "default"; // Default color
+    }
+  };
+
+  const handleNext = () => {
+    setPage(prevPage => prevPage + 1);
+  };
+
+  const handlePrev = () => {
+    setPage(prevPage => Math.max(prevPage - 1, 1));
+  };
+
+  const handleStartDateChange = (date) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    setStartDate(formattedDate);
+    if (formattedDate && (!endDate || date > new Date(endDate))) {
+      setEndDate(formattedDate);
+    }
+  };
+
+  const handleEndDateChange = (date) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    if (formattedDate && startDate && new Date(formattedDate) < new Date(startDate)) {
+      setEndDate(startDate);
+    } else {
+      setEndDate(formattedDate);
+    }
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+    }).format(value);
+  };
+
+  const calculateAttendancePercentage = (totalDays) => {
+    const currentDate = new Date();
+    const totalDaysInMonth = getDaysInMonth(currentDate);
+    const attendancePercentage = (totalDays / totalDaysInMonth) * 100;
+    return attendancePercentage.toFixed(2); // Format to 2 decimal places
+  };
+
+  const handleExcelDownload = (data) => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, "attendance.xlsx");
+  };
+
+  return (
+    <div className="container mx-auto space-y-6 md:p-4">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Employee Dashboard</h1>
+        <Button>Request Leave</Button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Leave Days Card */}
+        <Card className="col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Total Leave Days</CardTitle>
+            <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardData?.leaveCredits} days</div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {dashboardData?.usedLeaveDays} used, {dashboardData?.pendingLeaveRequests} pending
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Last Payroll Card */}
+        <Card className="col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Last Payroll</CardTitle>
+            <DollarSign className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            {dashboardData && dashboardData.latestPayroll ? <><div className="text-2xl font-bold">{formatCurrency(dashboardData?.latestPayroll.total_pay)}</div>
+              <p className="text-xs text-muted-foreground">{formatDate(dashboardData?.latestPayroll.created_at)}</p>
+            </> : <div className="text-2xl font-bold">0</div>}
+          </CardContent>
+        </Card>
+
+        {/* Attendance Rate Card */}
+        <Card className="col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
+            <Clock className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{calculateAttendancePercentage(dashboardData?.totalDays)}%</div>
+            <p className="text-xs text-muted-foreground">Last 30 days</p>
+          </CardContent>
+        </Card>
+
+        {/* Pending Requests Card */}
+        <Card className="col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
+            <FileText className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardData?.pendingLeaveRequests}</div>
+            <p className="text-xs text-muted-foreground">Leave requests awaiting approval</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Employee Information Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Employee Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-4">
+            <Avatar className="w-20 h-20">
+              <AvatarImage src={userData && userData.avatar ? userData.avatar : userDatas.avatar} alt={userDatas.name} />
+              <AvatarFallback>
+                {userData ? userData.name.split(' ').map(n => n[0]).join('') : 'JD'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-center sm:text-left">
+              <h2 className="text-xl font-bold sm:text-2xl">{userData ? userData.name : 'John Doe'}</h2>
+              <p className="text-muted-foreground">{userData ? userData.position : 'Software Engineer'}</p>
+              <p className="text-muted-foreground">{userData ? userData.department : 'Engineering'}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Recent Attendance Card */}
+        <Card >
+          <CardHeader className="flex flex-col pb-4 space-y-4 md:flex-row">
+            <div className="flex flex-col justify-between w-full gap-2 md:flex-row md:items-center">
+              <div>
+                <CardTitle className="text-xl font-semibold ">Recent Attendance</CardTitle>
+                <CardDescription>Your attendance for the last 5 working days</CardDescription>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8">
+                        <CalendarIcon className="w-4 h-4 mr-2" />
+                        {format(new Date(startDate), "MMM d")}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={new Date(startDate)}
+                        onSelect={handleStartDateChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <span className="text-gray-500">to</span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8">
+                        <CalendarIcon className="w-4 h-4 mr-2" />
+                        {format(new Date(endDate), "MMM d")}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={new Date(endDate)}
+                        onSelect={handleEndDateChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <Button size="sm" variant="secondary" className="h-8" onClick={() => handleExcelDownload(yearData)}>
+                  <FileDown className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto max-h-[300px] custom-scrollbar">
+              {!loadingAttendance ? <ScrollArea className="custom-scrollbar">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-gray-800 hover:bg-transparent">
+                      <TableHead className="font-medium">Date</TableHead>
+                      <TableHead className="font-medium">Check In</TableHead>
+                      <TableHead className="font-medium">Check Out</TableHead>
+                      <TableHead className="font-medium">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {yearData.map((record) => (
+                      <TableRow key={record.date} className="border-gray-800 hover:bg-transparent">
+                        <TableCell className="py-3">
+                          <div className="space-y-0.5">
+                            <div >
+                              {format(new Date(record.date), "MMM d,")}
+                            </div>
+                            <div className="text-sm ">
+                              {format(new Date(record.date), "yyyy")}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell >{record.time_in || "-"}</TableCell>
+                        <TableCell >{record.time_out || "-"}</TableCell>
+                        <TableCell>
+                          <Badge variant={getStatusVariant(record.status)}>
+                            {record.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea> :
+                <div className="flex items-center justify-center w-full h-[200px]">
+                  <LoaderCircle className="animate-spin" />
+                </div>
+              }
+            </div>
+          </CardContent>
+          <CardFooter>
+            {yearData.length > 0 && <div className="flex items-center justify-end w-full pt-2">
+
+              <div className="flex items-center gap-2">
+                {page !== 1 && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>}
+                <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
+                {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>}
+              </div>
+            </div>}
+          </CardFooter>
+        </Card>
+
+        {/* Recent Payrolls Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Payrolls</CardTitle>
+            <CardDescription>Your last 3 months of payroll</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto custom-scrollbar">
+              <ScrollArea className="custom-scrollbar">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Month</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Hours</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {dashboardData && dashboardData.totalPayroll.map((payroll, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{formatDate(payroll.created_at)}</TableCell>
+                        <TableCell>{formatCurrency(payroll.total_pay)}</TableCell>
+                        <TableCell>
+                          {payroll.hours_worked} Hours
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

@@ -6,14 +6,6 @@ import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-
 import QRCode from 'qrcode.react';
 import {
     Dialog,
@@ -30,7 +22,7 @@ function EditUserAccount({ id }) {
         email: '',
     });
 
-    const handleSubmit = () => {}
+    const handleSubmit = () => { }
 
     const handleChange = (e) => {
         setUserForm({
@@ -52,29 +44,29 @@ function EditUserAccount({ id }) {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="gap-4 py-4 ">
-                <form className='flex flex-col gap-3' onSubmit={handleSubmit}>
-            <div className="grid gap-4">
-              
-                <div className="grid items-center grid-cols-1 gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                        id="email"
-                        type="text"
-                        name="email"
-                        value={userForm.email} onChange={handleChange}
-                        placeholder="Enter email"
-                        required
-                    /></div>
-                <Button type="submit" className="w-full">
-                    Submit
-                </Button>
-            </div>
-            {userForm.name && (
-                <div className="hidden" ref={qrCodeRef}>
-                    <QRCode size={200} level="M" value={userForm.name} />
-                </div>
-            )}
-        </form>
+                    <form className='flex flex-col gap-3' onSubmit={handleSubmit}>
+                        <div className="grid gap-4">
+
+                            <div className="grid items-center grid-cols-1 gap-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    type="text"
+                                    name="email"
+                                    value={userForm.email} onChange={handleChange}
+                                    placeholder="Enter email"
+                                    required
+                                /></div>
+                            <Button type="submit" className="w-full">
+                                Submit
+                            </Button>
+                        </div>
+                        {userForm.name && (
+                            <div className="hidden" ref={qrCodeRef}>
+                                <QRCode size={200} level="M" value={userForm.name} />
+                            </div>
+                        )}
+                    </form>
                 </div>
             </DialogContent>
         </Dialog>

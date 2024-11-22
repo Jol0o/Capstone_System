@@ -30,6 +30,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Label } from '../ui/label';
+import { SunIcon } from '@radix-ui/react-icons';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
@@ -142,17 +145,26 @@ function Request() {
             console.error('Error:', e); // Log the error
         }
     }
+
     const handleUpdate = async () => {
-        if (status === "" && !selectedData.id) return
+        if (status === "" || !selectedData.id) return;
         try {
-            const res = await updateLeaveStatus(selectedData.id, status)
+            const res = await updateLeaveStatus(selectedData.id, {
+                status,
+                approved_by: selectedData.approved_by,
+                received_by: selectedData.received_by,
+                recorded_by: selectedData.recorded_by,
+                department_head: selectedData.department_head,
+                hr_department: selectedData.hr_department,
+                withpay: selectedData.withpay
+            });
             if (res.status === 200) {
                 toast(`Successfully updated the status`);
             }
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
-    }
+    };
 
     const handleChange = (value) => {
         setStatus(value);
@@ -170,7 +182,7 @@ function Request() {
     return (
         <>
             <div className="w-full">
-                <div className="flex items-center justify-between py-4">
+                <div className="flex flex-col md:flex-row items-center justify-between py-4">
                     <Input
                         placeholder="Filter Leave Requests..."
                         onChange={(event) => setFilter(event.target.value)}
@@ -269,7 +281,7 @@ function Request() {
                         <DialogTitle className="text-xl font-semibold text-white">Leave Request Details</DialogTitle>
                     </DialogHeader>
                     <ScrollArea className="max-h-[80vh] pr-4">
-                        <div className="space-y-0">
+                        <div className="space-y-4">
                             <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
                                 <InfoRow label="Name" value={selectedData?.name} />
@@ -297,38 +309,147 @@ function Request() {
                                     label="Person to Takeover"
                                     value={selectedData?.person_to_takeover}
                                 />
+                                <InfoRow
+                                    label="Start Date"
+                                    value={formatDate(selectedData?.inclusive_dates)}
+                                />
+                                <InfoRow
+                                    label="End Date"
+                                    value={formatDate(selectedData?.to_date)}
+                                />
                             </div>
 
                             <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Request Status</h3>
-                                <Select value={status} onValueChange={handleChange}>
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder={status === "" ? data?.status : status} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectItem value="Pending">Pending</SelectItem>
-                                            <SelectItem value="Process">Process</SelectItem>
-                                            <SelectItem value="Approved">Approved</SelectItem>
-                                            <SelectItem value="Rejected">Rejected</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                                <InfoRow
-                                    label="Requested By"
-                                    value={selectedData?.requested_by}
-                                />
-                                <InfoRow
-                                    label="Date Requested"
-                                    value={formatDate(selectedData?.created_at)}
-                                />
+                                {selectedData?.status !== 'Done' ? (
+                                    <>
+                                        <Select value={status} onValueChange={handleChange}>
+                                            <SelectTrigger className="w-[180px]">
+                                                <SelectValue placeholder={status === "" ? data?.status : status} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="Pending">Pending</SelectItem>
+                                                    <SelectItem value="Process">Process</SelectItem>
+                                                    <SelectItem value="Approved">Approved</SelectItem>
+                                                    <SelectItem value="Rejected">Rejected</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+
+                                        {/* Show additional inputs if status is "Approved" */}
+                                        {status === "Approved" && (
+                                            <div className="mt-4 space-y-4">
+                                                <InfoRow label="Requested By" value={selectedData?.requested_by} />
+                                                <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
+                                                <div>
+                                                    <Label className="block text-sm text-white">Approved By</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.approved_by || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, approved_by: e.target.value })}
+                                                    />
+                                                </div>
+                                                <InfoRow
+                                                    label="Date of Approval"
+                                                    value={selectedData?.date_of_approve ? formatDate(selectedData.date_of_approve) : formatDate(new Date())}
+                                                />
+                                                <div>
+                                                    <Label className="block text-sm text-white">Received By</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.received_by || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, received_by: e.target.value })}
+                                                    />
+                                                </div>
+                                                <InfoRow
+                                                    label="Date Received"
+                                                    value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : formatDate(new Date())}
+                                                />
+                                                <div>
+                                                    <Label className="block text-sm text-white">Recorded By</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.recorded_by || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, recorded_by: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label className="block text-sm text-white">Department Head</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.department_head || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, department_head: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label className="block text-sm text-white">HR Department</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.hr_department || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, hr_department: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedData.withpay || false}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, withpay: e.target.checked })}
+                                                    />
+                                                    <label className="block text-sm text-white">With Pay/ Without Pay</label>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <InfoRow
+                                        label="Status"
+                                        value={
+                                            <Badge
+                                                variant={selectedData?.status === "Done" ? "success" :
+                                                    selectedData?.status === "Pending" ? "warning" : "destructive"}
+                                                className="capitalize"
+                                            >
+                                                {selectedData?.status}
+                                            </Badge>
+                                        }
+                                    />
+                                )}
+
+                                {status !== 'Approved' ? <><InfoRow label="Requested By" value={selectedData?.requested_by} />
+                                    <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
+                                    <InfoRow label="Approved By" value={selectedData?.approved_by} />
+                                    <InfoRow
+                                        label="Date of Approval"
+                                        value={selectedData?.date_of_approve ? formatDate(selectedData.date_of_approve) : 'N/A'}
+                                    />
+                                    <InfoRow label="Received By" value={selectedData?.received_by} />
+                                    <InfoRow
+                                        label="Date Received"
+                                        value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : 'N/A'}
+                                    />
+                                    <InfoRow label="Recorded By" value={selectedData?.recorded_by} />
+                                    <InfoRow label="Department Head" value={selectedData?.department_head} />
+                                    <InfoRow label="HR Department" value={selectedData?.hr_department} /> </> : null}
                             </div>
+
 
                             <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Additional Information</h3>
                                 <InfoRow
                                     label="Supporting Document"
-                                    value={selectedData?.supporting_document}
+                                    value={
+                                        selectedData?.supporting_document ? (
+                                            <a href={selectedData?.supporting_document} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                                                View Document
+                                            </a>
+                                        ) : 'No document provided'
+                                    }
                                 />
                                 <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
                                     <div className="text-sm font-medium text-gray-400">Distribution Copy</div>

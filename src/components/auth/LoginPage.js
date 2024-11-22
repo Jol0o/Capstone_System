@@ -22,14 +22,19 @@ export default function LoginPage() {
   const [user, setUser] = useState(null)
   const router = useRouter()
 
+  function formatDate(dateString) {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
+
   useEffect(() => {
     const readerElement = document.getElementById('reader');
 
     if (readerElement && readerElement.offsetWidth > 0 && readerElement.offsetHeight > 0) {
       const scanner = new Html5QrcodeScanner('reader', {
         qrbox: {
-          width: 250,
-          height: 250
+          width: 400,
+          height: 400
         },
         fps: 5,
       })
@@ -91,15 +96,23 @@ export default function LoginPage() {
           attendance_id: uuidv4()
         });
         console.log(timeInResponse.data);
+        toast.success(`Welcome ${user.name}, time in ${timeInResponse.data.data.time_in}`)
+        window.location.reload()
       } else {
         console.log("data", data.data[0].time_in);
-        const timeOutResponse = await axios.put(`${API_URL}/api/time_out/${data.data[0].attendance_id}`, {
+        const timeOutResponse = await axios.put(`${API_URL}/api/time_out/${data.data[0].attendance_id} `, {
           time_in: data.data[0].time_in
         });
+        toast.success(`Goodbye ${user.name}, Time in ${timeOutResponse.data.time_in}, time out at ${timeOutResponse.data.time_out}.`);
         console.log(timeOutResponse.data);
+        window.location.reload()
       }
     } catch (error) {
       console.error('Error:', error);
+      toast.error(error?.response?.data.message || error.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000); // 3-second delay
     }
   };
 
@@ -124,23 +137,7 @@ export default function LoginPage() {
 
   return (
     <div className="grid w-full min-h-screen grid-cols-1 ">
-
       <div className="flex flex-col items-center justify-center bg-muted/50">
-        {user !== null &&
-          <div>
-            <Image width={300} height={300} src={user.qrcode} alt={user.name} />
-            <h1 className="mt-3 text-xl font-semibold tracking-tight border-b scroll-m-20 first:mt-0">{user.name}</h1>
-            <div className="flex gap-2">
-              <Badge>{user.department}</Badge>
-              <Badge >{user.position}</Badge>
-            </div>
-            <h2 className="mt-1 text-xs font-medium text-gray-300">Phone:{user.phone_number}</h2>
-            <Button onClick={() => {
-              setUser(null)
-              setResult(null)
-              window.location.reload()
-            }}>Reset</Button>
-          </div>}
         <div id="reader" className="w-[300px] h-[300px] border-0"></div>
       </div>
     </div>

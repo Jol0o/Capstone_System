@@ -60,8 +60,16 @@ export const removeEmployee = async (id) => {
     await axiosInstance.delete(`${API_URL}/api/employee/${id}`);
 };
 
-export const getAttendance = cacheWrapper(async (page, limit) => {
-    const response = await axiosInstance.get(`${API_URL}/api/attendances?page=${page}&limit=${limit}`);
+export const getAttendance = cacheWrapper(async (page, limit, startDate, endDate,) => {
+    console.log(page)
+    const response = await axiosInstance.get(`${API_URL}/api/attendances`, {
+        params: {
+            startDate,
+            endDate,
+            page,
+            limit
+        }
+    });
     if (response.status === 200) {
         return response;
     } else {
@@ -69,19 +77,35 @@ export const getAttendance = cacheWrapper(async (page, limit) => {
     }
 });
 
-export const getUserAttendance = cacheWrapper(async (id) => {
-    const response = await axiosInstance.get(`${API_URL}/api/user-attendance/${id}`);
-    console.log(response)
-    if (response.status === 200) {
-        return response;
-    } else {
+export const getUserAttendance = cacheWrapper(async (id, startDate, endDate, page, limit) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/user-attendance/${id}`, {
+            params: {
+                startDate,
+                endDate,
+                page,
+                limit
+            }
+        });
+        if (response.status === 200) {
+            return response; // Return the data directly
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching user attendance:', error);
         return null;
     }
-})
+});
 
-export const getAllUserAttendances = cacheWrapper(async () => {
+export const getAllUserAttendances = cacheWrapper(async (startDate, endDate) => {
     try {
-        const res = await axiosInstance.get(`${API_URL}/api//monthly-attendance`)
+        const res = await axiosInstance.get(`${API_URL}/api/import-attendance`, {
+            params: {
+                startDate,
+                endDate,
+            }
+        })
         return res
     } catch (err) {
         return err
@@ -167,8 +191,15 @@ export const getYearlyAttendance = cacheWrapper(async () => {
 });
 
 // api for payroll
-export const getPayrolls = cacheWrapper(async (page, limit) => {
-    const response = await axiosInstance.get(`${API_URL}/api/payroll?page=${page}&limit=${limit}`);
+export const getPayrolls = cacheWrapper(async (page, limit, startDate, endDate) => {
+    const response = await axiosInstance.get(`${API_URL}/api/payroll`, {
+        params: {
+            startDate,
+            endDate,
+            page,
+            limit
+        }
+    });
     if (response) {
         return response;
     } else {
@@ -193,6 +224,20 @@ export const getUserPayroll = cacheWrapper(async (page, limit, id) => {
         return null;
     }
 });
+
+export const exportPayroll = cacheWrapper(async (startDate, endDate) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/export-payroll`, {
+            params: {
+                startDate,
+                endDate,
+            }
+        });
+        return response;
+    } catch (error) {
+        return null;
+    }
+})
 
 export const removePayroll = async (id) => {
     await axiosInstance.delete(`${API_URL}/api/payroll/${id}`);
@@ -239,7 +284,9 @@ export const registerUser = async (userForm) => {
 
 export const registerAdminAcc = async (userForm) => {
     const response = await axiosInstance.post(`${API_URL}/api/auth/admin/register`, {
+        name: userForm.name,
         email: userForm.email,
+        position: userForm.position,
         password: userForm.password,
     });
     if (response.status === 200) {
@@ -278,8 +325,8 @@ export const removeLeaveRequest = async (id) => {
     return res
 }
 
-export const updateLeaveStatus = async (id, status) => {
-    const response = await axiosInstance.put(`${API_URL}/api/leave_request/${id}/status`, { status });
+export const updateLeaveStatus = async (id, data) => {
+    const response = await axiosInstance.put(`${API_URL}/api/leave_request/${id}/status`, data);
     return response;
 };
 
@@ -391,7 +438,7 @@ export const removeAdmin = async (id) => {
     }
 }
 
-export const exportData = async (table) => {
+export const exportData = cacheWrapper(async (table) => {
     try {
         const response = await axiosInstance.get(`${API_URL}/api/export/${table}`, {
             responseType: 'blob', // Set the response type to 'blob'
@@ -400,7 +447,7 @@ export const exportData = async (table) => {
     } catch (error) {
         throw error;
     }
-};
+});
 
 export const forgatPassword = async (email) => {
     try {
@@ -413,9 +460,28 @@ export const forgatPassword = async (email) => {
 
 export const checkPayroll = async () => {
     try {
-        const res = await axiosInstance.post(`${API_URL}/api//run-payroll`)
+        const res = await axiosInstance.post(`${API_URL}/api/run-payroll`)
         return res
     } catch (e) {
         return e.message
     }
 }
+
+
+export const getUserDataDashboard = cacheWrapper(async () => {
+    try {
+        const res = await axiosInstance.get(`${API_URL}/api/user-dashboard`)
+        return res
+    } catch (e) {
+        return e
+    }
+})
+
+export const getAdminData = cacheWrapper(async (email) => {
+    try {
+        const res = await axiosInstance.get(`${API_URL}/api/get-admin`, { params: { email } })
+        return res
+    } catch (e) {
+        return null
+    }
+})

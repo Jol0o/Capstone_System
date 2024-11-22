@@ -51,6 +51,7 @@ import LeaveRequest from "@/components/tabs/LeaveRequest";
 import { logoutUser } from "@/lib/api";
 import Request from "@/components/tabs/Request";
 import UserAccounts from "@/components/tabs/UserAccounts";
+import UserDashboard from "@/components/tabs/UserDashboard";
 import Loader from "@/components/Loader";
 import { ModeToggle } from "@/components/buttons/DarkMode";
 
@@ -63,6 +64,7 @@ const NAV_ITEMS = {
     { name: "Leave Request", icon: FileCheck, tab: "request" },
   ],
   user: [
+    { name: "Dashboard", icon: Home, tab: "dashboard" },
     { name: "Profile", icon: User, tab: "profile" },
     { name: "Leave Request", icon: FileCheck, tab: "leave" },
     { name: "Payroll", icon: Coins, tab: "userpayroll" },
@@ -73,12 +75,6 @@ export default function Page() {
   const { auth, user } = useAuth();
   const [tab, setTab] = useState("dashboard");
   const router = useRouter();
-
-  useEffect(() => {
-    if (user && user.status === "user") {
-      setTab("profile");
-    }
-  }, [user]);
 
   if (!auth) return <Loader />;
 
@@ -104,7 +100,7 @@ export default function Page() {
 
   const renderComponent = () => {
     const components = {
-      dashboard: Dashboard,
+      dashboard: user.status === "admin" ? Dashboard : UserDashboard,
       employee: Employee,
       attendance: Attendance,
       payroll: Payroll,
@@ -139,10 +135,9 @@ export default function Page() {
                     href="#"
                     onClick={() => setTab(item.tab)}
                     className={`flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors
-                      ${
-                        tab === item.tab
-                          ? "bg-gray-800 text-white"
-                          : "text-gray-400 hover:text-white hover:bg-gray-800"
+                      ${tab === item.tab
+                        ? "bg-gray-800 text-white"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800"
                       }`}
                   >
                     <item.icon className="w-4 h-4" />
@@ -172,11 +167,10 @@ export default function Page() {
                     href="#"
                     onClick={() => setTab(item.tab)}
                     className={`flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors
-                        ${
-                          tab === item.tab
-                            ? "bg-gray-800 text-white"
-                            : "text-gray-400 hover:text-white hover:bg-gray-800"
-                        }`}
+                        ${tab === item.tab
+                        ? "bg-gray-800 text-white"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800"
+                      }`}
                   >
                     <item.icon className="w-4 h-4" />
                     {item.name}
@@ -213,34 +207,38 @@ export default function Page() {
 
           <div className="flex items-center justify-center gap-4">
             <ModeToggle />
-            
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="overflow-hidden rounded-full"
+                >
+                  <Image
+                    src="https://res.cloudinary.com/dkibnftac/image/upload/v1696743505/wp8137478_ei7mcp.jpg"
+                    width={36}
+                    height={36}
+                    alt="Avatar"
                     className="overflow-hidden rounded-full"
-                  >
-                    <Image
-                      src="https://res.cloudinary.com/dkibnftac/image/upload/v1696743505/wp8137478_ei7mcp.jpg"
-                      width={36}
-                      height={36}
-                      alt="Avatar"
-                      className="overflow-hidden rounded-full"
-                    />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  {user.status === "admin" && <DropdownMenuItem onClick={() => router.push("/settings")}>
-                    Settings
-                  </DropdownMenuItem>}
-                  <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                {user.status === "admin" && <>
+                  <DropdownMenuItem onClick={() => router.push("/profile")}>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push("/admin-accounts")}>
+                    Manage Admin
+                  </DropdownMenuItem></>}
+                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
-        <main className="p-5">{renderComponent()}</main>
+        <main className="p-[5px] py-5 md:p-5">{renderComponent()}</main>
       </div>
     </div>
   );

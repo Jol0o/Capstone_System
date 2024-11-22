@@ -15,7 +15,7 @@ import { toast } from 'sonner'
 
 function Page() {
     const { auth, user } = useAuth();
-    const [userForm, setUserForm] = useState({ email: '', password: '' })
+    const [userForm, setUserForm] = useState({ name: '', email: '', password: '', position: '' })
     const [selectedAccount, setSelectedAccount] = useState(null)
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(0)
@@ -64,20 +64,23 @@ function Page() {
         try {
             await registerAdminAcc(userForm)
                 .then(() => {
-                    toast("Successfull", {
+                    toast("Successful", {
                         description: "Success creating an account!",
-                    })
+                    });
+                    setUserForm({ name: '', email: '', password: '', position: '' });
                     window.location.reload();
                 })
                 .catch(error => {
+                    console.log(error);
                     toast("Error", {
-                        description: error.response.data.errors[0].msg,
-                    })
+                        description: error?.response?.data.errors[0].msg,
+                    });
                 });
         } catch (error) {
+            console.log(error);
             toast("Error", {
-                description: error.response.data.errors[0].msg,
-            })
+                description: error?.response?.data.errors[0].msg,
+            });
         }
     };
 
@@ -89,12 +92,12 @@ function Page() {
                 toast("Successfull", {
                     description: "Success updating an account!",
                 })
+                setUserForm({ name: '', email: '', password: '', position: '' })
                 window.location.reload();
             }
-            reload
         } catch (e) {
             toast("Error", {
-                description: e.response.data.errors[0].msg,
+                description: e?.response?.data.errors[0].msg,
             })
         }
     }
@@ -129,16 +132,18 @@ function Page() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Id</TableHead>
+                                <TableHead>Name</TableHead>
                                 <TableHead>Email</TableHead>
+                                <TableHead>Position</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {data?.length > 0 ? data.map((account, index) => (
                                 <TableRow key={account.id}>
-                                    <TableCell>{account.id}</TableCell>
+                                    <TableCell>{account.name}</TableCell>
                                     <TableCell>{account.email}</TableCell>
+                                    <TableCell>{account.position}</TableCell>
                                     {index !== 0 && <TableCell className="text-right">
                                         <Dialog>
                                             <DialogTrigger asChild>
@@ -199,16 +204,24 @@ function Page() {
 function AdminAccountForm({ account = {}, handleChange, userForm, submit, setUserForm }) {
 
     useEffect(() => {
-        if (account && account.email && account.password) {
-            setUserForm({ ...userForm, email: account.email, password: account.password })
+        if (account && account.email && account.password && account.position && account.name) {
+            setUserForm({ ...userForm, email: account.email, password: account.password, position: account.position, name: account.name })
         }
     }, [account])
 
     return (
         <form className="space-y-4" onSubmit={submit}>
             <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" type="text" name="name" value={userForm.name} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" name="email" value={userForm.email} onChange={handleChange} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="position">Position</Label>
+                <Input id="position" type="text" name="position" value={userForm.position} onChange={handleChange} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>

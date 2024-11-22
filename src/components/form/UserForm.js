@@ -66,6 +66,9 @@ function UserForm({ id, setIsDialogOpen, data }) {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        if (type === 'number' && value < 0) {
+            return; // Prevent negative values for number inputs
+        }
         setUserForm({
             ...userForm,
             [name]: type === 'checkbox' ? checked : value
@@ -117,6 +120,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 baseSalary: updatedForm.baseSalary,
                 employee_id: updatedForm.employee_id,
                 hierarchy: updatedForm.hierarchy,
+                leaveCredits: updatedForm.leaveCredits
             });
 
             // Now create the user only if the employee creation is successful
@@ -138,7 +142,8 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 phone_number: '',
                 baseSalary: 0,
                 hierarchy: 'employee',
-                employee_id: ''
+                employee_id: '',
+                leaveCredits: 0
             });
             setIsDialogOpen(false);
         } catch (error) {
@@ -262,6 +267,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         value={userForm.name} onChange={handleChange}
                         placeholder="Enter name"
                         required
+                        readOnly
                     /></div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -272,6 +278,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         value={userForm.email} onChange={handleChange}
                         placeholder="Enter email"
                         required
+                        readOnly
                     /></div>
                 {/* <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="password">Password</Label>
@@ -289,10 +296,24 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         id="baseSalary"
                         type="number"
                         name="baseSalary"
-                        value={userForm.baseSalary} onChange={handleChange}
+                        value={userForm.baseSalary}
+                        onChange={handleChange}
                         placeholder="Enter base salary"
                         required
-                    /></div>
+                    />
+                </div>
+                <div className="grid items-center grid-cols-1 gap-2">
+                    <Label htmlFor="leaveCredits">Leave Credits</Label>
+                    <Input
+                        id="leaveCredits"
+                        type="number"
+                        name="leaveCredits"
+                        value={userForm.leaveCredits}
+                        onChange={handleChange}
+                        placeholder="Enter leave credits"
+                        required
+                    />
+                </div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="department">Department</Label>
                     <Input
@@ -338,12 +359,14 @@ function UserForm({ id, setIsDialogOpen, data }) {
                     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
                 </Button>
             </div>
-            {userForm.employee_id && (
-                <div className="hidden" ref={qrCodeRef}>
-                    <QRCode size={200} level="M" value={userForm.employee_id} />
-                </div>
-            )}
-        </form>
+            {
+                userForm.employee_id && (
+                    <div className="hidden" ref={qrCodeRef}>
+                        <QRCode size={200} level="M" value={userForm.employee_id} />
+                    </div>
+                )
+            }
+        </form >
     );
 }
 

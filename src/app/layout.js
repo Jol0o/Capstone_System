@@ -5,10 +5,10 @@ import { Toaster } from "@/components/ui/sonner"
 
 
 const inter = Inter({ subsets: ["latin"] });
-const APP_NAME = "Capstone System";
-const APP_DEFAULT_TITLE = "Capstone System - Comprehensive Employee Management";
-const APP_TITLE_TEMPLATE = "%s - Capstone System";
-const APP_DESCRIPTION = "Capstone System offers a comprehensive solution for employee management, including attendance tracking, payroll management, and performance analytics.";
+const APP_NAME = "Gasbee";
+const APP_DEFAULT_TITLE = "Gasbee";
+const APP_TITLE_TEMPLATE = "%s - Gasbee";
+const APP_DESCRIPTION = "Gasbee is a powerful employee management platform offering solutions for attendance tracking, payroll management, and performance analytics to streamline HR processes and boost productivity.";
 
 export const metadata = {
   applicationName: APP_NAME,

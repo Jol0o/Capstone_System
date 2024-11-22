@@ -31,6 +31,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import uploadToCloudinary from '@/lib/cloudy';
 
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
@@ -49,18 +50,20 @@ function LeaveRequest() {
         date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
         personToTakeover: '',
         requestedBy: '',
-        supportingDocument: '',
+        supportingDocument: null,
         distributionCopy: { employeeCopy: false, file201: false },
         leaveType: '',
     });
 
     const [open, setOpen] = useState(false)
+    const [availableCredits, setAvailableCredits] = useState(0)
     const [selectedData, setSelectedData] = useState(null)
     const [isLoading, setIsloading] = useState(false)
     const [loadGenerate, setLoadGenerate] = useState(false)
     const [data, setData] = useState([])
     const [request, setRequest] = useState(false)
     const [link, setLink] = useState('')
+
 
     const getRequests = async () => {
         try {
@@ -103,10 +106,10 @@ function LeaveRequest() {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, files } = e.target;
         let updatedFormData = {
             ...formData,
-            [name]: value
+            [name]: files ? files[0] : value
         };
 
         if (name === 'inclusiveDates' || name === 'toDate') {
@@ -126,6 +129,8 @@ function LeaveRequest() {
                 const res = await getEmployeeById(user.user_id);
                 if (res) {
                     if (res.data.length > 0) {
+                        console.log(res.data)
+                        setAvailableCredits(res.data[0].leaveCredits)
                         setFormData({ ...formData, name: res.data[0].name, email: user?.email, position: res.data[0].position, department: res.data[0].department, requestedBy: res.data[0].name })
                     }
                 }
@@ -136,26 +141,43 @@ function LeaveRequest() {
         fetchUser()
     }, [user])
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsloading(true);
+
         try {
-            setIsloading(true)
+            // Validate required fields (skip 'supportingDocument' since it's handled separately)
             for (let key of Object.keys(formData)) {
-                if (!formData[key]) {
+                if (!formData[key] && key !== 'supportingDocument') {
                     toast("Error", {
                         description: `${key} is required`,
                     });
-                    setIsloading(false)
+                    setIsloading(false);
                     return;
                 }
             }
 
-            const res = await submitRequest(formData)
+            // Upload the supporting document to Cloudinary
+            let supportingDocumentUrl = null;
+            if (formData.supportingDocument) {
+                supportingDocumentUrl = await uploadToCloudinary(formData.supportingDocument, setIsloading);
+            }
+
+            // Prepare the form data for submission
+            const formDataToSend = {
+                ...formData,
+                supportingDocumentUrl, // Add the uploaded document URL if it exists
+            };
+
+            // Submit the request with the form data
+            const res = await submitRequest(formDataToSend); // Pass the form data directly, no need to stringify
             if (res) {
                 toast("Success", {
                     description: res.data.message,
-                })
-                setIsloading(false)
+                });
+
+                // Reset form data after successful submission
                 setFormData({
                     name: '',
                     position: '',
@@ -167,25 +189,21 @@ function LeaveRequest() {
                     date: '',
                     personToTakeover: '',
                     requestedBy: '',
-                    supportingDocument: '',
+                    supportingDocument: null,
                     distributionCopy: { employeeCopy: false, file201: false },
                     leaveType: '',
-                })
-                setRequest(false)
+                });
+                setRequest(false);
             }
-            setIsloading(false)
         } catch (e) {
-            console.log(e)
+            console.log(e);
             toast("Error", {
-                description: e?.response?.data.message || e.message || 'An error occured please try again.',
-            })
-            setIsloading(false)
+                description: e?.response?.data.message || e?.response?.data?.errors[0]?.msg || e.message || 'An error occurred, please try again.',
+            });
+        } finally {
+            setIsloading(false);
         }
     };
-
-    useEffect(() => {
-        console.log(formData)
-    }, [formData])
 
     const handleGenerate = async (data) => {
         setLoadGenerate(true)
@@ -246,8 +264,15 @@ function LeaveRequest() {
                         <Button
                             variant={data.some(request => request.status === 'Pending' || request.status === 'Process') ? 'secondary' : ''}
                             disabled={data.some(request => request.status === 'Pending' || request.status === 'Process') ? true : undefined}
-                            onClick={() => setRequest(!request)}
+                            onClick={() => {
+                                if (availableCredits !== 0) {
+                                    setRequest(!request);
+                                } else {
+                                    toast.error("Not enough credits!")
+                                }
+                            }}
                         >
+                            {/* Button content here */}
                             Leave Request Form
                         </Button>
                     </div>
@@ -379,15 +404,25 @@ function LeaveRequest() {
                                                 <div className="space-y-1">
                                                     <div className="flex justify-between text-xs">
                                                         <span>Available leave credits</span>
-                                                        <Input type="text" className="w-16 h-6 p-0 border border-gray-600" readOnly disabled />
+                                                        <Input type="text" className="w-16 h-6 p-0 text-center border border-gray-600" value={availableCredits} readOnly disabled />
                                                     </div>
                                                     <div className="flex justify-between text-xs">
                                                         <span>Less: Requested leave</span>
-                                                        <Input type="text" className="w-16 h-6 p-0 border border-gray-600" readOnly disabled />
+                                                        <Input type="text" className="w-16 h-6 p-0 text-center border border-gray-600" value={formData.daysRequested || ''} readOnly disabled />
                                                     </div>
                                                     <div className="flex justify-between text-xs">
                                                         <span>Balance</span>
-                                                        <Input type="text" className="w-16 h-6 p-0 border border-gray-600" readOnly disabled />
+                                                        <Input
+                                                            type="text"
+                                                            className="w-16 h-6 p-0 text-center border border-gray-600"
+                                                            value={
+                                                                formData.daysRequested && !isNaN(availableCredits) && !isNaN(formData.daysRequested)
+                                                                    ? availableCredits - formData.daysRequested
+                                                                    : ''
+                                                            }
+                                                            readOnly
+                                                            disabled
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -397,7 +432,20 @@ function LeaveRequest() {
                                     <div className="flex flex-wrap border border-gray-300">
                                         <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
                                             <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
-                                            <Input type="text" id="supportingDocument" placeholder="Please specify" className="h-6 p-0 text-sm border-none" name='supportingDocument' value={formData.supportingDocument} onChange={handleChange} required />
+                                            <Input
+                                                type="file"
+                                                id="supportingDocument"
+                                                className="h-6 p-0 text-sm border-none"
+                                                name="supportingDocument"
+                                                onChange={(e) => {
+                                                    const file = e.target.files[0];
+                                                    setFormData((prevFormData) => ({
+                                                        ...prevFormData,
+                                                        supportingDocument: file,
+                                                    }));
+                                                }}
+                                                required
+                                            />
                                         </div>
                                         <div className="flex-1 min-w-[50%] p-1">
                                             <Label htmlFor="recordedBy" className="text-xs font-bold">Recorded by:</Label>
@@ -441,7 +489,7 @@ function LeaveRequest() {
                                     Leave Type: {item.leave_type}
                                     <div className="flex flex-wrap items-center gap-2">
                                         <Badge>{item.status}</Badge>
-                                         {item.status !== 'Pending' && item.status !== 'Process' ? (
+                                        {item.status !== 'Pending' && item.status !== 'Process' ? (
                                             <Button
                                                 size="sm"
                                                 disabled={loadGenerate}
@@ -502,8 +550,8 @@ function LeaveRequest() {
                         <DialogTitle className="text-xl font-semibold text-white">Leave Request Details</DialogTitle>
                     </DialogHeader>
                     <ScrollArea className="max-h-[80vh] pr-4">
-                        <div className="space-y-0">
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
+                        <div className="space-y-4">
+                            <div className="p-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
                                 <InfoRow label="Name" value={selectedData?.name} />
                                 <InfoRow label="Email" value={selectedData?.email} />
@@ -512,47 +560,58 @@ function LeaveRequest() {
                                 <InfoRow label="Position" value={selectedData?.position} />
                             </div>
 
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
+                            <div className="p-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Leave Details</h3>
-                                <InfoRow
-                                    label="Leave Type"
-                                    value={selectedData?.leave_type}
-                                />
-                                <InfoRow
-                                    label="Days Requested"
-                                    value={selectedData?.days_requested}
-                                />
-                                <InfoRow
-                                    label="Reason"
-                                    value={selectedData?.reason}
-                                />
-                                <InfoRow
-                                    label="Person to Takeover"
-                                    value={selectedData?.person_to_takeover}
-                                />
+                                <InfoRow label="Leave Type" value={selectedData?.leave_type} />
+                                <InfoRow label="Days Requested" value={selectedData?.days_requested} />
+                                <InfoRow label="Inclusive Dates" value={`${formatDate(selectedData?.inclusive_dates)} - ${formatDate(selectedData?.to_date)}`} />
+                                <InfoRow label="Reason" value={selectedData?.reason} />
+                                <InfoRow label="Person to Takeover" value={selectedData?.person_to_takeover} />
+                                <InfoRow label="With Pay" value={selectedData?.withpay === null ? 'Not specified' : selectedData?.withpay ? 'Yes' : 'No'} />
                             </div>
 
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
+                            <div className="p-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Request Status</h3>
                                 <InfoRow
                                     label="Status"
-                                    value={selectedData?.status}
+                                    value={
+                                        <Badge
+                                            variant={selectedData?.status === "Approved" ? "success" :
+                                                selectedData?.status === "Pending" ? "warning" : "destructive"}
+                                            className="capitalize"
+                                        >
+                                            {selectedData?.status}
+                                        </Badge>
+                                    }
                                 />
-                                <InfoRow
-                                    label="Requested By"
-                                    value={selectedData?.requested_by}
-                                />
-                                <InfoRow
-                                    label="Date Requested"
-                                    value={formatDate(selectedData?.created_at)}
-                                />
+                                <InfoRow label="Requested By" value={selectedData?.requested_by} />
+                                <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
+                                {selectedData?.status !== "Done" || selectedData?.status !== 'Approved' && <> <InfoRow label="Approved By" value={selectedData?.approved_by} />
+                                    <InfoRow
+                                        label="Date of Approval"
+                                        value={selectedData?.date_of_approve ? formatDate(selectedData.date_of_approve) : "N/A"}
+                                    />
+                                    <InfoRow label="Received By" value={selectedData?.received_by} />
+                                    <InfoRow
+                                        label="Date Received"
+                                        value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : "N/A"}
+                                    />
+                                    <InfoRow label="Recorded By" value={selectedData?.recorded_by} />
+                                    <InfoRow label="Department Head" value={selectedData?.department_head} />
+                                    <InfoRow label="HR Department" value={selectedData?.hr_department} /> </>}
                             </div>
 
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
+                            <div className="p-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Additional Information</h3>
                                 <InfoRow
                                     label="Supporting Document"
-                                    value={selectedData?.supporting_document}
+                                    value={
+                                        selectedData?.supporting_document ? (
+                                            <a href={selectedData?.supporting_document} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                                                View Document
+                                            </a>
+                                        ) : 'No document provided'
+                                    }
                                 />
                                 <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
                                     <div className="text-sm font-medium text-gray-400">Distribution Copy</div>
