@@ -145,7 +145,7 @@ export function AdminProfile() {
                             <Label htmlFor="position">Position</Label>
                             <Input
                                 id="position"
-                                value={position || "No Position Available"}
+                                value={position}
                                 onChange={handlePositionChange}
                             />
                         </div>
