@@ -11,7 +11,7 @@ const APP_DESCRIPTION = "Gasbee is a comprehensive employee management platform 
 const APP_KEYWORDS = "employee management, HR software, attendance tracking, payroll management, performance analytics, workforce management, HR automation, Gasbee solutions";
 const APP_AUTHOR = "John Loyd Belen";
 const APP_URL = "https://aap-h.com";
-const APP_IMAGE = "/Logo2.png";
+const APP_IMAGE = "https://res.cloudinary.com/dkibnftac/image/upload/v1732347968/Logo2_rburxq.png";
 
 export const metadata = {
   applicationName: APP_NAME,
@@ -19,55 +19,59 @@ export const metadata = {
     default: APP_DEFAULT_TITLE,
     template: APP_TITLE_TEMPLATE,
   },
-  description: APP_DESCRIPTION,
-  keywords: APP_KEYWORDS,
+  description: "Gasbee simplifies HR processes with advanced solutions for attendance tracking, payroll management, and workforce analytics.",
+  keywords: "HR platform, employee management software, Gasbee, workforce automation, payroll solutions",
   author: APP_AUTHOR,
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: APP_DEFAULT_TITLE,
-  },
-  formatDetection: {
-    telephone: false,
+    title: "Gasbee - HR Simplified",
   },
   openGraph: {
     type: "website",
     siteName: APP_NAME,
-    locale: "en_US", // Specify locale for OpenGraph
-    title: {
-      default: APP_DEFAULT_TITLE,
-      template: APP_TITLE_TEMPLATE,
-    },
+    title: "Gasbee - Transform HR Processes",
     description: APP_DESCRIPTION,
     url: APP_URL,
     images: [
       {
         url: APP_IMAGE,
-        width: 800,
-        height: 600,
-        alt: "Gasbee Logo - Employee Management Platform",
+        width: 1200,
+        height: 630,
+        alt: "Gasbee HR Software",
       },
     ],
   },
-  robots: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1", // Enhanced robots tag for better control
-  canonical: APP_URL,
-  structuredData: {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: APP_NAME,
+  twitter: {
+    card: "summary_large_image",
+    title: "Gasbee - Transform HR Processes",
     description: APP_DESCRIPTION,
-    author: {
-      "@type": "Person",
-      name: APP_AUTHOR,
-    },
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web",
-    url: APP_URL,
     image: APP_IMAGE,
-    keywords: APP_KEYWORDS,
   },
+  structuredData: [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: APP_NAME,
+      description: APP_DESCRIPTION,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      url: APP_URL,
+      image: APP_IMAGE,
+      keywords: APP_KEYWORDS,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Gasbee",
+      url: APP_URL,
+      logo: APP_IMAGE,
+      description: "A trusted platform for employee and HR management.",
+    },
+  ],
 };
+
 
 
 export const viewport = {
