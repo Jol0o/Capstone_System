@@ -27,7 +27,6 @@ export function AdminProfile() {
     useEffect(() => {
         if (!user) return;
         setIsLoading(true)
-        console.log(user);
         const fetchAdmin = async () => {
             if (!user.email) return;
             try {
@@ -35,8 +34,9 @@ export function AdminProfile() {
                 const { data } = res.data
                 setPassword(data.password);
                 setEmail(data.email);
-                setPosition(data.position);
-                setName(data.name)
+                setPosition(data.position || user.position);
+                setName(data.name || user.name)
+                console.log('Admin',user)
                 setIsLoading(false)
             } catch (e) {
                 console.log(e);
@@ -68,6 +68,7 @@ export function AdminProfile() {
         if (!user || !user.id) return
         try {
             const userForm = {
+                name,
                 email,
                 password,
                 position
@@ -78,6 +79,8 @@ export function AdminProfile() {
                 const localStorageAdmin = JSON.parse(localStorage.getItem('admin'));
                 if (localStorageAdmin) {
                     localStorageAdmin.email = email;
+                    localStorageAdmin.name = name;
+                    localStorageAdmin.position = position;
                     localStorage.setItem('admin', JSON.stringify(localStorageAdmin));
                 }
 
@@ -133,10 +136,18 @@ export function AdminProfile() {
                 <CardContent>
                     <div className="space-y-6">
                         <div className="space-y-2">
+                            <Label htmlFor="name">Name</Label>
+                            <Input
+                                id="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
                                 id="email"
-                                value={email || "No Email Available"}
+                                value={email}
                                 onChange={handleEmailChange}
                             />
                         </div>

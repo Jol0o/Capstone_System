@@ -9,6 +9,10 @@ const APP_NAME = "Gasbee";
 const APP_DEFAULT_TITLE = "Gasbee";
 const APP_TITLE_TEMPLATE = "%s - Gasbee";
 const APP_DESCRIPTION = "Gasbee is a powerful employee management platform offering solutions for attendance tracking, payroll management, and performance analytics to streamline HR processes and boost productivity.";
+const APP_KEYWORDS = "employee management, attendance tracking, payroll management, performance analytics, HR solutions, gasbee";
+const APP_AUTHOR = "John Loyd Belen";
+const APP_URL = "https://gasbee.aap-h.com";
+const APP_IMAGE = "/images/gasbee-logo.png";
 
 export const metadata = {
   applicationName: APP_NAME,
@@ -17,6 +21,8 @@ export const metadata = {
     template: APP_TITLE_TEMPLATE,
   },
   description: APP_DESCRIPTION,
+  keywords: APP_KEYWORDS,
+  author: APP_AUTHOR,
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -35,15 +41,27 @@ export const metadata = {
       template: APP_TITLE_TEMPLATE,
     },
     description: APP_DESCRIPTION,
+    url: APP_URL,
+    images: [
+      {
+        url: APP_IMAGE,
+        width: 800,
+        height: 600,
+        alt: "Gasbee Logo",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: {
       default: APP_DEFAULT_TITLE,
       template: APP_TITLE_TEMPLATE,
     },
     description: APP_DESCRIPTION,
+    images: [APP_IMAGE],
   },
+  robots: "index, follow",
+  canonical: APP_URL,
 };
 
 export const viewport = {

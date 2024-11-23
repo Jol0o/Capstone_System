@@ -203,8 +203,10 @@ function Page() {
 
 function AdminAccountForm({ account = {}, handleChange, userForm, submit, setUserForm }) {
 
+    console.log('Account', account)
+
     useEffect(() => {
-        if (account && account.email && account.password && account.position && account.name) {
+        if (account && account.email && account.password && account.name) {
             setUserForm({ ...userForm, email: account.email, password: account.password, position: account.position, name: account.name })
         }
     }, [account])
@@ -233,5 +235,4 @@ function AdminAccountForm({ account = {}, handleChange, userForm, submit, setUse
         </form>
     )
 }
-
 export default Page
