@@ -144,7 +144,7 @@ function Page() {
                                     <TableCell>{account.name}</TableCell>
                                     <TableCell>{account.email}</TableCell>
                                     <TableCell>{account.position}</TableCell>
-                                    {index !== 0 && <TableCell className="text-right">
+                                    {account.email !== user?.email && <TableCell className="text-right">
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" size="sm" onClick={() => setSelectedAccount(account)}>

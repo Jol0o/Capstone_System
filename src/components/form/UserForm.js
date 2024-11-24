@@ -120,7 +120,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 baseSalary: updatedForm.baseSalary,
                 employee_id: updatedForm.employee_id,
                 hierarchy: updatedForm.hierarchy,
-                leaveCredits: updatedForm.leaveCredits
+                leaveCredits: parseFloat(updatedForm.leaveCredits)
             });
 
             // Now create the user only if the employee creation is successful
