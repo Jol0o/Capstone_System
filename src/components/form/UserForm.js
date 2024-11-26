@@ -120,7 +120,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 baseSalary: updatedForm.baseSalary,
                 employee_id: updatedForm.employee_id,
                 hierarchy: updatedForm.hierarchy,
-                leaveCredits: parseFloat(updatedForm.leaveCredits)
+                leaveCredits: parseInt(updatedForm.leaveCredits, 10)
             });
 
             // Now create the user only if the employee creation is successful
@@ -147,7 +147,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
             });
             setIsDialogOpen(false);
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error:', error.response?.data?.errors?.[0]?.msg);
             toast("Error", {
                 description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again.",
             });
@@ -186,7 +186,8 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 userForm.position,
                 userForm.baseSalary,
                 updatedForm.qrcode,
-                userForm.hierarchy
+                userForm.hierarchy,
+                userForm.leaveCredits
             );
             toast("Successful", {
                 description: "Employee request approved successfully!",
@@ -210,7 +211,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
         } catch (error) {
             console.error('Approval failed:', error);
             toast("Error", {
-                description: error?.response?.data?.message || error?.message || "Failed to approve employee request. Please try again.",
+                description: error.response?.data?.errors?.[0]?.msg || error?.message || "Failed to approve employee request. Please try again.",
             });
         } finally {
             setIsLoading(false);

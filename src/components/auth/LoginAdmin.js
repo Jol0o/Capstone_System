@@ -152,21 +152,9 @@ function LoginAdmin() {
             });
             setError("");
         } catch (error) {
-            if (
-                error.response &&
-                error.response.data &&
-                error.response.data.message
-            ) {
-                toast("Error", {
-                    description: error.response.data.message,
-                });
-                console.error("Registration failed:", error.response.data.message);
-            } else {
-                toast("Error", {
-                    description: "An unexpected error occurred",
-                });
-                console.error("Registration failed:", error.message);
-            }
+            toast("Error", {
+                description: error.response?.data?.errors?.[0]?.msg || error.response?.data?.message || "Failed to save data. Please try again.",
+            });
             setError(error.message);
         } finally {
             setLoading(false);
