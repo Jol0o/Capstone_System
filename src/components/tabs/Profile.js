@@ -172,6 +172,7 @@ function Profile() {
     };
 
     const handleChange = (e) => {
+        console.log(userData)
         if (e.target.name === "name") {
             setUserData(prevUserData => ({
                 ...prevUserData,
@@ -237,13 +238,14 @@ function Profile() {
     //     return new Date(dateString).toLocaleDateString(undefined, options)
     // }
 
-        const formatCurrency = (value) => {
+    const formatCurrency = (value) => {
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
             currency: 'PHP',
         }).format(value);
     };
 
+    console.log(userData)
 
 
     return (
@@ -296,6 +298,18 @@ function Profile() {
                                 <CardDescription>User Employment Information here</CardDescription>
                             </CardHeader>
                             <CardContent className="flex flex-col gap-3">
+                                 <div className="flex items-center gap-2">
+                                    <Input
+                                        type="checkbox"
+                                        id="day_off"
+                                        checked={userData?.day_off}
+                                        name="day_off"
+                                        className="h-5 w-5"
+                                        onChange={(e) => setUserData({ ...userData, day_off: e.target.checked })}
+                                        disabled={user?.status === 'user'}
+                                    />
+                                    <Label htmlFor="day_off">Day Off</Label>
+                                </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="position">Position / Job Title</Label>
                                     <Input
@@ -340,17 +354,19 @@ function Profile() {
                                         disabled
                                     />
                                 </div>
-                                <div className="grid items-center grid-cols-1 gap-2">
+                                <div className="space-y-1">
                                     <Label htmlFor="hierarchy">Hierarchy</Label>
-                                    <Input
-                                        type="text"
-                                        id="hierarchy"
-                                        value={userData?.hierarchy}
-                                        name="hierarchy"
-                                        onChange={handleChange}
-                                        disabled={user?.status === 'user' ? true : false}
-                                    />
-                                </div>
+                                <Select className="w-full" defaultValue={userData.hierarchy} onValueChange={(value) => setUserData({ ...userData, hierarchy: value })}>
+                    <SelectTrigger className=" bg-transparent border-gray-800">
+                        <SelectValue placeholder={userData && userData.hierarchy ? userData.hierarchy : "Select hierarchy" }/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        {["Managerial", "Supervisor", "Rank & File"].map((hierarchy) => (
+                            <SelectItem key={hierarchy} value={hierarchy}>{hierarchy}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                 </div>
                                 <div className="grid items-center grid-cols-1 gap-2">
                                     <Label htmlFor="leaveCredits">Leave Credits</Label>
                                     <Input
