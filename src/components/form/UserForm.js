@@ -64,16 +64,16 @@ function UserForm({ id, setIsDialogOpen, data }) {
 
     console.log(userForm)
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        if (type === 'number' && value < 0) {
-            return; // Prevent negative values for number inputs
-        }
-        setUserForm({
-            ...userForm,
-            [name]: type === 'checkbox' ? checked : value
-        });
-    };
+               const handleChange = (e) => {
+            const { name, value, type, checked } = e.target;
+            if (type === 'number' && value < 0) {
+                return; // Prevent negative values for number inputs
+            }
+            setUserForm({
+                ...userForm,
+                [name]: type === 'checkbox' ? checked : value.trim() === '' ? value.trim() : value
+            });
+        };
 
     const axiosInstance = axios.create({
         withCredentials: true,
@@ -268,7 +268,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         value={userForm.name} onChange={handleChange}
                         placeholder="Enter name"
                         required
-                        readOnly
+                        readOnly disabled
                     /></div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -279,7 +279,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         value={userForm.email} onChange={handleChange}
                         placeholder="Enter email"
                         required
-                        readOnly
+                        readOnly disabled
                     /></div>
                 {/* <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="password">Password</Label>
@@ -289,7 +289,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         name="password"
                         value={userForm.password}
                         placeholder="*****"
-                        readOnly
+                        readOnly disabled
                     /></div> */}
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="baseSalary">Base Salary</Label>
@@ -344,6 +344,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         value={userForm.phone_number} onChange={handleChange}
                         placeholder="Enter phone number"
                         required
+                        disabled
                     />
                 </div>
                 <Select className="w-full" defaultValue={userForm.hierarchy} onValueChange={(value) => setUserForm({ ...userForm, hierarchy: value })}>

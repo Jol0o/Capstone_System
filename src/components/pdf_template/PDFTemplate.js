@@ -68,11 +68,11 @@ export const PDFTemplate = ({ data, type }) => {
             </div>
             <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
               <label className="block text-xs font-bold">Approved by:</label>
-              <input type="text" className="w-full p-0 text-sm border-none" readOnly />
+              <input type="text" className="w-full p-0 text-sm border-none" readOnly value={data?.approved_by} />
             </div>
             <div className="flex-1 min-w-[33%] p-1">
               <label className="block text-xs font-bold">Received by:</label>
-              <input type="text" className="w-full p-0 text-sm border-none" readOnly />
+              <input type="text" className="w-full p-0 text-sm border-none" readOnly value={data?.received_by}/>
             </div>
           </div>
 
@@ -83,13 +83,14 @@ export const PDFTemplate = ({ data, type }) => {
             </div>
             <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
               <label className="block mb-4 text-xs font-bold">DEPARTMENT HEAD</label>
+              <input type="text" className="w-full p-0 text-sm border-none" readOnly value={data?.department_head}/>
               <label className="block text-xs font-bold">Date:</label>
-              <input type="date" className="w-full p-0 text-sm border-none" readOnly />
+              <input type="date" className="w-full p-0 text-sm border-none" readOnly value={data?.created_at ? format(parseISO(data.date_of_approve), 'yyyy-MM-dd') : ''} />
             </div>
             <div className="flex-1 min-w-[33%] p-1">
               <label className="block mb-4 text-xs font-bold">HR DEPARTMENT</label>
               <label className="block text-xs font-bold">Date:</label>
-              <input type="date" className="w-full p-0 text-sm border-none" readOnly />
+              <input type="date" className="w-full p-0 text-sm border-none" readOnly value={data?.created_at ? format(parseISO(data.date_of_received), 'yyyy-MM-dd') : ''} />
             </div>
           </div>
 
@@ -106,13 +107,13 @@ export const PDFTemplate = ({ data, type }) => {
                 ))}
               </div>
               <div className="flex-1 min-w-[50%]">
-                <div className="flex items-center mb-1">
-                  <input type="checkbox" id="with-pay" className="mr-1" checked={data?.leave_with_pay || false} />
-                  <label htmlFor="with-pay" className="text-xs">With Pay</label>
+                                <div className="flex items-center mb-1">
+                    <input type="checkbox" id="with-pay" className="mr-1" checked={data?.withpay || false} />
+                    <label htmlFor="with-pay" className="text-xs">With Pay</label>
                 </div>
                 <div className="flex items-center mb-1">
-                  <input type="checkbox" id="without-pay" className="mr-1" checked={data?.leave_without_pay || false} />
-                  <label htmlFor="without-pay" className="text-xs">Without Pay</label>
+                    <input type="checkbox" id="without-pay" className="mr-1" checked={!data?.withpay} />
+                    <label htmlFor="without-pay" className="text-xs">Without Pay</label>
                 </div>
                 <div className="mt-2 mb-1 text-xs font-bold">DETAILS OF LEAVE MONITORING</div>
                 <div className="space-y-1">
@@ -140,7 +141,7 @@ export const PDFTemplate = ({ data, type }) => {
             </div>
             <div className="flex-1 min-w-[50%] p-1">
               <label className="block text-xs font-bold">Recorded by:</label>
-              <input type="text" className="w-full p-0 text-sm border-none" readOnly />
+              <input type="text" className="w-full p-0 text-sm border-none" readOnly value={data?.recorded_by} />
             </div>
           </div>
 

@@ -56,6 +56,7 @@ function Profile() {
     const userEmail = useStore(state => state.userEmail);
     const currentMonthStart = startOfMonth(new Date());
     const currentMonthEnd = endOfMonth(new Date());
+    const [rawSalary, setRawSalary] = useState(0);
 
     const filteredValue = yearData.filter(data =>
         isWithinInterval(new Date(data.date), { start: currentMonthStart, end: currentMonthEnd })
@@ -69,6 +70,7 @@ function Profile() {
                 if (response.data) {
                     const userData = response.data[0];
                     setUserData(userData);
+                    setRawSalary(userData.baseSalary)
                     setOriginalData(userData);
                 }
             }
@@ -238,6 +240,15 @@ function Profile() {
     //     return new Date(dateString).toLocaleDateString(undefined, options)
     // }
 
+    const handleSalaryChange = (e) => {
+        const value = e.target.value.replace(/[^0-9.]/g, ''); // Remove non-numeric characters
+        setRawSalary(value);
+        const numericValue = parseFloat(value);
+        if (!isNaN(numericValue)) {
+            handleChange({ target: { name: 'baseSalary', value: numericValue } });
+        }
+    };
+
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
@@ -272,7 +283,7 @@ function Profile() {
                             <CardContent className="flex flex-col gap-3">
                                 <div className="space-y-1">
                                     <Label htmlFor="employee_id">Employee ID</Label>
-                                    <Input type="tet" required id="employee_id" value={userData?.employee_id} name="employee_id" readOnly />
+                                    <Input type="tet" required id="employee_id" value={userData?.employee_id} name="employee_id" readOnly disabled />
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="name">Username</Label>
@@ -298,18 +309,29 @@ function Profile() {
                                 <CardDescription>User Employment Information here</CardDescription>
                             </CardHeader>
                             <CardContent className="flex flex-col gap-3">
-                                 <div className="flex items-center gap-2">
+                                {user?.status === 'user' ? <div className="space-y-1">
+                                    <Label htmlFor="day_off">Status</Label>
+                                    <Input
+                                        type="text"
+                                        id="day_off"
+                                        value={userData?.day_off ? 'Off Duty' : 'On Duty'}
+                                        name="day_off"
+                                        onChange={handleChange}
+                                        disabled={user?.status === 'user' ? true : false}
+                                    />
+                                </div>
+                                :  <div className="flex items-center gap-2">
                                     <Input
                                         type="checkbox"
                                         id="day_off"
                                         checked={userData?.day_off}
                                         name="day_off"
-                                        className="h-5 w-5"
+                                        className="w-5 h-5"
                                         onChange={(e) => setUserData({ ...userData, day_off: e.target.checked })}
                                         disabled={user?.status === 'user'}
                                     />
                                     <Label htmlFor="day_off">Day Off</Label>
-                                </div>
+                                </div>}
                                 <div className="space-y-1">
                                     <Label htmlFor="position">Position / Job Title</Label>
                                     <Input
@@ -337,18 +359,18 @@ function Profile() {
                                     <Input
                                         type="text"
                                         id="salary"
-                                        value={formatCurrency(userData?.baseSalary)}
+                                        value={rawSalary ? formatCurrency(rawSalary) : ''}
                                         name="baseSalary"
-                                        onChange={handleChange}
+                                        onChange={handleSalaryChange}
                                         disabled={user?.status === 'user' ? true : false}
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="salary">Total Salary</Label>
+                                    <Label htmlFor="totalsalary">Total Salary</Label>
                                     <Input
                                         type="text"
-                                        id="salary"
-                                        value={formatCurrency(userData?.totalSalary)}
+                                        id="totalsalary"
+                                        value={formatCurrency(userData.totalSalary || 0)}
                                         name="baseSalary"
                                         onChange={handleChange}
                                         disabled
@@ -356,17 +378,17 @@ function Profile() {
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor="hierarchy">Hierarchy</Label>
-                                <Select className="w-full" defaultValue={userData.hierarchy} onValueChange={(value) => setUserData({ ...userData, hierarchy: value })}>
-                    <SelectTrigger className=" bg-transparent border-gray-800">
-                        <SelectValue placeholder={userData && userData.hierarchy ? userData.hierarchy : "Select hierarchy" }/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {["Managerial", "Supervisor", "Rank & File"].map((hierarchy) => (
-                            <SelectItem key={hierarchy} value={hierarchy}>{hierarchy}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                 </div>
+                                    <Select className="w-full" defaultValue={userData.hierarchy} disabled={user?.status === 'user' ? true : false} onValueChange={(value) => setUserData({ ...userData, hierarchy: value })}>
+                                        <SelectTrigger className="bg-transparent border-gray-800 ">
+                                            <SelectValue placeholder={userData && userData.hierarchy ? userData.hierarchy : "Select hierarchy"} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {["Managerial", "Supervisor", "Rank & File"].map((hierarchy) => (
+                                                <SelectItem key={hierarchy} value={hierarchy}>{hierarchy}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                                 <div className="grid items-center grid-cols-1 gap-2">
                                     <Label htmlFor="leaveCredits">Leave Credits</Label>
                                     <Input

@@ -135,6 +135,12 @@ function Request() {
     };
 
     const handleRemove = async (id) => {
+        const isConfirmed = window.confirm("Are you sure you want to delete this request?");
+
+        if (!isConfirmed) {
+            return;
+        }
+
         try {
             const res = await removeLeaveRequest(id)
             if (res) {
@@ -146,20 +152,29 @@ function Request() {
         }
     }
 
-    const handleUpdate = async () => {
-        if (status === "" || !selectedData.id) return;
+        const handleUpdate = async () => {
+        if (status.trim() === "" || !selectedData.id) return;
+    
+        const trimmedData = {
+            status: status.trim(),
+            approved_by: selectedData.approved_by?.trim() || "",
+            received_by: selectedData.received_by?.trim() || "",
+            recorded_by: selectedData.recorded_by?.trim() || "",
+            department_head: selectedData.department_head?.trim() || "",
+            hr_department: selectedData.hr_department?.trim() || "",
+            withpay: selectedData.withpay
+        };
+    
+        // Check if any of the required fields are empty
+        if (Object.values(trimmedData).some(value => value === "")) {
+            toast("Please fill in all required fields.");
+            return;
+        }
+    
         try {
-            const res = await updateLeaveStatus(selectedData.id, {
-                status,
-                approved_by: selectedData.approved_by,
-                received_by: selectedData.received_by,
-                recorded_by: selectedData.recorded_by,
-                department_head: selectedData.department_head,
-                hr_department: selectedData.hr_department,
-                withpay: selectedData.withpay
-            });
+            const res = await updateLeaveStatus(selectedData.id, trimmedData);
             if (res.status === 200) {
-                toast(`Successfully updated the status`);
+                toast("Successfully updated the status");
             }
         } catch (e) {
             console.log(e);
@@ -182,7 +197,7 @@ function Request() {
     return (
         <>
             <div className="w-full">
-                <div className="flex flex-col md:flex-row items-center justify-between py-4">
+                <div className="flex flex-col items-center justify-between py-4 md:flex-row">
                     <Input
                         placeholder="Filter Leave Requests..."
                         onChange={(event) => setFilter(event.target.value)}

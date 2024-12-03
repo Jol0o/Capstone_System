@@ -127,7 +127,7 @@ function Attendance() {
     }
 
     const deleteAttendance = async (id) => {
-        const isConfirmed = window.confirm("Are you sure you want to delete this employee?");
+        const isConfirmed = window.confirm("Are you sure you want to delete this attendance?");
 
         if (!isConfirmed) {
             return;
@@ -198,13 +198,13 @@ function Attendance() {
             const hoursOvertime = Math.floor(minutesOvertime / 60);
             return `Overtime: ${hoursOvertime > 0 ? `${hoursOvertime} hour(s)` : ''}`;
         }
-        return 'On time';
+        return '';
     };
     if (isLoading) return <Loader />
 
     return (
         <div className="w-full">
-            <div className="flex items-center flex-col md:flex-row justify-between py-4">
+            <div className="flex flex-col items-center justify-between py-4 md:flex-row">
                 <div className="flex gap-2">
                     <Input
                         placeholder="Filter Attendance..."
@@ -290,7 +290,7 @@ function Attendance() {
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.time_in} <span className="text-red-500">({calculateLateTime(item.time_in)})</span> </TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.time_out} <span className="text-red-500">({calculateEarlyLeaveOrOvertime(item.time_out)})</span></TableCell>
+                                    <TableCell className="capitalize whitespace-nowrap">{item.time_out} <span className="text-red-500">{calculateEarlyLeaveOrOvertime(item.time_out)}</span></TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.hours}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

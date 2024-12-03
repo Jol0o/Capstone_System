@@ -33,8 +33,8 @@ export default function LoginPage() {
     if (readerElement && readerElement.offsetWidth > 0 && readerElement.offsetHeight > 0) {
       const scanner = new Html5QrcodeScanner('reader', {
         qrbox: {
-          width: 400,
-          height: 400
+          width: 500,
+          height: 500
         },
         fps: 5,
       })

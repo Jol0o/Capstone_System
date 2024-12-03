@@ -32,6 +32,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import uploadToCloudinary from '@/lib/cloudy';
+import { ConfirmationModal } from '../modal/ConfirmationModal';
 
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
@@ -63,6 +64,7 @@ function LeaveRequest() {
     const [data, setData] = useState([])
     const [request, setRequest] = useState(false)
     const [link, setLink] = useState('')
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
 
     const getRequests = async () => {
@@ -141,8 +143,12 @@ function LeaveRequest() {
         fetchUser()
     }, [user])
 
-
     const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsConfirmationOpen(true);
+    };
+
+    const handleConfirmedSubmit = async (e) => {
         e.preventDefault();
         setIsloading(true);
 
@@ -194,12 +200,14 @@ function LeaveRequest() {
                     leaveType: '',
                 });
                 setRequest(false);
+                setIsConfirmationOpen(false)
             }
         } catch (e) {
             console.log(e);
             toast("Error", {
                 description: e?.response?.data.message || e?.response?.data?.errors[0]?.msg || e.message || 'An error occurred, please try again.',
             });
+            setIsConfirmationOpen(false)
         } finally {
             setIsloading(false);
         }
@@ -256,6 +264,8 @@ function LeaveRequest() {
         }
     }
 
+    console.log(formData)
+
     return (
         <>
             <div className="w-full min-h-screen">
@@ -263,9 +273,9 @@ function LeaveRequest() {
                     <div className="flex justify-end">
                         <Button
                             variant={data.some(request => request.status === 'Pending' || request.status === 'Process') ? 'secondary' : ''}
-                            disabled={data.some(request => request.status === 'Pending' || request.status === 'Process') ? true : undefined}
+                            disabled={data.some(request => request.status === 'Pending' || request.status === 'Process' || request.status === 'Approved') ? true : undefined}
                             onClick={() => {
-                                if (availableCredits !== 0) {
+                                if (availableCredits >= 0) {
                                     setRequest(!request);
                                 } else {
                                     toast.error("Not enough credits!")
@@ -290,19 +300,19 @@ function LeaveRequest() {
                                     <div className="flex flex-wrap border border-gray-600">
                                         <div className="flex-1 min-w-[50%] p-1 border-r border-b border-gray-600">
                                             <Label htmlFor="name" className="text-xs font-bold">NAME:</Label>
-                                            <Input type="text" id="name" className="h-6 p-0 text-sm border-none" name='name' value={formData.name} onChange={handleChange} readOnly />
+                                            <Input type="text" id="name" className="h-6 p-0 text-sm border-none" name='name' value={formData.name} onChange={handleChange} disabled />
                                         </div>
                                         <div className="flex-1 min-w-[50%] p-1 border-b border-gray-300">
                                             <Label htmlFor="dateFiled" className="text-xs font-bold">DATE FILED:</Label>
-                                            <Input type="date" id="dateFiled" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} readOnly />
+                                            <Input type="date" id="dateFiled" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} disabled />
                                         </div>
                                         <div className="flex-1 min-w-[50%] p-1 border-r border-gray-600">
                                             <Label htmlFor="position" className="text-xs font-bold">POSITION:</Label>
-                                            <Input type="text" id="position" className="h-6 p-0 text-sm border-none" name='position' value={formData.position} onChange={handleChange} readOnly />
+                                            <Input type="text" id="position" className="h-6 p-0 text-sm border-none" name='position' value={formData.position} onChange={handleChange} disabled />
                                         </div>
                                         <div className="flex-1 min-w-[50%] p-1">
                                             <Label htmlFor="department" className="text-xs font-bold">DEPARTMENT:</Label>
-                                            <Input type="text" id="department" className="h-6 p-0 text-sm border-none" name='department' value={formData.department} onChange={handleChange} readOnly />
+                                            <Input type="text" id="department" className="h-6 p-0 text-sm border-none" name='department' value={formData.department} onChange={handleChange} disabled />
                                         </div>
                                     </div>
 
@@ -326,7 +336,7 @@ function LeaveRequest() {
                                         </div>
                                         <div className="flex-1 min-w-[33%] p-1">
                                             <Label htmlFor="daysRequested" className="text-xs font-bold">No. of Days Requested:</Label>
-                                            <Input type="number" id="daysRequested" className="h-6 p-0 text-sm border-none" name='daysRequested' value={formData.daysRequested} onChange={handleChange} required readOnly />
+                                            <Input type="number" id="daysRequested" className="h-6 p-0 text-sm border-none" name='daysRequested' value={formData.daysRequested} onChange={handleChange} required disabled />
                                         </div>
                                     </div>
 
@@ -343,7 +353,7 @@ function LeaveRequest() {
                                     <div className="flex flex-wrap border border-gray-300">
                                         <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
                                             <Label htmlFor="requestedBy" className="text-xs font-bold">Requested by:</Label>
-                                            <Input type="text" id="requestedBy" className="h-6 p-0 text-sm border-none" name='requestedBy' value={formData.requestedBy} onChange={handleChange} />
+                                            <Input type="text" id="requestedBy" className="h-6 p-0 text-sm border-none" name='requestedBy' value={formData.requestedBy} onChange={handleChange} disabled />
                                         </div>
                                         <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
                                             <Label htmlFor="approvedBy" className="text-xs font-bold">Approved by:</Label>
@@ -358,7 +368,7 @@ function LeaveRequest() {
                                     <div className="flex flex-wrap border border-gray-300">
                                         <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
                                             <Label htmlFor="date" className="text-xs font-bold">Date:</Label>
-                                            <Input type="date" id="date" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} readOnly />
+                                            <Input type="date" id="date" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} readOnly disabled />
                                         </div>
                                         <div className="flex-1 min-w-[33%] p-1 border-r border-gray-600">
                                             <Label className="block mb-4 text-xs font-bold">DEPARTMENT HEAD</Label>
@@ -449,14 +459,14 @@ function LeaveRequest() {
                                         </div>
                                         <div className="flex-1 min-w-[50%] p-1">
                                             <Label htmlFor="recordedBy" className="text-xs font-bold">Recorded by:</Label>
-                                            <Input type="text" id="recordedBy" className="h-6 p-0 text-sm border-none" readOnly />
+                                            <Input type="text" id="recordedBy" className="h-6 p-0 text-sm border-none" readOnly disabled />
                                         </div>
                                     </div>
 
                                     <div className="flex flex-wrap border border-gray-300">
                                         <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
                                             <Label htmlFor="date" className="text-xs font-bold">Date:</Label>
-                                            <Input type="date" id="date" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} />
+                                            <Input type="date" id="date" className="h-6 p-0 text-sm border-none" name='date' value={formData.date} onChange={handleChange} disabled />
                                         </div>
                                         <div className="flex-1 min-w-[50%] p-1">
                                             <Label className="block mb-4 text-xs font-bold">HRD</Label>
@@ -635,6 +645,14 @@ function LeaveRequest() {
                     </ScrollArea>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmationModal
+                isOpen={isConfirmationOpen}
+                onClose={() => setIsConfirmationOpen(false)}
+                onConfirm={handleConfirmedSubmit}
+                title="Confirm Leave Request Submission"
+                description="Are you sure you want to submit this leave request? This action cannot be undone."
+            />
         </>
     );
 }

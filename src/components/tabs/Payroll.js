@@ -109,7 +109,7 @@ function Payroll() {
     };
 
     const deletePayroll = async (id) => {
-        const isConfirmed = window.confirm("Are you sure you want to delete this employee?");
+        const isConfirmed = window.confirm("Are you sure you want to delete this payroll?");
 
         if (!isConfirmed) {
             return;
