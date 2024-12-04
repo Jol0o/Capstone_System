@@ -152,9 +152,9 @@ function Request() {
         }
     }
 
-        const handleUpdate = async () => {
+    const handleUpdate = async () => {
         if (status.trim() === "" || !selectedData.id) return;
-    
+
         const trimmedData = {
             status: status.trim(),
             approved_by: selectedData.approved_by?.trim() || "",
@@ -164,13 +164,17 @@ function Request() {
             hr_department: selectedData.hr_department?.trim() || "",
             withpay: selectedData.withpay
         };
-    
+
         // Check if any of the required fields are empty
-        if (Object.values(trimmedData).some(value => value === "")) {
-            toast("Please fill in all required fields.");
+        const emptyFields = Object.entries(trimmedData)
+            .filter(([key, value]) => value === "")
+            .map(([key]) => key.replace('_', ' '));
+
+        if (emptyFields.length > 0) {
+            toast(`Please fill in all required fields: ${emptyFields.join(', ')}`);
             return;
         }
-    
+
         try {
             const res = await updateLeaveStatus(selectedData.id, trimmedData);
             if (res.status === 200) {
@@ -416,7 +420,7 @@ function Request() {
                                                         checked={selectedData.withpay || false}
                                                         onChange={(e) => setSelectedData({ ...selectedData, withpay: e.target.checked })}
                                                     />
-                                                    <label className="block text-sm text-white">With Pay/ Without Pay</label>
+                                                    <label className="block text-sm text-white">With Pay</label>
                                                 </div>
                                             </div>
                                         )}

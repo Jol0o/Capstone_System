@@ -73,9 +73,22 @@ const NAV_ITEMS = {
 
 export default function Page() {
   const { auth, user } = useAuth();
-  const [tab, setTab] = useState("dashboard");
-  const router = useRouter();
+  const [tab, setTab] = useState(() => {
+    // Retrieve the tab state from localStorage when the component mounts
+    if (typeof window !== "undefined") {
+        return localStorage.getItem('tab') || 'dashboard';
+    }
+    return 'dashboard'; // Default value if window is undefined
+});
 
+const router = useRouter();
+
+useEffect(() => {
+    if (typeof window !== "undefined") {
+        localStorage.setItem('tab', tab);
+    }
+}, [tab]);
+  
   if (!auth) return <Loader />;
 
   // useEffect(() => {
