@@ -105,6 +105,7 @@ useEffect(() => {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("admin");
+       localStorage.removeItem("tab");
       router.push("/");
     } catch (e) {
       console.log(e);
