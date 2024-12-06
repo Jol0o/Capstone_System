@@ -259,6 +259,7 @@ function LeaveRequest() {
             })
             setData(data.filter(item => item.id !== id))
             setFilteredData(filterData.filter(item => item.id !== id))
+            window.location.reload();
         } catch (error) {
             console.error('Error deleting request:', error);
         }
