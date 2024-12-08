@@ -162,10 +162,14 @@ function Employee({ setTab }) {
         }).format(value);
     };
 
+    const camelCaseToWords = (str) => {
+        return str.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
+    };
+
     return (
         <>
             <div className="w-full">
-                <div className="flex items-center flex-col md:flex-row justify-between py-4">
+                <div className="flex flex-col items-center justify-between py-4 md:flex-row">
                     <Input
                         placeholder="Filter Employee Name..."
                         onChange={(event) => setFilter(event.target.value)}
@@ -188,8 +192,8 @@ function Employee({ setTab }) {
                             <TableRow>
                                 {Object.keys(filterData[0]).map((key) => {
                                     if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id' && key !== 'monthSalary' && key !== 'leaveCredits') {
-                                        // Replace all occurrences of "_" with a space
-                                        let formattedKey = key.replace(/_/g, ' ');
+                                        // Convert camel case to separate words by space
+                                        let formattedKey = camelCaseToWords(key);
                                         return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
                                     }
                                 })}

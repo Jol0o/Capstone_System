@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User, Eye, LoaderCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Image from 'next/image';
-import { exportData, getLeaveRequests, removeLeaveRequest, searchPayroll, updateLeaveStatus } from '@/lib/api';
+import { exportData, getLeaveRequests, removeLeaveRequest, searchPayroll, updateLeaveStatus, checkLeaveRequest } from '@/lib/api';
 import UpdateLeaveStatus from '../modal/UpdateLeaveStatus';
 import { io } from 'socket.io-client';
 import * as XLSX from 'xlsx';
@@ -47,6 +47,7 @@ function Request() {
     const [open, setOpen] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [status, setStatus] = useState('')
+    const [checking, setChecking] = useState(false)
     const table = "leaveRequest"
 
     useEffect(() => {
@@ -188,6 +189,9 @@ function Request() {
             }
         } catch (e) {
             console.log(e);
+            toast.error("Error", {
+                description: error?.response?.data.message || error.message,
+            });
         }
     };
 
@@ -205,6 +209,24 @@ function Request() {
         </div>
     )
 
+    const requestFucntion = async () => {
+        setChecking(true)
+        try {
+            const res = await checkLeaveRequest()
+            if (res.status === 200) {
+                toast.error("Success", {
+                    description: res.data.message,
+                });
+                setChecking(false)
+            }
+        } catch (e) { 
+            toast.error("Error", {
+                description: e?.response?.data.message || e.message,
+            });
+            setChecking(false)
+        }
+    }
+
     return (
         <>
             <div className="w-full">
@@ -214,10 +236,16 @@ function Request() {
                         onChange={(event) => setFilter(event.target.value)}
                         className="max-w-sm"
                     />
-                    <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
-                        <FileDown className="h-3.5 w-3.5" />
-                        Export
-                    </Button>
+                    <div className="flex items-center gap-1" >
+                        <Button onClick={requestFucntion} disabled={checking} >
+                            {checking ? <LoaderCircle className="animate-spin" /> : 'Check Leaver Reuest'}
+                        </Button>
+                        <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                            <FileDown className="h-3.5 w-3.5" />
+                            Export
+                        </Button>
+                    </div>
+                   
                 </div>
                 <div className="border rounded-md">
                     {filterData && filterData.length ? <Table>

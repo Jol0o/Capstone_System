@@ -474,7 +474,7 @@ export const getUserDataDashboard = cacheWrapper(async () => {
         const res = await axiosInstance.get(`${API_URL}/api/user-dashboard`)
         return res
     } catch (e) {
-        return e
+        throw e
     }
 })
 
@@ -483,6 +483,15 @@ export const getAdminData = cacheWrapper(async (email) => {
         const res = await axiosInstance.get(`${API_URL}/api/get-admin`, { params: { email } })
         return res
     } catch (e) {
-        return null
+        throw null
     }
 })
+
+export const checkLeaveRequest = async () => {
+    try {
+        const res = await axiosInstance.post(`${API_URL}/api/check-leave-requests`)
+        return res
+    } catch (e) {
+        throw e
+    }
+}
