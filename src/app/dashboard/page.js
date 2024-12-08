@@ -54,6 +54,7 @@ import UserAccounts from "@/components/tabs/UserAccounts";
 import UserDashboard from "@/components/tabs/UserDashboard";
 import Loader from "@/components/Loader";
 import { ModeToggle } from "@/components/buttons/DarkMode";
+import { useStore } from "@/hooks/useStore";
 
 const NAV_ITEMS = {
   admin: [
@@ -73,6 +74,7 @@ const NAV_ITEMS = {
 
 export default function Page() {
   const { auth, user } = useAuth();
+    const { removeAllUser } = useStore();
   const [tab, setTab] = useState(() => {
     // Retrieve the tab state from localStorage when the component mounts
     if (typeof window !== "undefined") {
@@ -107,6 +109,7 @@ useEffect(() => {
       localStorage.removeItem("admin");
       localStorage.removeItem("tab");
       localStorage.removeItem("userEmail");
+      removeAllUser()
       router.push("/");
     } catch (e) {
       console.log(e);

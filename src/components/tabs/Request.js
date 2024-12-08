@@ -154,7 +154,7 @@ function Request() {
 
     const handleUpdate = async () => {
         if (status.trim() === "" || !selectedData.id) return;
-
+    
         const trimmedData = {
             status: status.trim(),
             approved_by: selectedData.approved_by?.trim() || "",
@@ -164,17 +164,23 @@ function Request() {
             hr_department: selectedData.hr_department?.trim() || "",
             withpay: selectedData.withpay
         };
-
-        // Check if any of the required fields are empty
+    
+        // Define required fields based on status
+        const requiredFields = {
+            Approved: ["approved_by", "received_by", "recorded_by", "department_head", "hr_department"],
+            Rejected: ["received_by", "recorded_by"]
+        };
+    
+        // Check if any of the required fields are empty based on status
         const emptyFields = Object.entries(trimmedData)
-            .filter(([key, value]) => value === "")
+            .filter(([key, value]) => requiredFields[status]?.includes(key) && value === "")
             .map(([key]) => key.replace('_', ' '));
-
+    
         if (emptyFields.length > 0) {
             toast(`Please fill in all required fields: ${emptyFields.join(', ')}`);
             return;
         }
-
+    
         try {
             const res = await updateLeaveStatus(selectedData.id, trimmedData);
             if (res.status === 200) {
@@ -185,6 +191,7 @@ function Request() {
         }
     };
 
+    
     const handleChange = (value) => {
         setStatus(value);
     };
@@ -340,7 +347,7 @@ function Request() {
 
                             <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Request Status</h3>
-                                {selectedData?.status !== 'Done' ? (
+                                {(selectedData?.status !== 'Done' ) ? (
                                     <>
                                         <Select value={status} onValueChange={handleChange}>
                                             <SelectTrigger className="w-[180px]">
@@ -355,7 +362,7 @@ function Request() {
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
-
+                            
                                         {/* Show additional inputs if status is "Approved" */}
                                         {status === "Approved" && (
                                             <div className="mt-4 space-y-4">
@@ -424,6 +431,36 @@ function Request() {
                                                 </div>
                                             </div>
                                         )}
+                            
+                                        {/* Show additional inputs if status is "Rejected" */}
+                                        {status === "Rejected" && (
+                                            <div className="mt-4 space-y-4">
+                                                 <InfoRow label="Requested By" value={selectedData?.requested_by} />
+                                                <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
+                                                <div>
+                                                    <Label className="block text-sm text-white">Received By</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.received_by || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, received_by: e.target.value })}
+                                                    />
+                                                </div>
+                                                <InfoRow
+                                                    label="Date Received"
+                                                    value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : formatDate(new Date())}
+                                                />
+                                                <div>
+                                                    <Label className="block text-sm text-white">Recorded By</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.recorded_by || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, recorded_by: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </>
                                 ) : (
                                     <InfoRow
@@ -439,24 +476,27 @@ function Request() {
                                         }
                                     />
                                 )}
-
-                                {status !== 'Approved' ? <><InfoRow label="Requested By" value={selectedData?.requested_by} />
-                                    <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
-                                    <InfoRow label="Approved By" value={selectedData?.approved_by} />
-                                    <InfoRow
-                                        label="Date of Approval"
-                                        value={selectedData?.date_of_approve ? formatDate(selectedData.date_of_approve) : 'N/A'}
-                                    />
-                                    <InfoRow label="Received By" value={selectedData?.received_by} />
-                                    <InfoRow
-                                        label="Date Received"
-                                        value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : 'N/A'}
-                                    />
-                                    <InfoRow label="Recorded By" value={selectedData?.recorded_by} />
-                                    <InfoRow label="Department Head" value={selectedData?.department_head} />
-                                    <InfoRow label="HR Department" value={selectedData?.hr_department} /> </> : null}
+                            
+                                {status !== 'Approved' && status !== 'Rejected' ? (
+                                    <>
+                                        <InfoRow label="Requested By" value={selectedData?.requested_by} />
+                                        <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
+                                        <InfoRow label="Approved By" value={selectedData?.approved_by} />
+                                        <InfoRow
+                                            label="Date of Approval"
+                                            value={selectedData?.date_of_approve ? formatDate(selectedData.date_of_approve) : 'N/A'}
+                                        />
+                                        <InfoRow label="Received By" value={selectedData?.received_by} />
+                                        <InfoRow
+                                            label="Date Received"
+                                            value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : 'N/A'}
+                                        />
+                                        <InfoRow label="Recorded By" value={selectedData?.recorded_by} />
+                                        <InfoRow label="Department Head" value={selectedData?.department_head} />
+                                        <InfoRow label="HR Department" value={selectedData?.hr_department} />
+                                    </>
+                                ) : null}
                             </div>
-
 
                             <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
                                 <h3 className="mb-2 text-lg font-semibold text-white">Additional Information</h3>

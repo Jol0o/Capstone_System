@@ -53,7 +53,7 @@ function Profile() {
     const [yearData, setYearData] = useState([])
     const [selectedYear, setSelectedYear] = useState('2024');
     const router = useRouter();
-    const userEmail = useStore(state => state.userEmail);
+    const { removeAllUser, userEmail } = useStore();
     const currentMonthStart = startOfMonth(new Date());
     const currentMonthEnd = endOfMonth(new Date());
     const [rawSalary, setRawSalary] = useState(0);
@@ -64,6 +64,7 @@ function Profile() {
 
     const fetchUser = useCallback(async () => {
         const id = userEmail ? userEmail : user?.user_id;
+        console.log('Id',id)
         try {
             if (id) {
                 const response = await getEmployeeById(id);
@@ -72,6 +73,7 @@ function Profile() {
                     setUserData(userData);
                     setRawSalary(userData.baseSalary)
                     setOriginalData(userData);
+                    console.log(userData)
                 }
             }
         } catch (e) {
@@ -196,6 +198,7 @@ function Profile() {
             localStorage.removeItem('admin');
             localStorage.removeItem("tab");
             localStorage.removeItem("userEmail");
+            removeAllUser()
             router.push("/");
         } catch (e) {
             console.log(e);

@@ -13,6 +13,7 @@ import { logoutUser, getAdminData, updateAdmin } from "@/lib/api";
 import Loader from '../Loader';
 import { toast } from "sonner";
 import { useRouter } from "next/navigation"
+import { useStore } from '@/hooks/useStore'
 
 export function AdminProfile() {
     const { user } = useAuth()
@@ -22,6 +23,7 @@ export function AdminProfile() {
     const [name, setName] = useState("")
     const [position, setPosition] = useState("System Administrator")
     const [isLoading, setIsLoading] = useState(false)
+      const { removeAllUser } = useStore();
     const router = useRouter()
 
     useEffect(() => {
@@ -106,6 +108,7 @@ export function AdminProfile() {
             localStorage.removeItem("admin");
             localStorage.removeItem("tab");
             localStorage.removeItem("userEmail");
+            removeAllUser()
             router.push("/");
         } catch (e) {
             console.log(e);
