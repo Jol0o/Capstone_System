@@ -39,11 +39,11 @@ export const PDFTemplate = ({ data, type }) => {
           <div className="flex flex-wrap border border-gray-300">
             <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
               <label htmlFor="inclusive-dates" className="block text-xs font-bold">INCLUSIVE DATES</label>
-              <input type="text" id="inclusive-dates" className="w-full p-0 text-sm border-none" readOnly value={format(parseISO(data.inclusive_dates), 'yyyy-MM-dd') || ''} />
+              <input type="text" id="inclusive-dates" className="w-full p-0 text-sm border-none" readOnly value={data?.inclusive_dates ? format(parseISO(data.inclusive_dates), 'yyyy-MM-dd') : ''} />
             </div>
             <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
               <label htmlFor="to-date" className="block text-xs font-bold">TO:</label>
-              <input type="text" id="to-date" className="w-full p-0 text-sm border-none" readOnly value={format(parseISO(data.to_date), 'yyyy-MM-dd') || ''} />
+              <input type="text" id="to-date" className="w-full p-0 text-sm border-none" readOnly value={data?.to_date ? format(parseISO(data.to_date), 'yyyy-MM-dd') : ''} />
             </div>
             <div className="flex-1 min-w-[33%] p-1">
               <label htmlFor="days-requested" className="block text-xs font-bold">No. of Days Requested:</label>
@@ -85,12 +85,12 @@ export const PDFTemplate = ({ data, type }) => {
               <label className="block mb-4 text-xs font-bold">DEPARTMENT HEAD</label>
               <input type="text" className="w-full p-0 text-sm border-none" readOnly value={data?.department_head}/>
               <label className="block text-xs font-bold">Date:</label>
-              <input type="date" className="w-full p-0 text-sm border-none" readOnly value={data?.created_at ? format(parseISO(data.date_of_approve), 'yyyy-MM-dd') : ''} />
+              <input type="date" className="w-full p-0 text-sm border-none" readOnly value={data?.date_of_approve ? format(parseISO(data.date_of_approve), 'yyyy-MM-dd') : ''} />
             </div>
             <div className="flex-1 min-w-[33%] p-1">
               <label className="block mb-4 text-xs font-bold">HR DEPARTMENT</label>
               <label className="block text-xs font-bold">Date:</label>
-              <input type="date" className="w-full p-0 text-sm border-none" readOnly value={data?.created_at ? format(parseISO(data.date_of_received), 'yyyy-MM-dd') : ''} />
+              <input type="date" className="w-full p-0 text-sm border-none" readOnly value={data?.date_of_received ? format(parseISO(data.date_of_received), 'yyyy-MM-dd') : ''} />
             </div>
           </div>
 
@@ -107,7 +107,7 @@ export const PDFTemplate = ({ data, type }) => {
                 ))}
               </div>
               <div className="flex-1 min-w-[50%]">
-                                <div className="flex items-center mb-1">
+                <div className="flex items-center mb-1">
                     <input type="checkbox" id="with-pay" className="mr-1" checked={data?.withpay || false} />
                     <label htmlFor="with-pay" className="text-xs">With Pay</label>
                 </div>

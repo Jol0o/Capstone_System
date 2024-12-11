@@ -14,7 +14,7 @@ import useAuth from '@/hooks/useAuth';
 import { toast } from "sonner"
 import { getEmployeeById, submitRequest, userRequests, removeLeaveRequest } from '@/lib/api';
 import { Badge } from "@/components/ui/badge"
-import { LoaderCircle, MoreHorizontal } from 'lucide-react';
+import { LoaderCircle, MoreHorizontal, LinkIcon } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { format, parseISO } from 'date-fns';
 import generate from '../pdf_template/generatePDF';
@@ -215,6 +215,7 @@ function LeaveRequest() {
 
     const handleGenerate = async (data) => {
         setLoadGenerate(true)
+        console.log(data)
         try {
             const link = await generate({ data });
             if (link) {
@@ -226,7 +227,7 @@ function LeaveRequest() {
                 setLink(link)
             }
         } catch (e) {
-            console.log(e)
+            console.warn(e)
             setLoadGenerate(false)
         }
     }
@@ -265,7 +266,16 @@ function LeaveRequest() {
         }
     }
 
-    console.log(formData)
+           const downloadPDF = (link) => {
+            const anchor = document.createElement('a');
+            anchor.href = link;
+            anchor.download = 'form.pdf';
+            anchor.target = '_blank'; // Open link in a new tab
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        };
+
 
     return (
         <>
@@ -545,11 +555,21 @@ function LeaveRequest() {
                                     <div>Start Date: {format(parseISO(item.inclusive_dates), "PPP")}</div>
                                     <div>End Date: {format(parseISO(item.to_date), "PPP")}</div>
                                 </div>
-                                {link && <div className="text-sm text-gray-500 max-w-[1000px] truncate whitespace-nowrap">
-                                    <Link href={link} target='_blank'>
-                                        Form Link: {link}
-                                    </Link>
-                                </div>}
+                               
+                                   {link && <div className="space-y-2">
+                            <div className="flex items-center space-x-2 text-sm ">
+                                <LinkIcon size={16} />
+                                <span>Form Link:</span>
+                            </div>
+                            <Input
+                                value={link}
+                                readOnly
+                                className="font-mono text-sm"
+                            />
+                            <Button onClick={() => downloadPDF(link)} className="bg-blue-600 hover:bg-blue-700">
+                                Download
+                            </Button>
+                        </div>}
                             </CardContent>
                         </Card>
                     ))}

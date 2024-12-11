@@ -80,6 +80,7 @@ function UserPayroll() {
         const anchor = document.createElement('a');
         anchor.href = link;
         anchor.download = 'payroll.pdf';
+          anchor.target = '_blank';
         document.body.appendChild(anchor);
         anchor.click();
         document.body.removeChild(anchor);

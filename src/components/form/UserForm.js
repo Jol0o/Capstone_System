@@ -33,7 +33,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
         position: '',
         employee_id: "",
         phone_number: '',
-        baseSalary: 0,
+        basicSalary: 0,
         password: '',
         hierarchy: 'Rank & File',
         qrcode: "",
@@ -117,7 +117,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 qrcode: updatedForm.qrcode,
                 phone_number: updatedForm.phone_number,
                 password: updatedForm.password || updatedForm.phone_number.toString().slice(-4),
-                baseSalary: updatedForm.baseSalary,
+                basicSalary: updatedForm.basicSalary,
                 employee_id: updatedForm.employee_id,
                 hierarchy: updatedForm.hierarchy,
                 leaveCredits: parseInt(updatedForm.leaveCredits, 10)
@@ -140,7 +140,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 position: '',
                 qrcode: '',
                 phone_number: '',
-                baseSalary: 0,
+                basicSalary: 0,
                 hierarchy: 'employee',
                 employee_id: '',
                 leaveCredits: 0
@@ -184,7 +184,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 userForm.employee_id,
                 userForm.department,
                 userForm.position,
-                userForm.baseSalary,
+                userForm.basicSalary,
                 updatedForm.qrcode,
                 userForm.hierarchy,
                 userForm.leaveCredits
@@ -203,7 +203,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 position: '',
                 qrcode: '',
                 phone_number: '',
-                baseSalary: 0,
+                basicSalary: 0,
                 hierarchy: 'employee',
                 employee_id: ''
             });
@@ -292,12 +292,12 @@ function UserForm({ id, setIsDialogOpen, data }) {
                         readOnly disabled
                     /></div> */}
                 <div className="grid items-center grid-cols-1 gap-2">
-                    <Label htmlFor="baseSalary">Base Salary</Label>
+                    <Label htmlFor="basicSalary">Base Salary</Label>
                     <Input
-                        id="baseSalary"
+                        id="basicSalary"
                         type="number"
-                        name="baseSalary"
-                        value={userForm.baseSalary}
+                        name="basicSalary"
+                        value={userForm.basicSalary}
                         onChange={handleChange}
                         placeholder="Enter base salary"
                         required

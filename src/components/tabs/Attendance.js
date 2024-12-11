@@ -30,6 +30,26 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from '../ui/calendar';
 
+const currentDate = new Date();
+const currentDay = currentDate.getDate();
+const currentMonth = currentDate.getMonth();
+const currentYear = currentDate.getFullYear();
+
+const getDefaultDates = (range, month, year) => {
+    let startDate, endDate;
+    if (range === '1-15') {
+        startDate = new Date(year, month, 1);
+        endDate = new Date(year, month, 15);
+    } else if (range === '16-30') {
+        startDate = new Date(year, month, 16);
+        endDate = new Date(year, month + 1, 0); // 0 gets the last day of the previous month
+    } else {
+        startDate = new Date(year, month, 1);
+        endDate = new Date(year, month + 1, 0); // 0 gets the last day of the previous month
+    }
+    return { startDate, endDate };
+};
+
 function Attendance() {
     const [data, setData] = useState([])
     const [filterData, setFilteredData] = useState([])
@@ -40,15 +60,29 @@ function Attendance() {
     const router = useRouter()
     const [filter, setFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [monthlyAttendance, setMonthlyAttendance] = useState([])
     const table = "attendance"
+    const [dateRange, setDateRange] = useState('1-15');
+    const [month, setMonth] = useState(currentMonth);
+    const [year, setYear] = useState(currentYear);
 
-    const defaultStartDate = new Date();
-    defaultStartDate.setDate(defaultStartDate.getDate() - 15);
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+    let defaultStartDate;
+    let defaultEndDate;
+
+    if (currentDay <= 15) {
+        // If the current date is on or before the 15th, set startDate to the 1st and endDate to the 15th
+        defaultStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        defaultEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 15);
+    } else {
+        // If the current date is after the 15th, set startDate to the 16th and endDate to the last day of the month
+        defaultStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 16);
+        defaultEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // 0 gets the last day of the previous month
+    }
 
     // Format the dates to 'YYYY-MM-DD'
     const formattedStartDate = format(defaultStartDate, 'yyyy-MM-dd');
-    const formattedEndDate = format(new Date(), 'yyyy-MM-dd');
+    const formattedEndDate = format(defaultEndDate, 'yyyy-MM-dd');
 
     const [startDate, setStartDate] = useState(formattedStartDate);
     const [endDate, setEndDate] = useState(formattedEndDate);
@@ -178,7 +212,7 @@ function Attendance() {
             const minutesLate = differenceInMinutes(timeInDate, eightAM);
             const hoursLate = Math.floor(minutesLate / 60);
             const remainingMinutesLate = minutesLate % 60;
-            return `${hoursLate > 0 ? `${hoursLate} hour(s) ` : ''}${remainingMinutesLate} minute(s) late`;
+            return `${hoursLate > 0 ? `${hoursLate} hour/s ` : ''}${remainingMinutesLate} minute/s late`;
         }
         return 'On time';
     };
@@ -192,20 +226,43 @@ function Attendance() {
             const minutesEarly = differenceInMinutes(sevenPM, timeOutDate);
             const hoursEarly = Math.floor(minutesEarly / 60);
             const remainingMinutesEarly = minutesEarly % 60;
-            return `${hoursEarly > 0 ? `${hoursEarly} hour(s) ` : ''}${remainingMinutesEarly} minute(s) early`;
+            return `${hoursEarly > 0 ? `${hoursEarly} hour/s ` : ''}${remainingMinutesEarly} minute/s early`;
         } else if (timeOutDate > sevenPM) {
             const minutesOvertime = differenceInMinutes(timeOutDate, sevenPM);
             const hoursOvertime = Math.floor(minutesOvertime / 60);
-            return `Overtime: ${hoursOvertime > 0 ? `${hoursOvertime} hour(s)` : ''}`;
+            return `Overtime: ${hoursOvertime > 0 ? `${hoursOvertime} hour/s` : ''}`;
         }
         return '';
     };
+
+    const handleDateRangeChange = (e) => {
+        setDateRange(e.target.value);
+        const { startDate, endDate } = getDefaultDates(e.target.value, month, year);
+        setStartDate(format(startDate, 'yyyy-MM-dd'));
+        setEndDate(format(endDate, 'yyyy-MM-dd'));
+    };
+
+    const handleMonthChange = (e) => {
+        setMonth(e.target.value);
+        const { startDate, endDate } = getDefaultDates(dateRange, e.target.value, year);
+        setStartDate(format(startDate, 'yyyy-MM-dd'));
+        setEndDate(format(endDate, 'yyyy-MM-dd'));
+    };
+
+    const handleYearChange = (e) => {
+        setYear(e.target.value);
+        const { startDate, endDate } = getDefaultDates(dateRange, month, e.target.value);
+        setStartDate(format(startDate, 'yyyy-MM-dd'));
+        setEndDate(format(endDate, 'yyyy-MM-dd'));
+    };
+
+
     if (isLoading) return <Loader />
 
     return (
         <div className="w-full">
-            <div className="flex flex-col items-center justify-between py-4 md:flex-row">
-                <div className="flex gap-2">
+            <div className="flex flex-col justify-between gap-2 py-4 md:items-center md:flex-row">
+                <div className="flex flex-col gap-2 md:flex-row">
                     <Input
                         placeholder="Filter Attendance..."
                         onChange={(event) => setFilter(event.target.value)}
@@ -251,6 +308,38 @@ function Attendance() {
                                 />
                             </PopoverContent>
                         </Popover>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8">
+                                    <span>{new Date(0, month).toLocaleString('default', { month: 'long' }) || 'Month'}</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                {Array.from({ length: 12 }, (_, i) => (
+                                    <DropdownMenuItem key={i} onClick={() => handleMonthChange({ target: { value: i } })}>
+                                        {new Date(0, i).toLocaleString('default', { month: 'long' })}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8">
+                                    <span>{dateRange || 'Date Range'}</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
+                                    1 - 15
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '16-30' } })}>
+                                    16 - 30
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-30' } })}>
+                                    1 - 30
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 
@@ -289,9 +378,9 @@ function Attendance() {
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.time_in} <span className="text-red-500">({calculateLateTime(item.time_in)})</span> </TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.time_out} <span className="text-red-500">{calculateEarlyLeaveOrOvertime(item.time_out)}</span></TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.hours}</TableCell>
+                                    <TableCell className=" whitespace-nowrap">{item.time_in} <span className="text-red-500">({calculateLateTime(item.time_in)})</span> </TableCell>
+                                    <TableCell className=" whitespace-nowrap">{item.time_out} <span className="text-red-500">{calculateEarlyLeaveOrOvertime(item.time_out)}</span></TableCell>
+                                    <TableCell className=" whitespace-nowrap">{item.hours} Hour/s</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="w-8 h-8 p-0">

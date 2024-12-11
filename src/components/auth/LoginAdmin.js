@@ -145,10 +145,12 @@ function LoginAdmin() {
                 description: "Success creating an account! Just wait until your account is approved by the admin",
             });
             setUserForm({
-                name: "",
+                firstname: "",
+                lastname: "",
                 email: "",
                 password: "",
                 phone: "",
+                confirmPassword: ""
             });
             setError("");
         } catch (error) {

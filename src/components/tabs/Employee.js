@@ -27,6 +27,7 @@ import { removeEmployee, searchEmployee, sendEmailToEmployee, getEmployeeRequest
 import Loader from '../Loader';
 import ApproveEmployee from '../modal/ApproveEmployee';
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 function Employee({ setTab }) {
@@ -166,6 +167,7 @@ function Employee({ setTab }) {
         return str.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
     };
 
+
     return (
         <>
             <div className="w-full">
@@ -190,15 +192,26 @@ function Employee({ setTab }) {
                     {filterData && filterData.length ? <Table >
                         <TableHeader>
                             <TableRow>
-                                {Object.keys(filterData[0]).map((key) => {
-                                    if (key !== 'created_at' && key !== 'qrcode' && key !== 'id' && key !== 'avatar' && key !== 'password' && key !== 'employee_id' && key !== 'monthSalary' && key !== 'leaveCredits') {
+                                {Object.keys(filterData[0])
+                                    .filter(key => !['created_at', 'qrcode', 'id', 'avatar', 'password', 'employee_id', 'monthSalary', 'leaveCredits'].includes(key))
+                                    .sort((a, b) => {
+                                        // Ensure basicSalary and totalSalary are at the end, next to each other
+                                        const customOrder = ['basicSalary', 'totalSalary'];
+                                        if (customOrder.includes(a) && customOrder.includes(b)) {
+                                            return customOrder.indexOf(a) - customOrder.indexOf(b);
+                                        }
+                                        if (customOrder.includes(a)) return 1; // Push basicSalary and totalSalary to the end
+                                        if (customOrder.includes(b)) return -1;
+                                        return 0; // Maintain default order for other keys
+                                    })
+                                    .map((key) => {
                                         // Convert camel case to separate words by space
                                         let formattedKey = camelCaseToWords(key);
                                         return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
-                                    }
-                                })}
+                                    })}
                             </TableRow>
                         </TableHeader>
+
                         <TableBody>
                             {
                                 filterData.map(item =>
@@ -213,10 +226,15 @@ function Employee({ setTab }) {
                                         <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
-                                        <TableCell className="capitalize max-w-[300px] text-right truncate whitespace-nowrap">{formatCurrency(item.baseSalary)}</TableCell>
+                                        <TableCell className=" whitespace-nowrap"><Badge variant={item.hierarchy === "Managerial" ? "default" :
+                                            item.hierarchy === "Supervisor" ? "secondary" : "outline"}>
+                                            {item.hierarchy}
+                                        </Badge></TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap"> <Badge variant={item.day_off === 0 ? "success" : "destructive"}>
+                                            {item.day_off === 0 ? 'On Duty' : "Off Duty"}
+                                        </Badge></TableCell>
+                                        <TableCell className="capitalize max-w-[300px] text-right truncate whitespace-nowrap">{formatCurrency(item.basicSalary)}</TableCell>
                                         <TableCell className="capitalize max-w-[300px] text-right truncate whitespace-nowrap">{formatCurrency(item.totalSalary)}</TableCell>
-                                        <TableCell className=" whitespace-nowrap">{item.hierarchy}</TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.day_off === 0 ? 'On Duty' : "Off Duty"}</TableCell>
                                         <TableCell className="max-w-[30px]"> <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="w-8 h-8 p-0">

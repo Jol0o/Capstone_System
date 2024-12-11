@@ -30,10 +30,6 @@ export const PDFPayroll = ({ data }) => {
               <span>{data.name}</span>
             </div>
             <div className="mb-2">
-              <span className="font-semibold">Employee ID: </span>
-              <span>{data.employee_id}</span>
-            </div>
-            <div className="mb-2">
               <span className="font-semibold">Department: </span>
               <span>Sales</span>
             </div>

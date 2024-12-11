@@ -15,7 +15,7 @@ import Image from "next/image";
 import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LoaderCircle, FileDown } from "lucide-react";
+import { LoaderCircle, FileDown, EyeOff, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useStore } from '@/hooks/useStore';
@@ -44,7 +44,7 @@ function Profile() {
         position: '',
         phone_number: '',
         qrcode: '',
-        baseSalary: 0,
+        basicSalary: 0,
         totalSalary: 0,
     });
     const [originalData, setOriginalData] = useState(null);
@@ -57,6 +57,9 @@ function Profile() {
     const currentMonthStart = startOfMonth(new Date());
     const currentMonthEnd = endOfMonth(new Date());
     const [rawSalary, setRawSalary] = useState(0);
+    const [showPass, setShowPass] = useState(false)
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [eyePass, setEyePass] = useState(false)
 
     const filteredValue = yearData.filter(data =>
         isWithinInterval(new Date(data.date), { start: currentMonthStart, end: currentMonthEnd })
@@ -71,7 +74,7 @@ function Profile() {
                 if (response.data) {
                     const userData = response.data[0];
                     setUserData(userData);
-                    setRawSalary(userData.baseSalary)
+                    setRawSalary(userData.basicSalary)
                     setOriginalData(userData);
                     console.log(userData)
                 }
@@ -144,6 +147,15 @@ function Profile() {
             }
         }
 
+        if (showPass && data.password !== confirmPassword) {
+            toast("Error", {
+                description: "Password does not match",
+            });
+            setIsLoading(false);
+            setShowPass(false)
+            return;
+        }
+
         try {
             await editEmployeeData(data);
             toast("Successful", {
@@ -152,6 +164,8 @@ function Profile() {
             setOriginalData(data);
             setUserData(data);
             setImage(null);
+            setShowPass(false)
+            setEyePass(false)
         } catch (error) {
             console.error(error);
             toast("Error", {
@@ -250,7 +264,7 @@ function Profile() {
         setRawSalary(value);
         const numericValue = parseFloat(value);
         if (!isNaN(numericValue)) {
-            handleChange({ target: { name: 'baseSalary', value: numericValue } });
+            handleChange({ target: { name: 'basicSalary', value: numericValue } });
         }
     };
 
@@ -274,6 +288,7 @@ function Profile() {
 
                     <div className="flex gap-2">
                         <Button onClick={handleDiscard} className="rounded-lg" variant="outline" size="sm"> Discard </Button>
+                        <Button onClick={() => setShowPass(!showPass)} className="rounded-lg" variant="outline" size="sm"> Change Password </Button>
                         <Button onClick={handleSave} className="rounded-lg" size="sm">     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Save'} </Button>
                     </div>
                 </div>
@@ -302,10 +317,40 @@ function Profile() {
                                     <Label htmlFor="phone_number">phone_number</Label>
                                     <Input type="number" required id="phone_number" value={userData?.phone_number} name="phone_number" onChange={handleChange} />
                                 </div>
-                                <div className="space-y-1">
+                                {showPass && <> <div className="space-y-1">
                                     <Label htmlFor="password">Password</Label>
-                                    <Input type="password" placeholder="*******" required id="password" value={userData?.password} name="password" onChange={handleChange} />
+                                        <div className="relative">
+                                     <Input type={eyePass ? 'text' : 'password'}  placeholder="*******" required id="password" value={userData?.password} name="password" onChange={handleChange} />
+                                    <Button
+                                        type="button"
+                                        onClick={() => setEyePass(!eyePass)}
+                                        className="absolute inset-y-0 right-0 flex items-center px-2"
+                                    >
+                                        {eyePass ? (
+                                            <EyeOff className="w-5 h-5" />
+                                        ) : (
+                                            <Eye className="w-5 h-5" />
+                                        )}
+                                    </Button>
                                 </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="change">Confirm Password</Label>
+                                    <div className="relative">
+                                     <Input type={eyePass ? 'text' : 'password'} placeholder="*******" required id="change" value={confirmPassword} name="change" onChange={(e) => setConfirmPassword(e.target.value)} />
+                                    <Button
+                                        type="button"
+                                        onClick={() => setEyePass(!eyePass)}
+                                        className="absolute inset-y-0 right-0 flex items-center px-2"
+                                    >
+                                        {eyePass ? (
+                                            <EyeOff className="w-5 h-5" />
+                                        ) : (
+                                            <Eye className="w-5 h-5" />
+                                        )}
+                                    </Button>
+                                </div>
+                                </div> </>}
                             </CardContent>
                         </Card>
                         <Card className="rounded-xl">
@@ -365,7 +410,7 @@ function Profile() {
                                         type="text"
                                         id="salary"
                                         value={rawSalary ? formatCurrency(rawSalary) : ''}
-                                        name="baseSalary"
+                                        name="basicSalary"
                                         onChange={handleSalaryChange}
                                         disabled={user?.status === 'user' ? true : false}
                                     />
@@ -376,7 +421,7 @@ function Profile() {
                                         type="text"
                                         id="totalsalary"
                                         value={formatCurrency(userData.totalSalary || 0)}
-                                        name="baseSalary"
+                                        name="basicSalary"
                                         onChange={handleChange}
                                         disabled
                                     />

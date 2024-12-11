@@ -171,17 +171,21 @@ export const getMonthlyEmployees = cacheWrapper(async () => {
     }
 });
 
-export const getMonthlyAttendance = cacheWrapper(async () => {
-    const response = await axiosInstance.get(`${API_URL}/api/monthly_attendance`);
+export const getMonthlyAttendance = cacheWrapper(async (month, year) => {
+    const response = await axiosInstance.get(`${API_URL}/api/monthly_attendance`, {
+        params: { month, year }
+    });
     if (response.status === 200) {
-        return response;
+        return response.data;
     } else {
         return null;
     }
 });
 
-export const getYearlyAttendance = cacheWrapper(async () => {
-    const response = await axiosInstance.get(`${API_URL}/api/yearly_attendance`);
+export const getYearlyAttendance = cacheWrapper(async (month, year) => {
+    const response = await axiosInstance.get(`${API_URL}/api/yearly_attendance`, {
+        params: { month, year }
+    });
     console.log(response);
     if (response.status === 200) {
         return response;
@@ -381,15 +385,15 @@ export const getEmployeeRequest = cacheWrapper(async (limit, page) => {
     return response;
 });
 
-export const approveEmployeeRequest = async (id, employee_id, department, position, baseSalary, qrcode, hierarchy, leaveCredits) => {
+export const approveEmployeeRequest = async (id, employee_id, department, position, basicSalary, qrcode, hierarchy, leaveCredits) => {
     try {
-        console.log(id, employee_id, department, position, baseSalary, hierarchy, qrcode)
+        console.log(id, employee_id, department, position, basicSalary, hierarchy, qrcode)
         const response = await axiosInstance.post(`${API_URL}/api/employee-requests/${id}/approve`, {
             employee_id,
             qrcode,
             department,
             position,
-            baseSalary,
+            basicSalary,
             hierarchy,
             leaveCredits: parseInt(leaveCredits, 10)
         });

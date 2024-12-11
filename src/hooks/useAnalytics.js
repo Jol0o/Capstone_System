@@ -11,8 +11,6 @@ function useAnalytics() {
     const [absents, setAbsents] = useState(null)
     const [off, setOff] = useState(null)
     const [employee, setEmployee] = useState(null)
-    const [monthly, setMonthly] = useState(null)
-    const [yearly, setYearly] = useState(null)
 
     useEffect(() => {
 
@@ -46,16 +44,6 @@ function useAnalytics() {
             setEmployee(response.data.data)
         };
 
-        const fetchMonthly = async () => {
-            const response = await getMonthlyAttendance()
-            setMonthly(response.data.data)
-        };
-
-        const fetchYearly = async () => {
-            const response = await getYearlyAttendance()
-            setYearly(response.data.data)
-        };
-
 
         fetchEarlyBirds();
         fetchLates()
@@ -63,12 +51,10 @@ function useAnalytics() {
         fetchAbsents()
         fetchOff()
         fetchEmployees()
-        fetchMonthly()
-        fetchYearly()
     }, []);
 
 
-    return { earlyBirds, lates, earlyDepartures, absents, off, employee, monthly, yearly }
+    return { earlyBirds, lates, earlyDepartures, absents, off, employee }
 }
 
 export default useAnalytics
