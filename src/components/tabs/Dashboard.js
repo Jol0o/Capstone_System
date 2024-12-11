@@ -29,36 +29,34 @@ const currentMonth = currentDate.getMonth();
 const currentYear = currentDate.getFullYear();
 
 function Dashboard() {
-  const { earlyBirds, lates, earlyDepartures, absents, off, employee, } = useAnalytics()
-  const time = new Date();
-  const [year, setYear] = useState(currentYear)
-  const [month, setMonth] = useState(currentMonth)
-  const [monthly, setMonthly] = useState(null)
-  const [yearly, setYearly] = useState(null)
+  const { earlyBirds, lates, earlyDepartures, absents, off, employee } = useAnalytics();
+  const [year, setYear] = useState(currentYear);
+  const [month, setMonth] = useState(currentMonth);
+  const [monthly, setMonthly] = useState(null);
+  const [yearly, setYearly] = useState(null);
   const years = [currentYear, currentYear - 1, currentYear - 2];
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [date, setDate] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const fetchMonthly = async () => {
-    const response = await getMonthlyAttendance(month, year);
-    setMonthly(response.data.data);
-  };
-
-  const fetchYearly = async (year) => {
-    const response = await getYearlyAttendance(year);
-    setYearly(response.data.data);
-  };
-
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
-    fetchMonthly()
-    fetchYearly()
-  }, [year, month])
+    const fetchMonthly = async () => {
+      const response = await getMonthlyAttendance(month + 1, year);
+      setMonthly(response.data);
+    };
+
+    const fetchYearly = async () => {
+      const response = await getYearlyAttendance(year);
+      setYearly(response.data.data);
+    };
+
+    fetchMonthly();
+    fetchYearly();
+  }, [year, month]);
 
   const handleMonthChange = (e) => {
     setMonth(e.target.value);
@@ -68,7 +66,6 @@ function Dashboard() {
     setYear(event.target.value);
   };
 
-  console.log(lates)
 
   return (
     <div className="w-full h-full overflow-hidden">

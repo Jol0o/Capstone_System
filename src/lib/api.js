@@ -182,9 +182,9 @@ export const getMonthlyAttendance = cacheWrapper(async (month, year) => {
     }
 });
 
-export const getYearlyAttendance = cacheWrapper(async (month, year) => {
+export const getYearlyAttendance = cacheWrapper(async (year) => {
     const response = await axiosInstance.get(`${API_URL}/api/yearly_attendance`, {
-        params: { month, year }
+        params: { year }
     });
     console.log(response);
     if (response.status === 200) {

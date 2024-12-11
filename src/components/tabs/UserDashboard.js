@@ -190,7 +190,6 @@ export default function UserDashboard() {
     <div className="container mx-auto space-y-6 md:p-4">
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Employee Dashboard</h1>
-        <Button>Request Leave</Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

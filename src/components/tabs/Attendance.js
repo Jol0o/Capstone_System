@@ -1,7 +1,7 @@
 'use client'
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { CalendarIcon, ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, FileDown, MoreHorizontal, User, ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -324,8 +324,8 @@ function Attendance() {
                         </DropdownMenu>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8">
-                                    <span>{dateRange || 'Date Range'}</span>
+                                  <Button variant="outline" size="sm" className="flex items-center justify-between h-8">
+                                    <span>{dateRange || 'Date Range'}</span><ChevronDownIcon className="w-6 h-6"/>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
@@ -372,9 +372,6 @@ function Attendance() {
                             filterData.map(item =>
                                 <TableRow key={item.id}>
                                     <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
-                                        {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
-                                            height={36}
-                                            className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>

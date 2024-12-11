@@ -264,9 +264,9 @@ function LoginAdmin() {
                                 </Button>
                                 <button
                                     onClick={() => setForgotPasswordOpen(true)}
-                                    className="w-full text-sm text-center text-gray-400 hover:text-white"
+                                    className="w-full text-sm text-center text-gray-400 "
                                 >
-                                    Forgat password?
+                                    Forgot password?
                                 </button>
                             </div>
                         </CardFooter>

@@ -304,6 +304,36 @@ function Payroll() {
         }
     };
 
+    const handleGenerateAll = async (data) => {
+        const promise = generate({ type: "admin", data });
+
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: (link) => {
+                if (link) {
+                    window.open(link, '_blank');
+                    setLink(link);
+                    return 'Click the link';
+                }
+            },
+            error: 'Error',
+        });
+
+        try {
+            const link = await promise;
+            if (link) {
+                toast('Click the link', {
+                    action: {
+                        label: 'Download',
+                        onClick: () => downloadPDF(link)
+                    },
+                });
+            }
+        } catch (e) {
+            console.warn(e.message);
+        }
+    };
+
     const downloadPDF = (link) => {
         const anchor = document.createElement('a');
         anchor.href = link;
@@ -404,7 +434,7 @@ function Payroll() {
                     </div>
                 </div>
                 <div className="flex items-center gap-1">
-                    <Button disabled={filterData.length === 0 ? true : false} size="sm" onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
+                    <Button disabled={filterData.length === 0 ? true : false} size="sm" onClick={() => handleGenerateAll(filterData)} variant="outline" className="gap-1">
                         <FileDown className="h-3.5 w-3.5" />
                         Export
                     </Button>
@@ -428,9 +458,6 @@ function Payroll() {
                             filterData.map(item =>
                                 <TableRow key={item.id}>
                                     <TableCell className="flex items-center gap-1 overflow-hidden capitalize truncate whitespace-nowrap">
-                                        {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={30}
-                                            height={36}
-                                            className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.hierarchy}</TableCell>

@@ -195,7 +195,6 @@ function Request() {
         }
     };
 
-    
     const handleChange = (value) => {
         setStatus(value);
     };
@@ -238,7 +237,7 @@ function Request() {
                     />
                     <div className="flex items-center gap-1" >
                         <Button onClick={requestFucntion} disabled={checking} >
-                            {checking ? <LoaderCircle className="animate-spin" /> : 'Check Leaver Reuest'}
+                            {checking ? <LoaderCircle className="animate-spin" /> : 'Check Leave Reuest'}
                         </Button>
                         <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
                             <FileDown className="h-3.5 w-3.5" />
@@ -263,9 +262,6 @@ function Request() {
                                 filterData.map(item =>
                                     <TableRow key={item.id}>
                                         <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
-                                            {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={30}
-                                                height={36}
-                                                className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                             {item.name}
                                         </TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{formatDate(item.created_at)}</TableCell>

@@ -217,9 +217,6 @@ function Employee({ setTab }) {
                                 filterData.map(item =>
                                     <TableRow key={item.id}>
                                         <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
-                                            {item.avatar ? <Image src={item.avatar} alt={item.avatar} width={36}
-                                                height={36}
-                                                className="object-cover overflow-hidden rounded-full max-h-7" /> : <User />}
                                             {item.name}
                                         </TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.department}</TableCell>
