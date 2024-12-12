@@ -199,8 +199,6 @@ function LeaveRequest() {
                     distributionCopy: { employeeCopy: false, file201: false },
                     leaveType: '',
                 });
-                setRequest(false);
-                setIsConfirmationOpen(false)
             }
         } catch (e) {
             console.log(e);
@@ -210,6 +208,8 @@ function LeaveRequest() {
             setIsConfirmationOpen(false)
         } finally {
             setIsloading(false);
+            setRequest(false);
+            setIsConfirmationOpen(false)
         }
     };
 
@@ -274,7 +274,9 @@ function LeaveRequest() {
             document.body.appendChild(anchor);
             anchor.click();
             document.body.removeChild(anchor);
-        };
+    };
+    
+    console.log(availableCredits);
 
 
     return (
@@ -671,6 +673,7 @@ function LeaveRequest() {
                 isOpen={isConfirmationOpen}
                 onClose={() => setIsConfirmationOpen(false)}
                 onConfirm={handleConfirmedSubmit}
+                isLoading={isLoading}
                 title="Confirm Leave Request Submission"
                 description="Are you sure you want to submit this leave request? This action cannot be undone."
             />

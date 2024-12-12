@@ -14,6 +14,7 @@ export function ConfirmationModal({
   onClose,
   onConfirm,
   title,
+  isLoading,
   description
 }) {
   return (
@@ -24,8 +25,8 @@ export function ConfirmationModal({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={onConfirm}>Confirm</Button>
+                   <Button variant="outline" disabled={isLoading} onClick={onClose}>Cancel</Button>
+          <Button disabled={isLoading} onClick={onConfirm}>Confirm</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
