@@ -432,7 +432,7 @@ const NetPayDialog = ({ open, onClose, employee }) => {
     const InfoRow = ({ label, value, isDeduction }) => (
         <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
             <div className="text-sm font-medium text-gray-400">{label}</div>
-            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : 'text-white'}`}>{value}</div>
+            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : 'text-white'} font-bold`}>{value}</div>
         </div>
     );
 
