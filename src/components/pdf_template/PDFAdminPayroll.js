@@ -8,6 +8,14 @@ const PDFAdminPayroll = ({ data }) => {
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
 
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(value);
+    };
+
+
     return (
         <Tailwind>
             <div className="m-0 font-sans text-xs leading-tight text-gray-800 bg-gray-100"> {/* Reduced font size */}
@@ -25,7 +33,6 @@ const PDFAdminPayroll = ({ data }) => {
                                 <th className="px-1 py-2 text-right">PhilHealth</th>
                                 <th className="px-1 py-2 text-right">Pag-IBIG</th>
                                 <th className="px-1 py-2 text-right">Total Deductions</th>
-                                <th className="px-1 py-2 text-right">Total Earnings</th>
                                 <th className="px-1 py-2 text-right">Net Pay</th>
                             </tr>
                         </thead>
@@ -41,12 +48,12 @@ const PDFAdminPayroll = ({ data }) => {
                                     <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
                                         <td className="px-1 py-1">{payslip.name}</td>
                                         <td className="px-1 py-1">{formatDate(payslip.period_start)}/{formatDate(payslip.period_end)}</td>
-                                        <td className="px-1 py-1 text-right">{payslip.total_pay}</td>
-                                        <td className="px-1 py-1 text-right text-red-600">{sssDeduction}</td>
-                                        <td className="px-1 py-1 text-right text-red-600">{philHealthDeduction}</td>
-                                        <td className="px-1 py-1 text-right text-red-600">{pagIbigDeduction}</td>
-                                        <td className="px-1 py-1 text-right text-red-600">{totalDeductions}</td>
-                                        <td className="px-1 py-1 font-bold text-right">{netPay}</td>
+                                        <td className="px-1 py-1 text-right">{formatCurrency(payslip.total_pay)}</td>
+                                        <td className="px-1 py-1 text-right text-red-600">{formatCurrency(sssDeduction)}</td>
+                                        <td className="px-1 py-1 text-right text-red-600">{formatCurrency(philHealthDeduction)}</td>
+                                        <td className="px-1 py-1 text-right text-red-600">{formatCurrency(pagIbigDeduction)}</td>
+                                        <td className="px-1 py-1 text-right text-red-600">{formatCurrency(totalDeductions)}</td>
+                                        <td className="px-1 py-1 font-bold text-right">{formatCurrency(netPay)}</td>
                                     </tr>
                                 );
                             })}
