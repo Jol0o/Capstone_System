@@ -463,7 +463,7 @@ function Payroll() {
                                     <TableCell className="capitalize whitespace-nowrap">{item.hierarchy}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.period_start)}/{formatDate(item.period_end)}</TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{item.hours_worked} Hour/s</TableCell>
-                                    <TableCell className="text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
+                                    <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="w-8 h-8 p-0">

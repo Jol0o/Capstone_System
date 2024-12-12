@@ -230,8 +230,8 @@ function Employee({ setTab }) {
                                         <TableCell className="capitalize whitespace-nowrap"> <Badge variant={item.day_off === 0 ? "success" : "destructive"}>
                                             {item.day_off === 0 ? 'On Duty' : "Off Duty"}
                                         </Badge></TableCell>
-                                        <TableCell className="capitalize max-w-[300px] text-right truncate whitespace-nowrap">{formatCurrency(item.basicSalary)}</TableCell>
-                                        <TableCell className="capitalize max-w-[300px] text-right truncate whitespace-nowrap">{formatCurrency(item.totalSalary)}</TableCell>
+                                        <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap">{formatCurrency(item.basicSalary)}</TableCell>
+                                        <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap">{formatCurrency(item.totalSalary)}</TableCell>
                                         <TableCell className="max-w-[30px]"> <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="w-8 h-8 p-0">

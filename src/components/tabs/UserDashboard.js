@@ -180,10 +180,13 @@ export default function UserDashboard() {
   };
 
   const handleExcelDownload = (data) => {
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, "attendance.xlsx");
+      // Remove employee_id from each data object
+      const filteredData = data.map(({ employee_id, ...rest }) => rest);
+  
+      const ws = XLSX.utils.json_to_sheet(filteredData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+      XLSX.writeFile(wb, "attendance.xlsx");
   };
 
   return (

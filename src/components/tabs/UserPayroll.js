@@ -115,7 +115,7 @@ function UserPayroll() {
                                 <div className="flex items-center space-x-2 text-[clamp(12px, 18px, 5vw)] ">
                                     <Clock size={16} />
                                     <span>Hours worked: </span>
-                                    <span >{item.hours_worked}</span>
+                                    <span >{item.hours_worked} Hour/s</span>
                                 </div>
                                 <div className="flex items-center text-[clamp(12px, 18px, 5vw)] space-x-2 ">
                                     <span>Amount: </span>
@@ -123,7 +123,7 @@ function UserPayroll() {
                                 </div>
                             </div>
                             <div className="text-sm sm:text-[clamp(12px, 18px, 5vw)] ">
-                                Sent Date: {format(new Date(item.created_at), "PPP")}
+                                Period: {format(new Date(item.period_start), "PPP")}/ {format(new Date(item.period_end), "PPP")}
                             </div>
                         </div>
 
