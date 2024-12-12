@@ -44,6 +44,8 @@ function Employee({ setTab }) {
     const [isLoading, setIsloading] = useState(false)
     const [selectedData, setSelectedData] = useState(null)
     const [open, setOpen] = useState(false)
+    const [netPayDialogOpen, setNetPayDialogOpen] = useState(false)
+    const [selectedEmployee, setSelectedEmployee] = useState(null)
     const table = "employees"
 
     useEffect(() => {
@@ -167,6 +169,12 @@ function Employee({ setTab }) {
         return str.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
     };
 
+    const handleNetPayClick = (employee) => {
+        setSelectedEmployee(employee);
+        setNetPayDialogOpen(true);
+    };
+
+
 
     return (
         <>
@@ -214,56 +222,69 @@ function Employee({ setTab }) {
 
                         <TableBody>
                             {
-                                filterData.map(item =>
-                                    <TableRow key={item.id}>
-                                        <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
-                                            {item.name}
-                                        </TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.department}</TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
-                                        <TableCell className=" whitespace-nowrap"><Badge variant={item.hierarchy === "Managerial" ? "default" :
-                                            item.hierarchy === "Supervisor" ? "secondary" : "outline"}>
-                                            {item.hierarchy}
-                                        </Badge></TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap"> <Badge variant={item.day_off === 0 ? "success" : "destructive"}>
-                                            {item.day_off === 0 ? 'On Duty' : "Off Duty"}
-                                        </Badge></TableCell>
-                                        <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap">{formatCurrency(item.basicSalary)}</TableCell>
-                                        <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap">{formatCurrency(item.totalSalary)}</TableCell>
-                                        <TableCell className="max-w-[30px]"> <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="w-8 h-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="w-4 h-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem
-                                                    onClick={() => navigator.clipboard.writeText(item.employee_id)}
-                                                >
-                                                    Copy Candidate ID
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => {
-                                                    setTab("profile")
-                                                    setUser(item.employee_id)
-                                                }}>
-                                                    View
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleEmail(item)}>
-                                                    Send Email
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() => deleteEmployee(item.employee_id)}
-                                                >
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu></TableCell>
-                                    </TableRow>
-                                )
+                                filterData.map(item => {
+                                    const sssDeduction = item.totalSalary * 0.095;
+                                    const philHealthDeduction = item.totalSalary * 0.025;
+                                    const pagIbigDeduction = item.totalSalary * 0.01;
+                                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+                                    const netPay = item.totalSalary - totalDeductions;
+
+                                    return (
+                                        <TableRow key={item.id}>
+                                            <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
+                                                {item.name}
+                                            </TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">{item.department}</TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
+                                            <TableCell className="whitespace-nowrap">
+                                                <Badge variant={item.hierarchy === "Managerial" ? "default" : item.hierarchy === "Supervisor" ? "secondary" : "outline"}>
+                                                    {item.hierarchy}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">
+                                                <Badge variant={item.day_off === 0 ? "success" : "destructive"}>
+                                                    {item.day_off === 0 ? 'On Duty' : "Off Duty"}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap">
+                                                {formatCurrency(item.basicSalary)}
+                                            </TableCell>
+                                            <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap cursor-pointer" onClick={() => handleNetPayClick(item)}>
+                                                {formatCurrency(netPay)}
+                                            </TableCell>
+                                            <TableCell className="max-w-[30px]">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="w-8 h-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="w-4 h-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.employee_id)}>
+                                                            Copy Candidate ID
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => {
+                                                            setTab("profile");
+                                                            setUser(item.employee_id);
+                                                        }}>
+                                                            View
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleEmail(item)}>
+                                                            Send Email
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => deleteEmployee(item.employee_id)}>
+                                                            Delete
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
                             }
                         </TableBody>
                     </Table> : <Table>
@@ -393,8 +414,59 @@ function Employee({ setTab }) {
                     </ScrollArea>
                 </DialogContent>
             </Dialog>
+            <NetPayDialog open={netPayDialogOpen} onClose={() => setNetPayDialogOpen(false)} employee={selectedEmployee} />
         </>
     )
 }
 
+
+const NetPayDialog = ({ open, onClose, employee }) => {
+    if (!employee) return null;
+
+    const sssDeduction = employee.totalSalary * 0.095;
+    const philHealthDeduction = employee.totalSalary * 0.025;
+    const pagIbigDeduction = employee.totalSalary * 0.01;
+    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+    const netPay = employee.totalSalary - totalDeductions;
+
+    const InfoRow = ({ label, value, isDeduction }) => (
+        <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
+            <div className="text-sm font-medium text-gray-400">{label}</div>
+            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : 'text-white'}`}>{value}</div>
+        </div>
+    );
+
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(value);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="max-w-2xl bg-black border-gray-800">
+                <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold text-white">Net Pay Details</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="max-h-[80vh] pr-4">
+                    <div className="space-y-0">
+                        <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
+                            <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
+                            <InfoRow label="Name" value={employee.name} />
+                            <InfoRow label="Department" value={employee.department} />
+                            <InfoRow label="Position" value={employee.position} />
+                            <InfoRow label="Total Salary" value={formatCurrency(employee.totalSalary)} />
+                            <InfoRow label="SSS Deduction" value={formatCurrency(sssDeduction)} isDeduction />
+                            <InfoRow label="PhilHealth Deduction" value={formatCurrency(philHealthDeduction)} isDeduction />
+                            <InfoRow label="Pag-IBIG Deduction" value={formatCurrency(pagIbigDeduction)} isDeduction />
+                            <InfoRow label="Total Deductions" value={formatCurrency(totalDeductions)} isDeduction />
+                            <InfoRow label="Net Pay" value={formatCurrency(netPay)} />
+                        </div>
+                    </div>
+                </ScrollArea>
+            </DialogContent>
+        </Dialog>
+    );
+};
 export default Employee
