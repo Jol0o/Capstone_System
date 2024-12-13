@@ -146,7 +146,7 @@ function Dashboard() {
             />
             <StatCard
               title="Day Off"
-              value={off.length || 0}
+              value={off?.length || 0}
               icon={Sun}
               description=""
               trend=""
