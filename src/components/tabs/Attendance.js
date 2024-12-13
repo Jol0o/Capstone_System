@@ -220,7 +220,7 @@ function Attendance() {
     const calculateEarlyLeaveOrOvertime = (timeOut) => {
         const timeOutDate = parse(timeOut, 'hh:mm a', new Date());
         const sevenPM = new Date();
-        sevenPM.setHours(19, 0, 0, 0);
+        sevenPM.setHours(17, 0, 0, 0);
 
         if (timeOutDate < sevenPM) {
             const minutesEarly = differenceInMinutes(sevenPM, timeOutDate);
