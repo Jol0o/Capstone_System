@@ -301,10 +301,10 @@ function Profile() {
                                 <CardDescription> User credentials here.  </CardDescription>
                             </CardHeader>
                             <CardContent className="flex flex-col gap-3">
-                                <div className="space-y-1">
+                                {/* <div className="space-y-1">
                                     <Label htmlFor="employee_id">Employee ID</Label>
                                     <Input type="tet" required id="employee_id" value={userData?.employee_id} name="employee_id" readOnly disabled />
-                                </div>
+                                </div> */}
                                 <div className="space-y-1">
                                     <Label htmlFor="name">Username</Label>
                                     <Input type="tet" required id="name" value={userData?.name} name="name" onChange={handleChange} />

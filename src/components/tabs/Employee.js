@@ -200,8 +200,9 @@ function Employee({ setTab }) {
                     {filterData && filterData.length ? <Table >
                         <TableHeader>
                             <TableRow>
-                                {Object.keys(filterData[0])
+                                                               {Object.keys(filterData[0])
                                     .filter(key => !['created_at', 'qrcode', 'id', 'avatar', 'password', 'employee_id', 'monthSalary', 'leaveCredits'].includes(key))
+                                    .map(key => key === 'day_off' ? 'status' : key) // Replace 'day_off' with 'status'
                                     .sort((a, b) => {
                                         // Ensure basicSalary and totalSalary are at the end, next to each other
                                         const customOrder = ['basicSalary', 'totalSalary'];

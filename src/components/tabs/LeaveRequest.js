@@ -200,6 +200,7 @@ function LeaveRequest() {
                     leaveType: '',
                 });
             }
+            setRequest(false);
         } catch (e) {
             console.log(e);
             toast("Error", {
@@ -208,7 +209,7 @@ function LeaveRequest() {
             setIsConfirmationOpen(false)
         } finally {
             setIsloading(false);
-            setRequest(false);
+            
             setIsConfirmationOpen(false)
         }
     };

@@ -438,7 +438,7 @@ function Payroll() {
                         <FileDown className="h-3.5 w-3.5" />
                         Export
                     </Button>
-                    <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Send Payroll'}</Button>
+                    <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Generate Payroll'}</Button>
                 </div>
 
             </div>
