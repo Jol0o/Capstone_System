@@ -237,7 +237,7 @@ function Request() {
                     />
                     <div className="flex items-center gap-1" >
                         <Button onClick={requestFucntion} disabled={checking} >
-                            {checking ? <LoaderCircle className="animate-spin" /> : 'Check Leave Reuest'}
+                            {checking ? <LoaderCircle className="animate-spin" /> : 'Check Leave Request'}
                         </Button>
                         <Button disabled={filterData.length === 0} onClick={() => handleExcelDownload(filterData)} variant="outline" className="gap-1">
                             <FileDown className="h-3.5 w-3.5" />
