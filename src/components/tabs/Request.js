@@ -260,14 +260,14 @@ function Request() {
                         <TableBody>
                             {
                                 filterData.map(item =>
-                                    <TableRow key={item.id}>
+                                    <TableRow key={item?.id}>
                                         <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
-                                            {item.name}
+                                            {item?.name}
                                         </TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{formatDate(item.created_at)}</TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.leave_type}</TableCell>
-                                        <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item.inclusive_dates)} / {formatDate(item.to_date)}</TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.status}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{formatDate(item?.created_at)}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item?.leave_type}</TableCell>
+                                        <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item?.inclusive_dates)} / {formatDate(item?.to_date)}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item?.status}</TableCell>
                                         <TableCell className="max-w-[30px]"> <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="w-8 h-8 p-0">
@@ -397,7 +397,7 @@ function Request() {
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
-                                                        value={selectedData.approved_by || ""}
+                                                        value={selectedData?.approved_by || ""}
                                                         onChange={(e) => setSelectedData({ ...selectedData, approved_by: e.target.value })}
                                                     />
                                                 </div>
@@ -410,7 +410,7 @@ function Request() {
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
-                                                        value={selectedData.received_by || ""}
+                                                        value={selectedData?.received_by || ""}
                                                         onChange={(e) => setSelectedData({ ...selectedData, received_by: e.target.value })}
                                                     />
                                                 </div>
@@ -423,7 +423,7 @@ function Request() {
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
-                                                        value={selectedData.recorded_by || ""}
+                                                        value={selectedData?.recorded_by || ""}
                                                         onChange={(e) => setSelectedData({ ...selectedData, recorded_by: e.target.value })}
                                                     />
                                                 </div>

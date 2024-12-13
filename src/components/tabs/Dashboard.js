@@ -146,10 +146,10 @@ function Dashboard() {
             />
             <StatCard
               title="Day Off"
-              value={off || 0}
+              value={off.length || 0}
               icon={Sun}
-              description="No data available for yesterday."
-              trend="neutral"
+              description=""
+              trend=""
             />
 
           </div>
