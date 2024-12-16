@@ -50,6 +50,18 @@ const getDefaultDates = (range, month, year) => {
     return { startDate, endDate };
 };
 
+const getDateRange = () => {
+    const today = new Date();
+    const day = today.getDate();
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    
+    if (day <= 15) {
+        return '1-15';
+    } else {
+        return `16-${lastDayOfMonth}`;
+    }
+};
+
 function Attendance() {
     const [data, setData] = useState([])
     const [filterData, setFilteredData] = useState([])
@@ -61,7 +73,7 @@ function Attendance() {
     const [filter, setFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const table = "attendance"
-    const [dateRange, setDateRange] = useState('1-15');
+    const [dateRange, setDateRange] = useState(getDateRange);
     const [month, setMonth] = useState(currentMonth);
     const [year, setYear] = useState(currentYear);
 
@@ -220,7 +232,7 @@ function Attendance() {
     const calculateEarlyLeaveOrOvertime = (timeOut) => {
         const timeOutDate = parse(timeOut, 'hh:mm a', new Date());
         const sevenPM = new Date();
-        sevenPM.setHours(17, 0, 0, 0);
+        sevenPM.setHours(17, 0, 0, 0); // 5:00 PM
 
         if (timeOutDate < sevenPM) {
             const minutesEarly = differenceInMinutes(sevenPM, timeOutDate);
@@ -230,7 +242,8 @@ function Attendance() {
         } else if (timeOutDate > sevenPM) {
             const minutesOvertime = differenceInMinutes(timeOutDate, sevenPM);
             const hoursOvertime = Math.floor(minutesOvertime / 60);
-            return `Overtime: ${hoursOvertime > 0 ? `${hoursOvertime} hour/s` : ''}`;
+            const remainingMinutesOvertime = minutesOvertime % 60;
+            return `Overtime: ${hoursOvertime > 0 ? `${hoursOvertime} hour/s ` : ''}${remainingMinutesOvertime} minute/s`;
         }
         return '';
     };
@@ -324,8 +337,8 @@ function Attendance() {
                         </DropdownMenu>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="sm" className="flex items-center justify-between h-8">
-                                    <span>{dateRange || 'Date Range'}</span><ChevronDownIcon className="w-6 h-6"/>
+                                <Button variant="outline" size="sm" className="flex items-center justify-between h-8">
+                                    <span>{dateRange || 'Date Range'}</span><ChevronDownIcon className="w-6 h-6" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
@@ -375,8 +388,15 @@ function Attendance() {
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
-                                    <TableCell className=" whitespace-nowrap">{item.time_in} <span className="text-red-500">({calculateLateTime(item.time_in)})</span> </TableCell>
-                                    <TableCell className=" whitespace-nowrap">{item.time_out} <span className="text-red-500">{calculateEarlyLeaveOrOvertime(item.time_out)}</span></TableCell>
+                                    <TableCell className=" whitespace-nowrap">{item.time_in} <span className={calculateLateTime(item.time_in) === 'On time' ? 'text-green-500' : 'text-red-500'}>
+                                        ({calculateLateTime(item.time_in)})
+                                    </span> </TableCell>
+                                    <TableCell className="whitespace-nowrap">
+                                        {item.time_out}
+                                        <span className={calculateEarlyLeaveOrOvertime(item.time_out).includes('Overtime') ? 'text-green-500' : 'text-red-500'}>
+                                             {calculateEarlyLeaveOrOvertime(item.time_out)}
+                                        </span>
+                                    </TableCell>
                                     <TableCell className=" whitespace-nowrap">{item.hours} Hour/s</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

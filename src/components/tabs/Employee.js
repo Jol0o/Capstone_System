@@ -200,19 +200,31 @@ function Employee({ setTab }) {
                     {filterData && filterData.length ? <Table >
                         <TableHeader>
                             <TableRow>
-                                                               {Object.keys(filterData[0])
+                                {Object.keys(filterData[0])
                                     .filter(key => !['created_at', 'qrcode', 'id', 'avatar', 'password', 'employee_id', 'monthSalary', 'leaveCredits'].includes(key))
-                                    .map(key => key === 'day_off' ? 'status' : key) // Replace 'day_off' with 'status'
+                                    .map(key => {
+                                        if (key === 'day_off') return 'status';
+                                        if (key === 'basicSalary') return 'Gross Pay';
+                                        if (key === 'totalSalary') return 'Net Pay';
+                                        return key;
+                                    })
                                     .sort((a, b) => {
-                                        // Ensure basicSalary and totalSalary are at the end, next to each other
-                                        const customOrder = ['basicSalary', 'totalSalary'];
+                                        // Ensure Gross Pay and Net Pay are at the end, next to each other
+                                        const customOrder = ['Gross Pay', 'Net Pay'];
                                         if (customOrder.includes(a) && customOrder.includes(b)) {
                                             return customOrder.indexOf(a) - customOrder.indexOf(b);
                                         }
-                                        if (customOrder.includes(a)) return 1; // Push basicSalary and totalSalary to the end
+                                        if (customOrder.includes(a)) return 1; // Push Gross Pay and Net Pay to the end
                                         if (customOrder.includes(b)) return -1;
                                         return 0; // Maintain default order for other keys
                                     })
+                                    .reduce((acc, key) => {
+                                        acc.push(key);
+                                        if (key === 'hierarchy') {
+                                            acc.push('rate');
+                                        }
+                                        return acc;
+                                    }, [])
                                     .map((key) => {
                                         // Convert camel case to separate words by space
                                         let formattedKey = camelCaseToWords(key);
@@ -244,6 +256,7 @@ function Employee({ setTab }) {
                                                     {item.hierarchy}
                                                 </Badge>
                                             </TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">{item.hierarchy === 'Rank & File' ? 'Daily' : 'Monthly'}</TableCell>
                                             <TableCell className="capitalize whitespace-nowrap">
                                                 <Badge variant={item.day_off === 0 ? "success" : "destructive"}>
                                                     {item.day_off === 0 ? 'On Duty' : "Off Duty"}

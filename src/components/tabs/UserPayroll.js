@@ -2,7 +2,7 @@ import useAuth from '@/hooks/useAuth';
 import { getUserPayroll } from '@/lib/api';
 import axios from 'axios';
 import { format } from 'date-fns';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
     Card,
     CardContent,
@@ -10,8 +10,8 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, ChevronDown, MoreHorizontal, User, Clock, FileDown, LinkIcon, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import generate from '../pdf_template/generatePDF';
@@ -19,35 +19,33 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 
 function UserPayroll() {
-    const { user } = useAuth()
-    const [page, setPage] = useState(1)
-    const [data, setData] = useState([])
-    const [filterData, setFilteredData] = useState(null)
-    const [loadGenerate, setLoadGenerate] = useState(false)
-    const [link, setLink] = useState('')
+    const { user } = useAuth();
+    const [page, setPage] = useState(1);
+    const [data, setData] = useState([]);
+    const [filterData, setFilteredData] = useState(null);
+    const [loadingItems, setLoadingItems] = useState({}); // Track loading state for each item
+    const [links, setLinks] = useState({}); // Track link state for each item
 
-    const limit = 5
+    const limit = 5;
 
     useEffect(() => {
-
         const fetch = async () => {
-
-            const id = user?.user_id
-            console.log(id)
+            const id = user?.user_id;
+            console.log(id);
             try {
                 axios.defaults.withCredentials = true;
-                const res = await getUserPayroll(page, limit, id)
+                const res = await getUserPayroll(page, limit, id);
                 if (res.status === 200) {
-                    console.log(res.data)
-                    setData(res.data.data)
-                    setFilteredData(res.data)
+                    console.log(res.data);
+                    setData(res.data.data);
+                    setFilteredData(res.data);
                 }
             } catch (e) {
-                console.log(e)
+                console.log(e);
             }
-        }
-        fetch()
-    }, [user, page])
+        };
+        fetch();
+    }, [user, page]);
 
     const handleNext = () => {
         setPage(prevPage => prevPage + 1);
@@ -57,22 +55,22 @@ function UserPayroll() {
         setPage(prevPage => Math.max(prevPage - 1, 1));
     };
 
-    const handleGenerate = async (data) => {
-        setLoadGenerate(true);
-        console.log(data)
+    const handleGenerate = async (item) => {
+        setLoadingItems(prev => ({ ...prev, [item.id]: true }));
+        console.log(item);
         try {
-            const link = await generate({ type: "payroll", data });
+            const link = await generate({ type: "payroll", data: item });
             if (link) {
                 window.open(link, '_blank');
-                setLoadGenerate(false);
                 toast("Success", {
                     description: `PDF Generated Successfully!`,
                 });
-                setLink(link);
+                setLinks(prev => ({ ...prev, [item.id]: link }));
             }
         } catch (e) {
             console.log(e);
-            setLoadGenerate(false);
+        } finally {
+            setLoadingItems(prev => ({ ...prev, [item.id]: false }));
         }
     };
 
@@ -80,7 +78,7 @@ function UserPayroll() {
         const anchor = document.createElement('a');
         anchor.href = link;
         anchor.download = 'payroll.pdf';
-          anchor.target = '_blank';
+        anchor.target = '_blank';
         document.body.appendChild(anchor);
         anchor.click();
         document.body.removeChild(anchor);
@@ -93,7 +91,6 @@ function UserPayroll() {
         }).format(value);
     };
 
-
     return (
         <div className="max-w-[1000px] m-auto flex flex-col gap-5">
             {data.length > 0 ? data.map(item => (
@@ -104,8 +101,13 @@ function UserPayroll() {
                             <Button disabled variant="outline" size='sm'>
                                 Paid
                             </Button>
-                            <Button disabled={loadGenerate} size='sm' onClick={() => handleGenerate(item)} className="bg-blue-600 hover:bg-blue-700">
-                                {loadGenerate ? <LoaderCircle className="animate-spin" /> : 'Generate'}
+                            <Button
+                                disabled={loadingItems[item.id]}
+                                size='sm'
+                                onClick={() => handleGenerate(item)}
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                {loadingItems[item.id] ? <LoaderCircle className="animate-spin" /> : 'Generate Payslip'}
                             </Button>
                         </div>
                     </CardHeader>
@@ -127,17 +129,17 @@ function UserPayroll() {
                             </div>
                         </div>
 
-                        {link && <div className="space-y-2">
+                        {links[item.id] && <div className="space-y-2">
                             <div className="flex items-center space-x-2 text-sm ">
                                 <LinkIcon size={16} />
                                 <span>Payroll Link:</span>
                             </div>
                             <Input
-                                value={link}
+                                value={links[item.id]}
                                 readOnly
                                 className="font-mono text-sm"
                             />
-                            <Button onClick={() => downloadPDF(link)} className="bg-blue-600 hover:bg-blue-700">
+                            <Button onClick={() => downloadPDF(links[item.id])} className="bg-blue-600 hover:bg-blue-700">
                                 Download
                             </Button>
                         </div>}
@@ -162,7 +164,7 @@ function UserPayroll() {
                 </div>}
             </div>}
         </div>
-    )
+    );
 }
 
-export default UserPayroll
+export default UserPayroll;

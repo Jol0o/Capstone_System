@@ -54,6 +54,17 @@ const getDefaultDates = (range, month, year) => {
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
 
+const getDateRange = () => {
+    const today = new Date();
+    const day = today.getDate();
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    
+    if (day <= 15) {
+        return '1-15';
+    } else {
+        return `16-${lastDayOfMonth}`;
+    }
+};
 
 function Payroll() {
     const [data, setData] = useState([])
@@ -64,7 +75,7 @@ function Payroll() {
     const [totalPages, setTotalPages] = useState(0)
     const [loadPayroll, setLoadPayroll] = useState(false)
     const limit = 15
-        const [dateRange, setDateRange] = useState('1-15');
+    const [dateRange, setDateRange] = useState(getDateRange);
     const [month, setMonth] = useState(currentMonth);
     const [year, setYear] = useState(currentYear);
     const [link, setLink] = useState('');
@@ -74,7 +85,7 @@ function Payroll() {
     const currentDay = currentDate.getDate();
     let defaultStartDate;
     let defaultEndDate;
-    
+
     if (currentDay <= 15) {
         // If the current date is on or before the 15th, set startDate to the 1st and endDate to the 15th
         defaultStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -84,11 +95,11 @@ function Payroll() {
         defaultStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 16);
         defaultEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // 0 gets the last day of the previous month
     }
-    
+
     // Format the dates to 'YYYY-MM-DD'
     const formattedStartDate = format(defaultStartDate, 'yyyy-MM-dd');
     const formattedEndDate = format(defaultEndDate, 'yyyy-MM-dd');
-    
+
     const [startDate, setStartDate] = useState(formattedStartDate);
     const [endDate, setEndDate] = useState(formattedEndDate);
 
@@ -113,15 +124,15 @@ function Payroll() {
         const options = { year: "numeric", month: "long", day: "numeric" };
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
-    
+
     const fetchData = async () => {
-            if (filter.trim() === '') {
-                setFilteredData(data);
-                return;
-            }
-            const res = await searchPayroll(filter.trim());
-            setFilteredData(res.data.data);
-        };
+        if (filter.trim() === '') {
+            setFilteredData(data);
+            return;
+        }
+        const res = await searchPayroll(filter.trim());
+        setFilteredData(res.data.data);
+    };
 
     useEffect(() => {
         fetchData();
@@ -142,15 +153,15 @@ function Payroll() {
 
 
     const fetchpayroll = async () => {
-            const response = await getPayrolls(page, limit, startDate, endDate)
-            if (response) {
-                console.table('Payroll', response.data)
-                setData(response.data.data)
-                setTotalPages(response.data.totalPages)
-                setFilteredData(response.data.data)
-                setIsLoading(false)
-            }
+        const response = await getPayrolls(page, limit, startDate, endDate)
+        if (response) {
+            console.table('Payroll', response.data)
+            setData(response.data.data)
+            setTotalPages(response.data.totalPages)
+            setFilteredData(response.data.data)
+            setIsLoading(false)
         }
+    }
 
     useEffect(() => {
         setIsLoading(true)
@@ -246,14 +257,14 @@ function Payroll() {
         }
     }
 
-        const formatCurrency = (value) => {
+    const formatCurrency = (value) => {
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
             currency: 'PHP',
         }).format(value);
     };
 
-     const handleDateRangeChange = (e) => {
+    const handleDateRangeChange = (e) => {
         setDateRange(e.target.value);
         const { startDate, endDate } = getDefaultDates(e.target.value, month, year);
         setStartDate(format(startDate, 'yyyy-MM-dd'));
@@ -274,9 +285,9 @@ function Payroll() {
         setEndDate(format(endDate, 'yyyy-MM-dd'));
     };
 
-       const handleGenerate = async (data) => {
+    const handleGenerate = async (data) => {
         const promise = generate({ type: "payroll", data });
-    
+
         toast.promise(promise, {
             loading: 'Loading...',
             success: (link) => {
@@ -288,7 +299,7 @@ function Payroll() {
             },
             error: 'Error',
         });
-    
+
         try {
             const link = await promise;
             if (link) {
@@ -357,7 +368,7 @@ function Payroll() {
                         className="max-w-sm"
                     />
                     <div className="flex gap-2 md:items-center gap-s">
-                    
+
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-8">
@@ -397,8 +408,8 @@ function Payroll() {
                                 />
                             </PopoverContent>
                         </Popover>
-                    
-                         <DropdownMenu>
+
+                        <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-8">
                                     <span>{new Date(0, month).toLocaleString('default', { month: 'long' }) || 'Month'}</span>
@@ -415,7 +426,7 @@ function Payroll() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="flex items-center justify-between h-8">
-                                    <span>{dateRange || 'Date Range'}</span><ChevronDownIcon className="w-6 h-6"/>
+                                    <span>{dateRange || 'Date Range'}</span><ChevronDownIcon className="w-6 h-6" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
@@ -430,7 +441,7 @@ function Payroll() {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                      
+
                     </div>
                 </div>
                 <div className="flex items-center gap-1">
@@ -449,49 +460,59 @@ function Payroll() {
                             <TableHead className="capitalize">Name</TableHead>
                             <TableHead className="capitalize">Hierarchy</TableHead>
                             <TableHead className="capitalize">Start/End Period</TableHead>
+                            <TableHead className="">Absent/s</TableHead>
                             <TableHead className="capitalize">Hours Worked</TableHead>
-                            <TableHead className="text-right capitalize">Total Pay</TableHead>
+                            <TableHead className="text-right capitalize">Gross Pay</TableHead>
+                            <TableHead className="text-right capitalize">Net Pay</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {
-                            filterData.map(item =>
-                                <TableRow key={item.id}>
-                                    <TableCell className="flex items-center gap-1 overflow-hidden capitalize truncate whitespace-nowrap">
-                                        {item.name}
-                                    </TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.hierarchy}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{formatDate(item.period_start)}/{formatDate(item.period_end)}</TableCell>
-                                    <TableCell className="capitalize whitespace-nowrap">{item.hours_worked} Hour/s</TableCell>
-                                    <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
-                                    <TableCell className="max-w-[30px]"> <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="w-8 h-8 p-0">
-                                                <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="w-4 h-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem
-                                                onClick={() => navigator.clipboard.writeText(item.id)}
-                                            >
-                                                Copy Payroll ID
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => handleGenerate(item)}
-                                            >
-                                                Payslip
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => deletePayroll(item.id)}
-                                            >
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu></TableCell>
-                                </TableRow>
-                            )
+                            filterData.map(item => {
+                                const sssDeduction = item.total_pay * 0.095;
+                                const philHealthDeduction = item.total_pay * 0.025;
+                                const pagIbigDeduction = item.total_pay * 0.01;
+                                const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+                                const netPay = item.total_pay - totalDeductions;
+
+                                return (
+                                    <TableRow key={item.id}>
+                                        <TableCell className="flex items-center gap-1 overflow-hidden capitalize truncate whitespace-nowrap">
+                                            {item.name}
+                                        </TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">{item.hierarchy}</TableCell>
+                                        <TableCell className="capitalize whitespace-nowrap">
+                                            {`${format(new Date(item.period_start), 'MMMM d')} - ${format(new Date(item.period_end), 'd, yyyy')}`}
+                                        </TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.absent}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.hours_worked} Hour/s</TableCell>
+                                        <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
+                                        <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(netPay)}</TableCell>
+                                        <TableCell className="max-w-[30px]">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="w-8 h-8 p-0">
+                                                        <span className="sr-only">Open menu</span>
+                                                        <MoreHorizontal className="w-4 h-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.id)}>
+                                                        Copy Payroll ID
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleGenerate(item)}>
+                                                        Payslip
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => deletePayroll(item.id)}>
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })
                         }
                     </TableBody>
                 </Table> : <Table>

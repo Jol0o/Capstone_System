@@ -14,6 +14,19 @@ export const PDFPayroll = ({ data }) => {
   // Calculate net pay
   const netPay = total_pay - totalDeductions;
 
+    function formatDate(dateString) {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+  
+
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(value);
+    };
+
   return (
     <Tailwind>
       <div className="max-w-3xl p-8 mx-auto bg-white rounded-lg shadow">
@@ -37,11 +50,11 @@ export const PDFPayroll = ({ data }) => {
           <div>
             <div className="mb-2">
               <span className="font-semibold">Pay Period: </span>
-              <span>May 1, 2024 - May 15, 2024</span>
+              <span>{formatDate(data.period_start)}- {formatDate(data.period_end)}</span>
             </div>
             <div className="mb-2">
               <span className="font-semibold">Pay Date: </span>
-              <span>May 20, 2024</span>
+              <span>{formatDate(data.created_at)}</span>
             </div>
           </div>
         </div>
@@ -61,11 +74,11 @@ export const PDFPayroll = ({ data }) => {
               <tbody>
                 <tr className="border-b">
                   <td className="p-2">Basic Salary</td>
-                  <td className="p-2 text-right">₱{total_pay.toFixed(2)}</td>
+                  <td className="p-2 text-right">{formatCurrency(total_pay)}</td>
                 </tr>
                 <tr className="font-bold">
                   <td className="p-2">Gross Pay</td>
-                  <td className="p-2 text-right">₱{total_pay.toFixed(2)}</td>
+                  <td className="p-2 text-right">{formatCurrency(total_pay)}</td>
                 </tr>
               </tbody>
             </table>
@@ -84,19 +97,19 @@ export const PDFPayroll = ({ data }) => {
               <tbody>
                 <tr className="border-b">
                   <td className="p-2">SSS</td>
-                  <td className="p-2 text-right text-red-500">₱{sssDeduction.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">{formatCurrency(sssDeduction)}</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-2">PhilHealth</td>
-                  <td className="p-2 text-right text-red-500">₱{philHealthDeduction.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">{formatCurrency(philHealthDeduction)}</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-2">Pag-IBIG</td>
-                  <td className="p-2 text-right text-red-500">₱{pagIbigDeduction.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">{formatCurrency(pagIbigDeduction)}</td>
                 </tr>
                 <tr className="font-bold">
                   <td className="p-2">Total Deductions</td>
-                  <td className="p-2 text-right text-red-500">₱{totalDeductions.toFixed(2)}</td>
+                  <td className="p-2 text-right text-red-500">{formatCurrency(totalDeductions)}</td>
                 </tr>
               </tbody>
             </table>
@@ -116,15 +129,15 @@ export const PDFPayroll = ({ data }) => {
             <tbody>
               <tr className="border-b">
                 <td className="p-2">Total Earnings</td>
-                <td className="p-2 text-right">₱{total_pay.toFixed(2)}</td>
+                <td className="p-2 text-right">{formatCurrency(total_pay)}</td>
               </tr>
               <tr className="border-b">
                 <td className="p-2">Total Deductions</td>
-                <td className="p-2 text-right text-red-500">₱{totalDeductions.toFixed(2)}</td>
+                <td className="p-2 text-right text-red-500">{formatCurrency(totalDeductions)}</td>
               </tr>
               <tr className="font-bold">
                 <td className="p-2">Net Pay</td>
-                <td className="p-2 text-right">₱{netPay.toFixed(2)}</td>
+                <td className="p-2 text-right">{formatCurrency(netPay)}</td>
               </tr>
             </tbody>
           </table>
