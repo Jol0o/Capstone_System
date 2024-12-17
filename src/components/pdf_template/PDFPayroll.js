@@ -43,9 +43,13 @@ export const PDFPayroll = ({ data }) => {
               <span>{data.name}</span>
             </div>
             <div className="mb-2">
-              <span className="font-semibold">Department: </span>
-              <span>Sales</span>
+              <span className="font-semibold">Hierarchy: </span>
+              <span>{data.hierarchy}</span>
             </div>
+             <div className="mb-2">
+                                            <span className="font-semibold">Absent: </span>
+                                            <span>{data.absent}</span>
+                                        </div>
           </div>
           <div>
             <div className="mb-2">
@@ -56,6 +60,7 @@ export const PDFPayroll = ({ data }) => {
               <span className="font-semibold">Pay Date: </span>
               <span>{formatDate(data.created_at)}</span>
             </div>
+            
           </div>
         </div>
 

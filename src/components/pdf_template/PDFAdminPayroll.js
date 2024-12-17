@@ -42,7 +42,7 @@ const PDFAdminPayroll = ({ data }) => {
                                         </div>
                                         <div className="mb-2">
                                             <span className="font-semibold">Hierarchy: </span>
-                                            <span>{payslip.name}</span>
+                                            <span>{payslip.hierarchy}</span>
                                         </div>
                                         <div className="mb-2">
                                             <span className="font-semibold">Absent: </span>

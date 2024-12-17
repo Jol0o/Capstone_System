@@ -29,6 +29,8 @@ import {
 import { Calendar } from '../ui/calendar';
 import { io } from 'socket.io-client';
 import generate from '../pdf_template/generatePDF';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const currentDate = new Date();
 const currentDay = currentDate.getDate();
@@ -79,6 +81,9 @@ function Payroll() {
     const [month, setMonth] = useState(currentMonth);
     const [year, setYear] = useState(currentYear);
     const [link, setLink] = useState('');
+    const [open, setOpen] = useState(false)
+    const [netPayDialogOpen, setNetPayDialogOpen] = useState(false)
+    const [selectedEmployee, setSelectedEmployee] = useState(null)
     const table = "payroll"
 
     const currentDate = new Date();
@@ -355,10 +360,15 @@ function Payroll() {
         document.body.removeChild(anchor);
     };
 
+    const handleNetPayClick = (employee) => {
+        setSelectedEmployee(employee);
+        setNetPayDialogOpen(true);
+    };
 
     if (isLoading) return <Loader />
 
     return (
+        <>
         <div className="w-full h-full overflow-hidden">
             <div className="flex flex-col justify-between gap-2 py-4 md:items-center md:flex-row">
                 <div className="flex flex-col gap-2 md:flex-row">
@@ -487,7 +497,7 @@ function Payroll() {
                                         <TableCell className="whitespace-nowrap">{item.absent}</TableCell>
                                         <TableCell className="whitespace-nowrap">{item.hours_worked} Hour/s</TableCell>
                                         <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
-                                        <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(netPay)}</TableCell>
+                                        <TableCell className="font-bold text-right capitalize whitespace-nowrap" onClick={() => handleNetPayClick(item)}>{formatCurrency(netPay)}</TableCell>
                                         <TableCell className="max-w-[30px]">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
@@ -541,7 +551,59 @@ function Payroll() {
                 </div>
             </div>}
         </div>
+            <NetPayDialog open={netPayDialogOpen} onClose={() => setNetPayDialogOpen(false)} employee={selectedEmployee} />
+        </>
+
     )
 }
+
+const NetPayDialog = ({ open, onClose, employee }) => {
+    if (!employee) return null;
+
+    const sssDeduction = employee.total_pay * 0.095;
+    const philHealthDeduction = employee.total_pay * 0.025;
+    const pagIbigDeduction = employee.total_pay * 0.01;
+    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+    const netPay = employee.total_pay - totalDeductions;
+
+    const InfoRow = ({ label, value, isDeduction }) => (
+        <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
+            <div className="text-sm font-medium text-gray-400">{label}</div>
+            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : 'text-white'} font-bold`}>{value}</div>
+        </div>
+    );
+
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(value);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="max-w-2xl bg-black border-gray-800">
+                <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold text-white">Net Pay Details</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="max-h-[80vh] pr-4">
+                    <div className="space-y-0">
+                        <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
+                            <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
+                            <InfoRow label="Name" value={employee.name} />
+                            <InfoRow label="Hierarchy" value={employee.hierarchy} />
+                            <InfoRow label="Total Salary" value={formatCurrency(employee.total_pay)} />
+                            <InfoRow label="SSS Deduction" value={formatCurrency(sssDeduction)} isDeduction />
+                            <InfoRow label="PhilHealth Deduction" value={formatCurrency(philHealthDeduction)} isDeduction />
+                            <InfoRow label="Pag-IBIG Deduction" value={formatCurrency(pagIbigDeduction)} isDeduction />
+                            <InfoRow label="Total Deductions" value={formatCurrency(totalDeductions)} isDeduction />
+                            <InfoRow label="Net Pay" value={formatCurrency(netPay)} />
+                        </div>
+                    </div>
+                </ScrollArea>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 export default Payroll

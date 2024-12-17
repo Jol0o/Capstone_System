@@ -388,14 +388,18 @@ function Attendance() {
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
-                                    <TableCell className=" whitespace-nowrap">{item.time_in} <span className={calculateLateTime(item.time_in) === 'On time' ? 'text-green-500' : 'text-red-500'}>
-                                        ({calculateLateTime(item.time_in)})
-                                    </span> </TableCell>
+                                                                       <TableCell className="whitespace-nowrap">
+                                        <span className={calculateLateTime(item.time_in) === 'On time' ? 'text-green-500' : ''}>
+                                            {item.time_in}
+                                        </span>
+                                        {calculateLateTime(item.time_in) !== 'On time' && (
+                                            <span className="text-red-500">
+                                                ({calculateLateTime(item.time_in)})
+                                            </span>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="whitespace-nowrap">
                                         {item.time_out}
-                                        <span className={calculateEarlyLeaveOrOvertime(item.time_out).includes('Overtime') ? 'text-green-500' : 'text-red-500'}>
-                                             {calculateEarlyLeaveOrOvertime(item.time_out)}
-                                        </span>
                                     </TableCell>
                                     <TableCell className=" whitespace-nowrap">{item.hours} Hour/s</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
