@@ -257,9 +257,9 @@ function Employee({ setTab }) {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="capitalize whitespace-nowrap">{item.hierarchy === 'Rank & File' ? 'Daily' : 'Monthly'}</TableCell>
-                                            <TableCell className="capitalize whitespace-nowrap">
-                                                <Badge variant={item.day_off === 0 ? "success" : "destructive"}>
-                                                    {item.day_off === 0 ? 'On Duty' : "Off Duty"}
+                                                                                        <TableCell className="capitalize whitespace-nowrap">
+                                                <Badge className={item.day_off === 0 ? 'bg-green-500' : 'bg-red-500'}>
+                                                    {item.day_off === 0 ? 'On Duty' : 'Off Duty'}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap">
