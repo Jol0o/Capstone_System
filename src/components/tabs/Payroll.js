@@ -320,33 +320,43 @@ function Payroll() {
         }
     };
 
-    const handleGenerateAll = async (data) => {
-        const promise = generate({ type: "admin", data });
-
-        toast.promise(promise, {
-            loading: 'Loading...',
-            success: (link) => {
-                if (link) {
-                    window.open(link, '_blank');
-                    setLink(link);
-                    return 'Click the link';
-                }
-            },
-            error: 'Error',
-        });
-
+      const handleGenerateAll = async () => {
         try {
+            const res = await exportPayroll(startDate, endDate);
+    
+            if (res.status !== 200) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const { data } = res.data;
+            console.log(data);
+    
+            if (!Array.isArray(data)) {
+                throw new Error('Data is not an array');
+            }
+    
+            const promise = generate({ type: "admin", data });
+    
+            toast.promise(promise, {
+                loading: 'Loading...',
+                success: 'PDF Generated Successfully!',
+                error: 'Error generating PDF',
+            });
+    
             const link = await promise;
             if (link) {
+                setLink(link);
+                window.open(link, '_blank');
                 toast('Click the link', {
                     action: {
                         label: 'Download',
-                        onClick: () => downloadPDF(link)
+                        onClick: () => downloadPDF(link),
                     },
                 });
             }
         } catch (e) {
-            console.warn(e.message);
+            console.error('Error:', e.message);
+            toast.error('Failed to generate payroll');
         }
     };
 
