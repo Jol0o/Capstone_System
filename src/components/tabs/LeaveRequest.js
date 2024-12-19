@@ -286,8 +286,8 @@ function LeaveRequest() {
                 <div className="max-w-[1000px] m-auto flex flex-col gap-5">
                     <div className="flex justify-end">
                         <Button
-                            variant={data.some(request => request.status === 'Pending' || request.status === 'Process') ? 'secondary' : ''}
-                            disabled={data.some(request => request.status === 'Pending' || request.status === 'Process' || request.status === 'Approved') ? true : undefined}
+                            variant={data.some(request => request.status === 'Pending' || request.status === 'Processing') ? 'secondary' : ''}
+                            disabled={data.some(request => request.status === 'Pending' || request.status === 'Processing' || request.status === 'Approved') ? true : undefined}
                             onClick={() => {
                                 if (availableCredits >= 0) {
                                     setRequest(!request);
@@ -513,7 +513,7 @@ function LeaveRequest() {
                                     Leave Type: {item.leave_type}
                                     <div className="flex flex-wrap items-center gap-2">
                                         <Badge>{item.status}</Badge>
-                                        {item.status !== 'Pending' && item.status !== 'Process' ? (
+                                        {item.status !== 'Pending' && item.status !== 'Processing' ? (
                                             <Button
                                                 size="sm"
                                                 disabled={loadGenerate}

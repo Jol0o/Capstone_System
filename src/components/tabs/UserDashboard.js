@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Calendar as CalendarIcon, Clock, DollarSign, FileText, User, ChevronLeft, ChevronRight, Filter, LoaderCircle, FileDown } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, PhilippinePeso , FileText, User, ChevronLeft, ChevronRight, Filter, LoaderCircle, FileDown } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
@@ -214,7 +214,7 @@ export default function UserDashboard() {
         <Card className="col-span-1">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Last Payroll</CardTitle>
-            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                       <span className="w-4 h-4 text-muted-foreground">₱</span>
           </CardHeader>
           <CardContent>
             {dashboardData && dashboardData.latestPayroll ? <><div className="text-2xl font-bold">{formatCurrency(dashboardData?.latestPayroll.total_pay)}</div>

@@ -60,6 +60,7 @@ function Profile() {
     const [showPass, setShowPass] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
     const [eyePass, setEyePass] = useState(false)
+    const [netPay, setNetPay] = useState(0);
 
     const filteredValue = yearData.filter(data =>
         isWithinInterval(new Date(data.date), { start: currentMonthStart, end: currentMonthEnd })
@@ -275,7 +276,14 @@ function Profile() {
         }).format(value);
     };
 
-    console.log(userData)
+useEffect(() => {
+    const sssDeduction = userData.totalSalary * 0.095;
+    const philHealthDeduction = userData.totalSalary * 0.025;
+    const pagIbigDeduction = userData.totalSalary * 0.01;
+    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+    const calculatedNetPay = userData.totalSalary - totalDeductions;
+    setNetPay(calculatedNetPay);
+}, [userData]);
 
 
     return (
@@ -314,7 +322,7 @@ function Profile() {
                                     <Input type="email" required id="email" value={userData?.email} name="email" onChange={handleChange} />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="phone_number">phone_number</Label>
+                                    <Label htmlFor="phone_number">Phone Number</Label>
                                     <Input type="number" required id="phone_number" value={userData?.phone_number} name="phone_number" onChange={handleChange} />
                                 </div>
                                 {showPass && <> <div className="space-y-1">
@@ -405,7 +413,7 @@ function Profile() {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="salary">Salary</Label>
+                                    <Label htmlFor="salary">Gross Pay</Label>
                                     <Input
                                         type="text"
                                         id="salary"
@@ -416,11 +424,11 @@ function Profile() {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="totalsalary">Total Salary</Label>
+                                    <Label htmlFor="totalsalary">Net Pay</Label>
                                     <Input
                                         type="text"
                                         id="totalsalary"
-                                        value={formatCurrency(userData.totalSalary || 0)}
+                                        value={formatCurrency(netPay || 0)}
                                         name="basicSalary"
                                         onChange={handleChange}
                                         disabled

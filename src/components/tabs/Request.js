@@ -380,7 +380,7 @@ function Request() {
                                             <SelectContent>
                                                 <SelectGroup>
                                                     <SelectItem value="Pending">Pending</SelectItem>
-                                                    <SelectItem value="Process">Process</SelectItem>
+                                                    <SelectItem value="Processing">Process</SelectItem>
                                                     <SelectItem value="Approved">Approved</SelectItem>
                                                     <SelectItem value="Rejected">Rejected</SelectItem>
                                                 </SelectGroup>

@@ -212,7 +212,6 @@ function LoginAdmin() {
                     <Card className="max-w-sm mx-auto">
                         <CardHeader>
                             <CardTitle>Login</CardTitle>
-                            <CardDescription>Enter your admin/user credentials</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             <div className="space-y-1">
