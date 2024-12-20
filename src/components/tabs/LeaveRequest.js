@@ -472,7 +472,7 @@ function LeaveRequest() {
                                     </div>
 
                                     <div className="flex flex-wrap border border-gray-300">
-                                        <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
+                                                                              <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
                                             <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
                                             <Input
                                                 type="file"
@@ -482,10 +482,16 @@ function LeaveRequest() {
                                                 accept="image/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" // Accept images and Word documents, but not PDFs
                                                 onChange={(e) => {
                                                     const file = e.target.files[0];
-                                                    setFormData((prevFormData) => ({
-                                                        ...prevFormData,
-                                                        supportingDocument: file,
-                                                    }));
+                                                    if (file && file.type !== 'application/pdf') {
+                                                        setFormData((prevFormData) => ({
+                                                            ...prevFormData,
+                                                            supportingDocument: file,
+                                                        }));
+                                                    } else {
+                                                        // Handle the case where a PDF is selected
+                                                        toast.error('PDF files are not allowed. Please select an image or Word document.');
+                                                        e.target.value = null; // Clear the input
+                                                    }
                                                 }}
                                                 required
                                             />
