@@ -338,7 +338,13 @@ function Payroll() {
 
             toast.promise(promise, {
                 loading: "Generating PDF...",
-                success: "PDF Generated Successfully!",
+                success: (link) => {
+                    if (link) {
+                        window.open(link, '_blank');
+                        setLink(link);
+                        return 'Generete Successfully!';
+                    }
+                },
                 error: "Error generating PDF",
             });
 
