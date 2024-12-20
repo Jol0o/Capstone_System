@@ -319,47 +319,45 @@ function Payroll() {
             console.log(e);
         }
     };
-
+    
     const handleGenerateAll = async () => {
         try {
             const res = await exportPayroll(startDate, endDate);
-
+    
             if (res.status !== 200) {
                 throw new Error("Network response was not ok");
             }
-
+    
             const { data } = res.data;
-
+    
             if (!Array.isArray(data)) {
                 throw new Error("Data is not an array");
             }
-
+    
             const promise = generatePDF({ type: "admin", data });
-
+    
             toast.promise(promise, {
                 loading: "Generating PDF...",
                 success: (link) => {
                     if (link) {
                         window.open(link, '_blank');
                         setLink(link);
-                        return 'Generete Successfully!';
+                        return 'Generate Successfully!';
                     }
                 },
                 error: "Error generating PDF",
             });
-
+    
             const pdfLink = await promise;
             if (pdfLink) {
                 setLink(pdfLink);
                 window.open(pdfLink, "_blank");
-                 if (link) {
                 toast('Click the link', {
                     action: {
                         label: 'Download',
-                        onClick: () => downloadPDF(link)
+                        onClick: () => downloadPDF(pdfLink)
                     },
                 });
-            }
             }
         } catch (error) {
             console.error("Error generating admin PDF:", error);

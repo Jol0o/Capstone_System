@@ -226,7 +226,7 @@ function LeaveRequest() {
                     if (link) {
                         window.open(link, '_blank');
                         setLink(link);
-                        return 'Click the link';
+                        return 'Generate Successfully';
                     }
                 },
                 error: 'Error generating PDF',
