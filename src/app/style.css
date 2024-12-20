@@ -1,0 +1,96 @@
+.payslip-container {
+  font-family: Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.4;
+  color: #333;
+}
+
+.payslip-page {
+  page-break-after: always;
+  padding: 20px;
+  background-color: white;
+}
+
+.payslip-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #ccc;
+}
+
+.payslip-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.payslip-title {
+  font-size: 24pt;
+  font-weight: bold;
+  color: #2b6cb0;
+}
+
+.employee-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  margin-bottom: 5px;
+}
+
+.info-label {
+  font-weight: bold;
+}
+
+.earnings-deductions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section {
+  width: 48%;
+}
+
+.section-title {
+  font-size: 14pt;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.payslip-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payslip-table th,
+.payslip-table td {
+  padding: 5px;
+  border: 1px solid #ccc;
+}
+
+.payslip-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  text-align: left;
+}
+
+.amount {
+  text-align: right;
+}
+
+.deduction {
+  color: #e53e3e;
+}
+
+.total-row {
+  font-weight: bold;
+}
+
+.note {
+  font-size: 9pt;
+  font-style: italic;
+  color: #666;
+  margin-top: 20px;
+}

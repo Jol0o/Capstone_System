@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Tailwind } from "@fileforge/react-print";
 import { format, parseISO } from "date-fns";
 
 export const PDFPayroll = ({ data }) => {
@@ -14,145 +13,237 @@ export const PDFPayroll = ({ data }) => {
   // Calculate net pay
   const netPay = total_pay - totalDeductions;
 
-    function formatDate(dateString) {
-        const options = { year: "numeric", month: "long", day: "numeric" };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-  
+  function formatDate(dateString) {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
 
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
-    };
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+    }).format(value);
+  };
 
   return (
-    <Tailwind>
-      <div className="max-w-3xl p-8 mx-auto bg-white rounded-lg shadow">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-blue-600">Gasbee Payslip</h1>
-        </div>
-
-        {/* Employee Information */}
-        <div className="flex justify-between gap-4 mb-8">
-          <div>
-            <div className="mb-2">
-              <span className="font-semibold">Employee Name: </span>
-              <span>{data.name}</span>
+    <>
+      <div className="payslip-container">
+        <div className="payslip-page">
+          <div className="payslip-content">
+            {/* Header */}
+            <div className="payslip-header">
+              <h1 className="payslip-title">Gasbee Payslip</h1>
             </div>
-            <div className="mb-2">
-              <span className="font-semibold">Hierarchy: </span>
-              <span>{data.hierarchy}</span>
+
+            {/* Employee Information */}
+            <div className="employee-info">
+              <div>
+                <div className="info-row">
+                  <span className="info-label">Employee Name: </span>
+                  <span>{data.name}</span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Hierarchy: </span>
+                  <span>{data.hierarchy}</span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Absent: </span>
+                  <span>{data.absent}</span>
+                </div>
+              </div>
+              <div>
+                <div className="info-row">
+                  <span className="info-label">Pay Period: </span>
+                  <span>{formatDate(data.period_start)} - {formatDate(data.period_end)}</span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Pay Date: </span>
+                  <span>{formatDate(data.created_at)}</span>
+                </div>
+              </div>
             </div>
-             <div className="mb-2">
-                                            <span className="font-semibold">Absent: </span>
-                                            <span>{data.absent}</span>
-                                        </div>
-          </div>
-          <div>
-            <div className="mb-2">
-              <span className="font-semibold">Pay Period: </span>
-              <span>{formatDate(data.period_start)}- {formatDate(data.period_end)}</span>
+
+            {/* Earnings and Deductions */}
+            <div className="earnings-deductions">
+              {/* Earnings */}
+              <div className="section">
+                <h2 className="section-title">Earnings</h2>
+                <table className="payslip-table">
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Basic Salary</td>
+                      <td className="amount">{formatCurrency(total_pay)}</td>
+                    </tr>
+                    <tr className="total-row">
+                      <td>Gross Pay</td>
+                      <td className="amount">{formatCurrency(total_pay)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Deductions */}
+              <div className="section">
+                <h2 className="section-title">Deductions</h2>
+                <table className="payslip-table">
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>SSS</td>
+                      <td className="amount deduction">{formatCurrency(sssDeduction)}</td>
+                    </tr>
+                    <tr>
+                      <td>PhilHealth</td>
+                      <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
+                    </tr>
+                    <tr>
+                      <td>Pag-IBIG</td>
+                      <td className="amount deduction">{formatCurrency(pagIbigDeduction)}</td>
+                    </tr>
+                    <tr className="total-row">
+                      <td>Total Deductions</td>
+                      <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div className="mb-2">
-              <span className="font-semibold">Pay Date: </span>
-              <span>{formatDate(data.created_at)}</span>
+
+            {/* Net Pay */}
+            <div className="section">
+              <h2 className="section-title">Net Pay</h2>
+              <table className="payslip-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Total Earnings</td>
+                    <td className="amount">{formatCurrency(total_pay)}</td>
+                  </tr>
+                  <tr>
+                    <td>Total Deductions</td>
+                    <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
+                  </tr>
+                  <tr className="total-row">
+                    <td>Net Pay</td>
+                    <td className="amount">{formatCurrency(netPay)}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            
+
+            {/* Note */}
+            <div className="note">
+              Note: This is a computer-generated document and does not require a signature.
+            </div>
           </div>
-        </div>
-
-        {/* Earnings and Deductions */}
-        <div className="flex justify-between gap-8 mb-8">
-          {/* Earnings */}
-          <div>
-            <h2 className="mb-4 text-lg font-bold">Earnings</h2>
-            <table className="w-full">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-2 text-left">Description</th>
-                  <th className="p-2 text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="p-2">Basic Salary</td>
-                  <td className="p-2 text-right">{formatCurrency(total_pay)}</td>
-                </tr>
-                <tr className="font-bold">
-                  <td className="p-2">Gross Pay</td>
-                  <td className="p-2 text-right">{formatCurrency(total_pay)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* Deductions */}
-          <div>
-            <h2 className="mb-4 text-lg font-bold">Deductions</h2>
-            <table className="w-full">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-2 text-left">Description</th>
-                  <th className="p-2 text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="p-2">SSS</td>
-                  <td className="p-2 text-right text-red-500">{formatCurrency(sssDeduction)}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">PhilHealth</td>
-                  <td className="p-2 text-right text-red-500">{formatCurrency(philHealthDeduction)}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">Pag-IBIG</td>
-                  <td className="p-2 text-right text-red-500">{formatCurrency(pagIbigDeduction)}</td>
-                </tr>
-                <tr className="font-bold">
-                  <td className="p-2">Total Deductions</td>
-                  <td className="p-2 text-right text-red-500">{formatCurrency(totalDeductions)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Net Pay */}
-        <div className="mb-8">
-          <h2 className="mb-4 text-lg font-bold">Net Pay</h2>
-          <table className="w-full">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-2 text-left">Description</th>
-                <th className="p-2 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b">
-                <td className="p-2">Total Earnings</td>
-                <td className="p-2 text-right">{formatCurrency(total_pay)}</td>
-              </tr>
-              <tr className="border-b">
-                <td className="p-2">Total Deductions</td>
-                <td className="p-2 text-right text-red-500">{formatCurrency(totalDeductions)}</td>
-              </tr>
-              <tr className="font-bold">
-                <td className="p-2">Net Pay</td>
-                <td className="p-2 text-right">{formatCurrency(netPay)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* Note */}
-        <div className="text-sm italic text-gray-600">
-          Note: This is a computer-generated document and does not require a signature.
         </div>
       </div>
-    </Tailwind>
+
+        <style>
+                {`
+                    .payslip-container {
+                        margin: 0;
+                        font-family: sans-serif;
+                        font-size: 0.75rem;
+                        line-height: 1.25;
+                        color: #2d3748;
+                        background-color: #f7fafc;
+                    }
+                    .payslip-page {
+                        padding: 1rem;
+                        margin: 1rem auto;
+                        background-color: white;
+                        border-radius: 0.5rem;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                        page-break-after: always;
+                    }
+                    .payslip-content {
+                        max-width: 48rem;
+                        padding: 2rem;
+                        margin: 0 auto;
+                        background-color: white;
+                        border-radius: 0.5rem;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    }
+                    .payslip-header {
+                        margin-bottom: 2rem;
+                        text-align: center;
+                    }
+                    .payslip-title {
+                        font-size: 1.5rem;
+                        font-weight: bold;
+                        color: #2b6cb0;
+                    }
+                    .employee-info {
+                        display: flex;
+                        justify-content: space-between;
+                        gap: 1rem;
+                        margin-bottom: 2rem;
+                    }
+                    .info-row {
+                        margin-bottom: 0.5rem;
+                    }
+                    .info-label {
+                        font-weight: 600;
+                    }
+                    .earnings-deductions {
+                        display: flex;
+                        justify-content: space-between;
+                        gap: 2rem;
+                        margin-bottom: 2rem;
+                    }
+                    .section {
+                        margin-bottom: 2rem;
+                    }
+                    .section-title {
+                        font-size: 1.125rem;
+                        font-weight: bold;
+                        margin-bottom: 1rem;
+                    }
+                    .payslip-table {
+                        width: 100%;
+                    }
+                    .payslip-table th {
+                        padding: 0.5rem;
+                        text-align: left;
+                        background-color: #f7fafc;
+                    }
+                    .payslip-table td {
+                        padding: 0.5rem;
+                        border-bottom: 1px solid #e2e8f0;
+                    }
+                    .amount {
+                        text-align: right;
+                    }
+                    .deduction {
+                        color: #e53e3e;
+                    }
+                    .total-row {
+                        font-weight: bold;
+                    }
+                    .note {
+                        font-size: 0.875rem;
+                        font-style: italic;
+                        color: #718096;
+                    }
+                `}
+            </style>
+    </>
   );
 };

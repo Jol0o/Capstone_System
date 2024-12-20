@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from '../ui/calendar';
 import { io } from 'socket.io-client';
-import generate from '../pdf_template/generatePDF';
+import generatePDF from '../pdf_template/generatePDF';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -291,10 +291,10 @@ function Payroll() {
     };
 
     const handleGenerate = async (data) => {
-        const promise = generate({ type: "payroll", data });
+        const promise = generatePDF({ type: "payroll", data });
 
         toast.promise(promise, {
-            loading: 'Loading...',
+            loading: 'Generating PDF...',
             success: (link) => {
                 if (link) {
                     window.open(link, '_blank');
@@ -302,7 +302,7 @@ function Payroll() {
                     return 'Click the link';
                 }
             },
-            error: 'Error',
+            error: 'Error generating PDF',
         });
 
         try {
@@ -320,45 +320,47 @@ function Payroll() {
         }
     };
 
-      const handleGenerateAll = async () => {
+    const handleGenerateAll = async () => {
         try {
             const res = await exportPayroll(startDate, endDate);
-    
+
             if (res.status !== 200) {
-                throw new Error('Network response was not ok');
+                throw new Error("Network response was not ok");
             }
-    
+
             const { data } = res.data;
-            console.log(data);
-    
+
             if (!Array.isArray(data)) {
-                throw new Error('Data is not an array');
+                throw new Error("Data is not an array");
             }
-    
-            const promise = generate({ type: "admin", data });
-    
+
+            const promise = generatePDF({ type: "admin", data });
+
             toast.promise(promise, {
-                loading: 'Loading...',
-                success: 'PDF Generated Successfully!',
-                error: 'Error generating PDF',
+                loading: "Generating PDF...",
+                success: "PDF Generated Successfully!",
+                error: "Error generating PDF",
             });
-    
-            const link = await promise;
-            if (link) {
-                setLink(link);
-                window.open(link, '_blank');
+
+            const pdfLink = await promise;
+            if (pdfLink) {
+                setLink(pdfLink);
+                window.open(pdfLink, "_blank");
+                 if (link) {
                 toast('Click the link', {
                     action: {
                         label: 'Download',
-                        onClick: () => downloadPDF(link),
+                        onClick: () => downloadPDF(link)
                     },
                 });
             }
-        } catch (e) {
-            console.error('Error:', e.message);
-            toast.error('Failed to generate payroll');
+            }
+        } catch (error) {
+            console.error("Error generating admin PDF:", error);
+            toast.error("Failed to generate PDF.");
         }
     };
+
 
     const downloadPDF = (link) => {
         const anchor = document.createElement('a');

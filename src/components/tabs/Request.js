@@ -528,8 +528,8 @@ function Request() {
                                     label="Supporting Document"
                                     value={
                                         selectedData?.supporting_document ? (
-                                            <a href={selectedData?.supporting_document} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                                                View Document
+                                            <a href={selectedData?.supporting_document} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline" download>
+                                                Download Document
                                             </a>
                                         ) : 'No document provided'
                                     }

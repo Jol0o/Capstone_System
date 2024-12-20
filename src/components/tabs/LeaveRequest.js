@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { LoaderCircle, MoreHorizontal, LinkIcon } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { format, parseISO } from 'date-fns';
-import generate from '../pdf_template/generatePDF';
+import generatePDF from '../pdf_template/generatePDF';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -215,23 +215,41 @@ function LeaveRequest() {
     };
 
     const handleGenerate = async (data) => {
-        setLoadGenerate(true)
-        console.log(data)
+        setLoadGenerate(true);
+        console.log(data);
         try {
-            const link = await generate({ data });
+            const promise = generatePDF({ data });
+
+            toast.promise(promise, {
+                loading: 'Generating PDF...',
+                success: (link) => {
+                    if (link) {
+                        window.open(link, '_blank');
+                        setLink(link);
+                        return 'Click the link';
+                    }
+                },
+                error: 'Error generating PDF',
+            });
+
+            const link = await promise;
             if (link) {
-                window.open(link, '_blank');
-                setLoadGenerate(false)
-                toast("Success", {
-                    description: `PDF Generated Successfully!`,
-                })
-                setLink(link)
+                setLoadGenerate(false);
+                 if (link) {
+                toast('Click the link', {
+                    action: {
+                        label: 'Download',
+                        onClick: () => downloadPDF(link)
+                    },
+                });
+            }
+                setLink(link);
             }
         } catch (e) {
-            console.warn(e)
-            setLoadGenerate(false)
+            console.warn(e);
+            setLoadGenerate(false);
         }
-    }
+    };
 
     const InfoRow = ({ label, value }) => (
         <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
@@ -461,6 +479,7 @@ function LeaveRequest() {
                                                 id="supportingDocument"
                                                 className="h-6 p-0 text-sm border-none"
                                                 name="supportingDocument"
+                                                accept="image/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" // Accept images and Word documents, but not PDFs
                                                 onChange={(e) => {
                                                     const file = e.target.files[0];
                                                     setFormData((prevFormData) => ({
