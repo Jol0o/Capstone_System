@@ -173,7 +173,7 @@ export const PDFTemplate = ({ data, type }) => {
 
         <div className="form-section">
           <div className="form-section-title">
-            FOR HRD'S USE
+                      FOR HRD&rsquo;S USE
           </div>
           <div className="grid-2-cols">
             <div className="form-cell-border-r">
