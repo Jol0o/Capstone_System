@@ -350,7 +350,9 @@ function LeaveRequest() {
 
                                     <div className="flex flex-wrap border border-gray-300">
                                         <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
-                                            <Label htmlFor="inclusiveDates" className="text-xs font-bold">INCLUSIVE DATES</Label>
+                                                                                        <Label htmlFor="inclusiveDates" className="text-xs font-bold">
+                                                INCLUSIVE DATES <span className="text-red-500">*</span>
+                                            </Label>
                                             <Input
                                                 type="date"
                                                 id="inclusiveDates"
@@ -363,7 +365,7 @@ function LeaveRequest() {
                                             />
                                         </div>
                                         <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
-                                            <Label htmlFor="toDate" className="text-xs font-bold">TO:</Label>
+                                            <Label htmlFor="toDate" className="text-xs font-bold">TO:<span className="text-red-500">*</span></Label>
                                             <Input type="date" id="toDate" className="h-6 p-0 text-sm border-none" name='toDate' value={formData.toDate} onChange={handleChange} required min={formData.inclusiveDates} />
                                         </div>
                                         <div className="flex-1 min-w-[33%] p-1">
@@ -373,12 +375,12 @@ function LeaveRequest() {
                                     </div>
 
                                     <div className="p-1 border border-gray-600">
-                                        <Label htmlFor="reason" className="text-xs font-bold">REASON:</Label>
+                                        <Label htmlFor="reason" className="text-xs font-bold">REASON:<span className="text-red-500">*</span></Label>
                                         <Input type="text" id="reason" className="h-6 p-0 text-sm border-none" name='reason' value={formData.reason} onChange={handleChange} required />
                                     </div>
 
                                     <div className="p-1 border border-gray-300">
-                                        <Label htmlFor="personToTakeover" className="text-xs font-bold">PERSON TO HAND OVER THE TASK:</Label>
+                                        <Label htmlFor="personToTakeover" className="text-xs font-bold">PERSON TO HAND OVER THE TASK:<span className="text-red-500">*</span></Label>
                                         <Input type="text" id="personToTakeover" className="h-6 p-0 text-sm border-none" name='personToTakeover' value={formData.personToTakeover} onChange={handleChange} required />
                                     </div>
 
@@ -418,7 +420,7 @@ function LeaveRequest() {
                                         <div className="p-1 text-xs font-bold text-center text-white bg-black">FOR HRD&apos;S USE</div>
                                         <div className="flex flex-wrap p-2">
                                             <div className="flex-1 min-w-[50%]">
-                                                <div className="mb-1 text-xs font-bold">TYPE OF LEAVE APPLIED FOR</div>
+                                                <div className="mb-1 text-xs font-bold">TYPE OF LEAVE APPLIED FOR<span className="text-red-500">*</span></div>
                                                 {['Vacation Leave', 'Sick Leave', 'Emergency Leave', 'Maternity Leave', 'Paternity Leave', 'Solo Parent Act/Leave', 'Others:'].map((type) => (
                                                     <div key={type} className="flex items-center">
                                                         <input
@@ -472,8 +474,8 @@ function LeaveRequest() {
                                     </div>
 
                                     <div className="flex flex-wrap border border-gray-300">
-                                                                              <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
-                                            <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
+                                        <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
+                                            <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT<span className="text-red-500">*</span></Label>
                                             <Input
                                                 type="file"
                                                 id="supportingDocument"
@@ -514,14 +516,18 @@ function LeaveRequest() {
                                     </div>
 
                                     <div className="flex items-center justify-between p-1 space-x-4 border border-gray-600">
-                                        <span className="text-xs font-bold">DISTRIBUTION COPY</span>
-                                        <div className="flex items-center">
-                                            <Checkbox id="employee-copy" className="mr-1" />
-                                            <Label htmlFor="employee-copy" className="text-xs">Employee</Label>
+                                        <span className="text-xs font-bold">DISTRIBUTION COPY<span className="text-red-500">*</span></span>
+                                                                               <div className="flex items-center">
+                                            <Checkbox id="employee-copy" className="mr-1"  />
+                                            <Label htmlFor="employee-copy" className="text-xs">
+                                                Employee <span className="text-red-500">*</span>
+                                            </Label>
                                         </div>
                                         <div className="flex items-center">
-                                            <Checkbox id="201-file" className="mr-1" />
-                                            <Label htmlFor="201-file" className="text-xs">201 file</Label>
+                                            <Checkbox id="201-file" className="mr-1"  />
+                                            <Label htmlFor="201-file" className="text-xs">
+                                                201 file <span className="text-red-500">*</span>
+                                            </Label>
                                         </div>
                                     </div>
                                     <Button disabled={isLoading}>

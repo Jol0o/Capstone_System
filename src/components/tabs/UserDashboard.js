@@ -39,6 +39,26 @@ const userDatas = {
   avatar: "https://github.com/shadcn.png",
 }
 
+const getDateRange = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const day = today.getDate();
+  const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+
+  if (day <= 15) {
+    return {
+      start: new Date(year, month, 1),
+      end: new Date(year, month, 15)
+    };
+  } else {
+    return {
+      start: new Date(year, month, 16),
+      end: new Date(year, month, lastDayOfMonth)
+    };
+  }
+};
+
 export default function UserDashboard() {
   const { user } = useAuth();
   const userEmail = useStore(state => state.userEmail);
@@ -53,15 +73,17 @@ export default function UserDashboard() {
   const defaultStartDate = new Date();
   defaultStartDate.setDate(defaultStartDate.getDate() - 15);
 
+  const { start, end } = getDateRange();
+
   // Format the dates to 'YYYY-MM-DD'
-  const formattedStartDate = format(defaultStartDate, 'yyyy-MM-dd');
-  const formattedEndDate = format(new Date(), 'yyyy-MM-dd');
+  const formattedStartDate = format(start, 'yyyy-MM-dd');
+  const formattedEndDate = format(end, 'yyyy-MM-dd');
+
 
   const [startDate, setStartDate] = useState(formattedStartDate);
   const [endDate, setEndDate] = useState(formattedEndDate);
   const [loadingAttendance, setLoadingAttendance] = useState(false)
 
-  console.log(startDate, endDate)
 
   const fetchDashboardData = async () => {
     try {
@@ -249,31 +271,51 @@ export default function UserDashboard() {
       </div>
 
       {/* Employee Information Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Employee Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-4">
-            <Avatar className="w-20 h-20">
-              <AvatarImage src={userData && userData.avatar ? userData.avatar : userDatas.avatar} alt={userDatas.name} />
-              <AvatarFallback>
-                {userData ? userData.name.split(' ').map(n => n[0]).join('') : 'JD'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="text-center sm:text-left">
-              <h2 className="text-xl font-bold sm:text-2xl">{userData ? userData.name : 'John Doe'}</h2>
-              <p className="text-muted-foreground">{userData ? userData.position : 'Software Engineer'}</p>
-              <p className="text-muted-foreground">{userData ? userData.department : 'Engineering'}</p>
+      <div className='grid grid-cols-1 gap-5 md:grid-cols-2'>
+        <Card>
+          <CardHeader>
+            <CardTitle>Employee Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center space-y-4 sm:flex-row sm:items-start sm:space-y-0 sm:space-x-4">
+              <Avatar className="w-20 h-20">
+                <AvatarImage src={userData && userData.avatar ? userData.avatar : userDatas.avatar} alt={userDatas.name} />
+                <AvatarFallback>
+                  {userData ? userData.name.split(' ').map(n => n[0]).join('') : 'JD'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="text-center sm:text-left">
+                <h2 className="text-xl font-bold sm:text-2xl">{userData ? userData.name : 'John Doe'}</h2>
+                <p className="text-muted-foreground">{userData ? userData.position : 'Software Engineer'}</p>
+                <p className="text-muted-foreground">{userData ? userData.department : 'Engineering'}</p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+        <Card >
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Schedule</CardTitle>
+            <Clock className="w-4 h-4 text-zinc-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Work Days</span>
+                <span className="text-sm text-zinc-400">Monday - Friday</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Work Hours</span>
+                <span className="text-sm text-zinc-400">8:00 AM - 5:00 PM</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Recent Attendance Card */}
         <Card >
-          <CardHeader className="flex flex-col pb-4 space-y-4 md:flex-row">
+          <CardHeader className="flex flex-col p-2 pb-4 space-y-4 md:p-6 md:flex-row">
             <div className="flex flex-col justify-between w-full gap-2 md:flex-row md:items-center">
               <div>
                 <CardTitle className="text-xl font-semibold ">Recent Attendance</CardTitle>
@@ -370,7 +412,7 @@ export default function UserDashboard() {
               }
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter clasName="p-2 md:p-6">
             {yearData.length > 0 && <div className="flex items-center justify-end w-full pt-2">
 
               <div className="flex items-center gap-2">
@@ -406,7 +448,7 @@ export default function UserDashboard() {
                   <TableBody>
                     {dashboardData && dashboardData.totalPayroll.map((payroll, index) => (
                       <TableRow key={index}>
-                        <TableCell>{formatDate(payroll.created_at)}</TableCell>
+                        <TableCell>{formatDate(payroll.period_start)}</TableCell>
                         <TableCell>{formatCurrency(payroll.total_pay)}</TableCell>
                         <TableCell>
                           {payroll.hours_worked} Hours
