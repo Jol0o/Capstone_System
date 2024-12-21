@@ -198,7 +198,7 @@ function Request() {
     const handleChange = (value) => {
         setStatus(value);
     };
-s
+
     if (isLoading) return <Loader />
 
     const InfoRow = ({ label, value }) => (
