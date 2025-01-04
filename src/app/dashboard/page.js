@@ -234,7 +234,7 @@ useEffect(() => {
                   className="overflow-hidden rounded-full"
                 >
                   <Image
-                    src="https://res.cloudinary.com/dkibnftac/image/upload/v1696743505/wp8137478_ei7mcp.jpg"
+                    src={user && user.avatar && user.status === "user" ? user.avatar : "https://res.cloudinary.com/dkibnftac/image/upload/v1696743505/wp8137478_ei7mcp.jpg"}
                     width={36}
                     height={36}
                     alt="Avatar"

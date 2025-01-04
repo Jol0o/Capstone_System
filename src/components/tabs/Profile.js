@@ -114,17 +114,24 @@ function Profile() {
         }
     };
 
-    const handleSave = async (e) => {
+       const handleSave = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-
+    
         let data = { ...userData };
-
+    
         if (userData.avatar && typeof userData.avatar !== 'string') {
             try {
                 const url = await uploadAvatar(userData.avatar);
                 if (url) {
                     data.avatar = url;
+    
+                    // Update avatar in local storage
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    if (user) {
+                        user.avatar = url;
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
                 }
             } catch (error) {
                 console.error("Error uploading avatar:", error);
@@ -135,7 +142,7 @@ function Profile() {
                 return;
             }
         }
-
+    
         for (let key of Object.keys(data)) {
             if (!data.avatar && key === 'avatar') continue;
             if (key === 'day_off' || key === 'totalSalary' || key === 'monthSalary') continue;
@@ -147,16 +154,16 @@ function Profile() {
                 return;
             }
         }
-
+    
         if (showPass && data.password !== confirmPassword) {
             toast("Error", {
                 description: "Password does not match",
             });
             setIsLoading(false);
-            setShowPass(false)
+            setShowPass(false);
             return;
         }
-
+    
         try {
             await editEmployeeData(data);
             toast("Successful", {
@@ -165,8 +172,8 @@ function Profile() {
             setOriginalData(data);
             setUserData(data);
             setImage(null);
-            setShowPass(false)
-            setEyePass(false)
+            setShowPass(false);
+            setEyePass(false);
         } catch (error) {
             console.error(error);
             toast("Error", {

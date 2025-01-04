@@ -360,31 +360,55 @@ export const removeUserById = async (id) => {
 
 // search routes
 export const searchEmployee = cacheWrapper(async (search) => {
-    const response = await axiosInstance.get(`${API_URL}/api/search_employee?q=${search}`);
-    return response;
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/search_employee?q=${search}`);
+        return response;
+    } catch (error) {
+        console.error("Error searching employee:", error);
+        throw error;
+    }
 });
 
 export const searchAttendance = cacheWrapper(async (search) => {
-    const response = await axiosInstance.get(`${API_URL}/api/search_attendance?q=${search}`);
-    return response;
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/search_attendance?q=${search}`);
+        return response;
+    } catch (error) {
+        console.error("Error searching attendance:", error);
+        throw error;
+    }
 });
 
 export const searchPayroll = cacheWrapper(async (search) => {
-    const response = await axiosInstance.get(`${API_URL}/api/search_payroll?q=${search}`);
-    return response;
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/search_payroll?q=${search}`);
+        return response;
+    } catch (error) {
+        console.error("Error searching payroll:", error);
+        throw error;
+    }
 });
 
 export const searchLeaveRequest = cacheWrapper(async (search) => {
-    const response = await axiosInstance.get(`${API_URL}/api/search_leave_request?q=${search}`);
-    return response;
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/search_leave_request?q=${search}`);
+        return response;
+    } catch (error) {
+        console.error("Error searching leave request:", error);
+        throw error;
+    }
 });
 
 // employee requests route
 export const getEmployeeRequest = cacheWrapper(async (limit, page) => {
-    const response = await axiosInstance.get(`${API_URL}/api/employee-requests?page=${page}&limit=${limit}`);
-    return response;
+    try {
+        const response = await axiosInstance.get(`${API_URL}/api/employee-requests?page=${page}&limit=${limit}`);
+        return response;
+    } catch (error) {
+        console.error("Error getting employee request:", error);
+        throw error;
+    }
 });
-
 export const approveEmployeeRequest = async (id, employee_id, department, position, basicSalary, qrcode, hierarchy, leaveCredits) => {
     try {
         console.log(id, employee_id, department, position, basicSalary, hierarchy, qrcode)

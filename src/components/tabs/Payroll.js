@@ -283,11 +283,13 @@ function Payroll() {
         setEndDate(format(endDate, 'yyyy-MM-dd'));
     };
 
-    const handleYearChange = (e) => {
-        setYear(e.target.value);
-        const { startDate, endDate } = getDefaultDates(dateRange, month, e.target.value);
-        setStartDate(format(startDate, 'yyyy-MM-dd'));
-        setEndDate(format(endDate, 'yyyy-MM-dd'));
+    const handleYearChange = (item) => {
+        console.log(item)
+        setYear(item);
+        const { startDate, endDate } = getDefaultDates(dateRange, month, year);
+        console.log("Date", startDate, endDate)
+        setStartDate(startDate);
+        setEndDate(endDate);
     };
 
     const handleGenerate = async (data) => {
@@ -381,6 +383,9 @@ function Payroll() {
         setNetPayDialogOpen(true);
     };
 
+     const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
+
+    
     if (isLoading) return <Loader />
 
     return (
@@ -394,7 +399,6 @@ function Payroll() {
                         className="max-w-sm"
                     />
                     <div className="flex gap-2 md:items-center gap-s">
-
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-8">
@@ -433,7 +437,24 @@ function Payroll() {
                                     initialFocus
                                 />
                             </PopoverContent>
-                        </Popover>
+                            </Popover>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8">
+                                        <CalendarIcon className="w-4 h-4 mr-2" />
+                                        {year}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-auto p-0" align="start">
+                                    <ScrollArea className="max-h-[200px] overflow-y-auto">
+                                        {years.map((year) => (
+                                            <DropdownMenuItem  onClick={( ) => {handleYearChange(year)}} key={year} value={year}>
+                                                {year}
+                                            </DropdownMenuItem>
+                                        ))}
+                                       </ScrollArea> 
+                                </DropdownMenuContent>
+                            </DropdownMenu>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -467,7 +488,6 @@ function Payroll() {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-
                     </div>
                 </div>
                 <div className="flex items-center gap-1">

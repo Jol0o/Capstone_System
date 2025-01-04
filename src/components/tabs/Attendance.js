@@ -29,6 +29,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Calendar } from '../ui/calendar';
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const currentDate = new Date();
 const currentDay = currentDate.getDate();
@@ -262,12 +263,14 @@ function Attendance() {
         setEndDate(format(endDate, 'yyyy-MM-dd'));
     };
 
-    const handleYearChange = (e) => {
-        setYear(e.target.value);
-        const { startDate, endDate } = getDefaultDates(dateRange, month, e.target.value);
-        setStartDate(format(startDate, 'yyyy-MM-dd'));
-        setEndDate(format(endDate, 'yyyy-MM-dd'));
+        const handleYearChange = (item) => {
+        setYear(item);
+        const { startDate, endDate } = getDefaultDates(dateRange, month, year);
+        setStartDate(startDate);
+        setEndDate(endDate);
     };
+
+      const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
 
 
     if (isLoading) return <Loader />
@@ -321,6 +324,23 @@ function Attendance() {
                                 />
                             </PopoverContent>
                         </Popover>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8">
+                                        <CalendarIcon className="w-4 h-4 mr-2" />
+                                        {year}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-auto p-0" align="start">
+                                    <ScrollArea className="max-h-[200px] overflow-y-auto">
+                                        {years.map((year) => (
+                                            <DropdownMenuItem  onClick={( ) => {handleYearChange(year)}} key={year} value={year}>
+                                                {year}
+                                            </DropdownMenuItem>
+                                        ))}
+                                       </ScrollArea> 
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-8">

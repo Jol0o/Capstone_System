@@ -254,7 +254,7 @@ const generatePDF = async ({ data, type = "request" }) => {
             },
             body: JSON.stringify({
                 html: fullHtmlContent,  // Use the "html" parameter directly
-                name: type === "payroll" ? "GeneratedPayroll.pdf" : "LeaveForm.pdf",
+                name: type === "payroll" || type === "admin" ? "GeneratedPayroll.pdf" : "LeaveForm.pdf",
             }),
         });
 
