@@ -40,15 +40,16 @@ const currentYear = currentDate.getFullYear();
 
 const getDefaultDates = (range, month, year) => {
     let startDate, endDate;
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate(); // Get the last day of the month
     if (range === '1-15') {
         startDate = new Date(year, month, 1);
         endDate = new Date(year, month, 15);
-    } else if (range === '16-30') {
+    } else if (range === `16-${lastDayOfMonth}`) {
         startDate = new Date(year, month, 16);
-        endDate = new Date(year, month + 1, 0); // 0 gets the last day of the previous month
+        endDate = new Date(year, month, lastDayOfMonth); // Use the last day of the month
     } else {
         startDate = new Date(year, month, 1);
-        endDate = new Date(year, month + 1, 0); // 0 gets the last day of the previous month
+        endDate = new Date(year, month, lastDayOfMonth); // Use the last day of the month
     }
     return { startDate, endDate };
 };
@@ -90,6 +91,8 @@ function Payroll() {
     const currentDay = currentDate.getDate();
     let defaultStartDate;
     let defaultEndDate;
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
 
     if (currentDay <= 15) {
         // If the current date is on or before the 15th, set startDate to the 1st and endDate to the 15th
@@ -160,7 +163,6 @@ function Payroll() {
     const fetchpayroll = async () => {
         const response = await getPayrolls(page, limit, startDate, endDate)
         if (response) {
-            console.table('Payroll', response.data)
             setData(response.data.data)
             setTotalPages(response.data.totalPages)
             setFilteredData(response.data.data)
@@ -272,6 +274,7 @@ function Payroll() {
     const handleDateRangeChange = (e) => {
         setDateRange(e.target.value);
         const { startDate, endDate } = getDefaultDates(e.target.value, month, year);
+        console.log(startDate, endDate)
         setStartDate(format(startDate, 'yyyy-MM-dd'));
         setEndDate(format(endDate, 'yyyy-MM-dd'));
     };
@@ -382,9 +385,6 @@ function Payroll() {
         setSelectedEmployee(employee);
         setNetPayDialogOpen(true);
     };
-
-     const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
-
     
     if (isLoading) return <Loader />
 
@@ -480,11 +480,11 @@ function Payroll() {
                                 <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
                                     1 - 15
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '16-30' } })}>
-                                    16 - 30
+                                    <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `16-${lastDayOfMonth}` } })}>
+                                    16 - {lastDayOfMonth}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-30' } })}>
-                                    1 - 30
+                                    <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `1-${lastDayOfMonth}` } })}>
+                                    1 - {lastDayOfMonth}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

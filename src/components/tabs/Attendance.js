@@ -38,15 +38,16 @@ const currentYear = currentDate.getFullYear();
 
 const getDefaultDates = (range, month, year) => {
     let startDate, endDate;
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate(); // Get the last day of the month
     if (range === '1-15') {
         startDate = new Date(year, month, 1);
         endDate = new Date(year, month, 15);
-    } else if (range === '16-30') {
+    } else if (range === `16-${lastDayOfMonth}`) {
         startDate = new Date(year, month, 16);
-        endDate = new Date(year, month + 1, 0); // 0 gets the last day of the previous month
+        endDate = new Date(year, month, lastDayOfMonth); // Use the last day of the month
     } else {
         startDate = new Date(year, month, 1);
-        endDate = new Date(year, month + 1, 0); // 0 gets the last day of the previous month
+        endDate = new Date(year, month, lastDayOfMonth); // Use the last day of the month
     }
     return { startDate, endDate };
 };
@@ -80,6 +81,8 @@ function Attendance() {
 
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    
     let defaultStartDate;
     let defaultEndDate;
 
@@ -126,7 +129,6 @@ function Attendance() {
             const res = await searchAttendance(filter.trim());
             setFilteredData(res.data.data);
         };
-
         fetchData();
     }, [filter]);
 
@@ -362,15 +364,15 @@ function Attendance() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
-                                    1 - 15
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '16-30' } })}>
-                                    16 - 30
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-30' } })}>
-                                    1 - 30
-                                </DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
+                                                                  1 - 15
+                                                              </DropdownMenuItem>
+                                                                  <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `16-${lastDayOfMonth}` } })}>
+                                                                  16 - {lastDayOfMonth}
+                                                              </DropdownMenuItem>
+                                                                  <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `1-${lastDayOfMonth}` } })}>
+                                                                  1 - {lastDayOfMonth}
+                                                              </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
