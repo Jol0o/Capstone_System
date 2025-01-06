@@ -203,6 +203,7 @@ function Employee({ setTab }) {
                                     .filter(key => !['created_at', 'qrcode', 'id', 'avatar', 'password', 'employee_id', 'monthSalary', 'leaveCredits'].includes(key))
                                     .map(key => {
                                         if (key === 'day_off') return 'status';
+                                        if (key === 'email') return 'email address';
                                         if (key === 'basicSalary') return 'Gross Pay';
                                         if (key === 'totalSalary') return 'Net Pay';
                                         return key;
@@ -227,7 +228,7 @@ function Employee({ setTab }) {
                                     .map((key) => {
                                         // Convert camel case to separate words by space
                                         let formattedKey = camelCaseToWords(key);
-                                        return <TableHead className="capitalize" key={key}>{formattedKey}</TableHead>;
+                                        return <TableHead className="font-bold capitalize" key={key}>{formattedKey}</TableHead>;
                                     })}
                             </TableRow>
                         </TableHeader>
@@ -285,9 +286,6 @@ function Employee({ setTab }) {
                                                             setUser(item.employee_id);
                                                         }}>
                                                             View
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleEmail(item)}>
-                                                            Send Email
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => deleteEmployee(item.employee_id)}>
                                                             Delete
@@ -443,9 +441,9 @@ const NetPayDialog = ({ open, onClose, employee }) => {
     const netPay = employee.totalSalary - totalDeductions;
 
     const InfoRow = ({ label, value, isDeduction }) => (
-        <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
-            <div className="text-sm font-medium text-gray-400">{label}</div>
-            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : 'text-white'} font-bold`}>{value}</div>
+        <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-400">
+            <div className="text-sm font-medium ">{label}</div>
+            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : ''} font-bold`}>{value}</div>
         </div>
     );
 
@@ -458,14 +456,14 @@ const NetPayDialog = ({ open, onClose, employee }) => {
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl bg-black border-gray-800">
+            <DialogContent className="max-w-2xl border-gray-800">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold text-white">Net Pay Details</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold ">Net Pay Details</DialogTitle>
                 </DialogHeader>
                 <ScrollArea className="max-h-[80vh] pr-4">
                     <div className="space-y-0">
-                        <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
-                            <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
+                        <div className="p-4 mb-4 rounded-lg ">
+                            <h3 className="mb-2 text-lg font-semibold ">Employee Information</h3>
                             <InfoRow label="Name" value={employee.name} />
                             <InfoRow label="Department" value={employee.department} />
                             <InfoRow label="Position" value={employee.position} />

@@ -1,18 +1,13 @@
 import React from 'react';
-import { Tailwind } from "@fileforge/react-print";
+import { formatCurrency , numberToWords } from "@/lib/util";
+import { format } from "date-fns";
+
 
 const PDFAdminPayroll = ({ data }) => {
     function formatDate(dateString) {
         const options = { year: "numeric", month: "long", day: "numeric" };
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
-    };
 
     return (
         <>
@@ -23,134 +18,113 @@ const PDFAdminPayroll = ({ data }) => {
                     const pagIbigDeduction = payslip.total_pay * 0.01;
                     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
                     const netPay = payslip.total_pay - totalDeductions;
-                    console.log(payslip)
 
                     return (
-                        <div key={index} className="payslip-page">
-                            <div className="payslip-content">
-                                {/* Header */}
-                                <div className="payslip-header">
-                                    <h1 className="payslip-title">Gasbee Payslip</h1>
-                                </div>
+                       <div key={index} className="payslip-card">
+        <div className="payslip-header">
+          <h1 className="header-title">Payslip</h1>
+          <h2 className="company-name">Gasbee</h2>
+        </div>
 
-                                {/* Employee Information */}
-                                <div className="employee-info">
-                                    <div>
-                                        <div className="info-row">
-                                            <span className="info-label">Employee Name: </span>
-                                            <span>{payslip.name}</span>
-                                        </div>
-                                        <div className="info-row">
-                                            <span className="info-label">Hierarchy: </span>
-                                            <span>{payslip.hierarchy}</span>
-                                        </div>
-                                        <div className="info-row">
-                                            <span className="info-label">Absent: </span>
-                                            <span>{payslip.absent}</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div className="info-row">
-                                            <span className="info-label">Pay Period: </span>
-                                            <span>{formatDate(payslip.period_start)} - {formatDate(payslip.period_end)}</span>
-                                        </div>
-                                        <div className="info-row">
-                                            <span className="info-label">Pay Date: </span>
-                                            <span>{formatDate(payslip.created_at)}</span>
-                                        </div>
-                                    </div>
-                                </div>
+        <div className="employee-details">
+          <div className="details-row">
+            <div className="detail-item">
+              <span className="detail-label">Employee name</span>
+              <span className="detail-separator">:</span>
+              <span className="detail-value">{payslip?.name}</span>
+            </div>
+          </div>
+          <div className="details-row">
+            <div className="detail-item">
+              <span className="detail-label">Pay Period</span>
+              <span className="detail-separator">:</span>
+              <span className="detail-value"> {`${format(new Date(payslip.period_start), 'MMMM d')} - ${format(new Date(payslip.period_end), 'd, yyyy')}`}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Hierarchy</span>
+              <span className="detail-separator">:</span>
+              <span className="detail-value">{payslip?.hierarchy}</span>
+            </div>
+          </div>
+          <div className="details-row">
+            <div className="detail-item">
+              <span className="detail-label">Worked Days</span>
+              <span className="detail-separator">:</span>
+              <span className="detail-value">{payslip?.days_present}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Department</span>
+              <span className="detail-separator">:</span>
+              <span className="detail-value">{payslip?.department}</span>
+            </div>
+          </div>
+        </div>
 
-                                {/* Earnings and Deductions */}
-                                <div className="earnings-deductions">
-                                    {/* Earnings */}
-                                    <div className="section">
-                                        <h2 className="section-title">Earnings</h2>
-                                        <table className="payslip-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Description</th>
-                                                    <th>Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Basic Salary</td>
-                                                    <td className="amount">{formatCurrency(payslip.total_pay)}</td>
-                                                </tr>
-                                                <tr className="total-row">
-                                                    <td>Gross Pay</td>
-                                                    <td className="amount">{formatCurrency(payslip.total_pay)}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+        <table className="payslip-table">
+          <thead>
+            <tr>
+              <th className="table-header left">Earnings</th>
+              <th className="table-header right">Amount</th>
+              <th className="table-header left with-padding">Deductions</th>
+              <th className="table-header right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Basic Salary</td>
+              <td className="amount">{formatCurrency(payslip.total_pay)}</td>
+              <td className="with-padding">Pag-IBIG</td>
+              <td className="amount deduction">{formatCurrency(pagIbigDeduction)}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td className="with-padding">SSS</td>
+              <td className="amount deduction">{formatCurrency(sssDeduction)}</td>
+            </tr>
+            <tr>
+               <td></td>
+              <td></td>
+              <td className="with-padding">PhilHealth</td>
+              <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
+            </tr>
+            <tr className="total-row">
+              <td>Gross Pay</td>
+              <td className="amount">{formatCurrency(payslip.total_pay)}</td>
+              <td className="with-padding">Total Deductions</td>
+              <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td className="with-padding">Net Pay</td>
+              <td className="amount">{formatCurrency(netPay)}</td>
+            </tr>
+          </tbody>
+        </table>
 
-                                    {/* Deductions */}
-                                    <div className="section">
-                                        <h2 className="section-title">Deductions</h2>
-                                        <table className="payslip-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Description</th>
-                                                    <th>Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>SSS</td>
-                                                    <td className="amount deduction">{formatCurrency(sssDeduction)}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>PhilHealth</td>
-                                                    <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Pag-IBIG</td>
-                                                    <td className="amount deduction">{formatCurrency(pagIbigDeduction)}</td>
-                                                </tr>
-                                                <tr className="total-row">
-                                                    <td>Total Deductions</td>
-                                                    <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+        <div className="net-amount">
+          <p className="amount-number">{formatCurrency(netPay)}</p>
+          <p className="amount-words">{numberToWords(netPay)}</p>
+        </div>
 
-                                {/* Net Pay */}
-                                <div className="section">
-                                    <h2 className="section-title">Net Pay</h2>
-                                    <table className="payslip-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Description</th>
-                                                <th>Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Total Earnings</td>
-                                                <td className="amount">{formatCurrency(payslip.total_pay)}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Total Deductions</td>
-                                                <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
-                                            </tr>
-                                            <tr className="total-row">
-                                                <td>Net Pay</td>
-                                                <td className="amount">{formatCurrency(netPay)}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+        <div className="signature-section">
+          <div className="signature-box">
+            <div className="signature-line">
+              <p className="signature-text">Employer Signature</p>
+            </div>
+          </div>
+          <div className="signature-box">
+            <div className="signature-line">
+              <p className="signature-text">Employee Signature</p>
+            </div>
+          </div>
+        </div>
 
-                                {/* Note */}
-                                <div className="note">
-                                    Note: This is a computer-generated document and does not require a signature.
-                                </div>
-                            </div>
-                        </div>
+        <div className="footer">
+          <p>This is system generated payslip</p>
+        </div>
+      </div>
                     );
                 })}
             </div>
@@ -164,85 +138,148 @@ const PDFAdminPayroll = ({ data }) => {
                         font-size: 0.75rem;
                         line-height: 1.25;
                         color: #2d3748;
-                        background-color: #f7fafc;
                     }
                     .payslip-page {
                         padding: 1rem;
                         margin: 1rem auto;
-                        background-color: white;
+            
                         border-radius: 0.5rem;
                         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
                         page-break-after: always;
                     }
-                    .payslip-content {
-                        max-width: 48rem;
-                        padding: 2rem;
-                        margin: 0 auto;
-                        background-color: white;
-                        border-radius: 0.5rem;
-                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                    }
-                    .payslip-header {
-                        margin-bottom: 2rem;
-                        text-align: center;
-                    }
-                    .payslip-title {
-                        font-size: 1.5rem;
-                        font-weight: bold;
-                        color: #2b6cb0;
-                    }
-                    .employee-info {
-                        display: flex;
-                        justify-content: space-between;
-                        gap: 1rem;
-                        margin-bottom: 2rem;
-                    }
-                    .info-row {
-                        margin-bottom: 0.5rem;
-                    }
-                    .info-label {
-                        font-weight: 600;
-                    }
-                    .earnings-deductions {
-                        display: flex;
-                        justify-content: space-between;
-                        gap: 2rem;
-                        margin-bottom: 2rem;
-                    }
-                    .section {
-                        margin-bottom: 2rem;
-                    }
-                    .section-title {
-                        font-size: 1.125rem;
-                        font-weight: bold;
-                        margin-bottom: 1rem;
-                    }
-                    .payslip-table {
-                        width: 100%;
-                    }
-                    .payslip-table th {
-                        padding: 0.5rem;
-                        text-align: left;
-                        background-color: #f7fafc;
-                    }
-                    .payslip-table td {
-                        padding: 0.5rem;
-                        border-bottom: 1px solid #e2e8f0;
-                    }
-                    .amount {
-                        text-align: right;
-                    }
-                    .deduction {
-                        color: #e53e3e;
-                    }
-                    .total-row {
-                        font-weight: bold;
-                    }
-                    .note {
-                        font-size: 0.875rem;
-                        font-style: italic;
-                        color: #718096;
-                    }
+               .payslip-card {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  page-break-after: always;
+}
+
+          .payslip-header {
+            text-align: center;
+            margin-bottom: 2rem;
+          }
+
+          .header-title {
+            font-size: 1.5rem;
+            font-weight: normal;
+            margin-bottom: 0.5rem;
+          }
+
+          .company-name {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+          }
+
+          .company-address {
+            font-size: 0.875rem;
+            margin: 0;
+          }
+
+          .employee-details {
+            margin-bottom: 2rem;
+          }
+
+          .details-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            margin-bottom: 0.5rem;
+          }
+
+          .detail-item {
+            display: flex;
+          }
+
+          .detail-label {
+            width: 8rem;
+          }
+
+          .detail-separator {
+            margin: 0 0.5rem;
+          }
+
+          .payslip-table {
+            width: 100%;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            margin-bottom: 2rem;
+            border-collapse: collapse;
+          }
+
+          .table-header {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid black;
+            font-weight: normal;
+          }
+
+          .left {
+            text-align: left;
+          }
+
+          .right {
+            text-align: right;
+          }
+
+          .with-padding {
+            padding-left: 2rem;
+          }
+
+          .amount {
+            text-align: right;
+          }
+
+          .payslip-table td {
+            padding: 0.25rem 0;
+          }
+
+          .total-row {
+            border-top: 1px solid black;
+            font-weight: 500;
+          }
+
+          .net-amount {
+            text-align: center;
+            margin-bottom: 4rem;
+          }
+
+          .amount-number {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+          }
+
+          .amount-words {
+            margin: 0;
+          }
+
+          .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+          }
+
+          .signature-box {
+            width: 16rem;
+          }
+
+          .signature-line {
+            border-top: 1px solid black;
+            padding-top: 0.5rem;
+          }
+
+          .signature-text {
+            text-align: center;
+            margin: 0;
+          }
+
+          .footer {
+            text-align: center;
+            margin-top: 2rem;
+          }
+
+          .deduction{
+          color: red
+          }
                 `}
             </style>
         </>

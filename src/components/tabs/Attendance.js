@@ -395,11 +395,11 @@ function Attendance() {
                 {filterData && filterData.length ? <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="capitalize">Name</TableHead>
-                            <TableHead className="capitalize">Date</TableHead>
-                            <TableHead className="capitalize">Time In</TableHead>
-                            <TableHead className="capitalize">Time Out</TableHead>
-                            <TableHead className="capitalize">Total Hours</TableHead>
+                            <TableHead className="capitalize font-bold">Name</TableHead>
+                            <TableHead className="capitalize font-bold">Date</TableHead>
+                            <TableHead className="capitalize font-bold">Time In</TableHead>
+                            <TableHead className="capitalize font-bold">Time Out</TableHead>
+                            <TableHead className="capitalize font-bold">Total Hours</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

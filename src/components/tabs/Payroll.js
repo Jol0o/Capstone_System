@@ -325,15 +325,8 @@ function Payroll() {
         }
     };
     
-    const handleGenerateAll = async () => {
+    const handleGenerateAll = async (data) => {
         try {
-            const res = await exportPayroll(startDate, endDate);
-    
-            if (res.status !== 200) {
-                throw new Error("Network response was not ok");
-            }
-    
-            const { data } = res.data;
     
             if (!Array.isArray(data)) {
                 throw new Error("Data is not an array");
@@ -385,6 +378,8 @@ function Payroll() {
         setSelectedEmployee(employee);
         setNetPayDialogOpen(true);
     };
+
+    console.log(filterData)
     
     if (isLoading) return <Loader />
 
@@ -503,13 +498,13 @@ function Payroll() {
                 {filterData && filterData.length ? <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="capitalize">Name</TableHead>
-                            <TableHead className="capitalize">Hierarchy</TableHead>
-                            <TableHead className="capitalize">Start/End Period</TableHead>
-                            <TableHead className="">Absent/s</TableHead>
-                            <TableHead className="capitalize">Hours Worked</TableHead>
-                            <TableHead className="text-right capitalize">Gross Pay</TableHead>
-                            <TableHead className="text-right capitalize">Net Pay</TableHead>
+                            <TableHead className="font-bold capitalize">Name</TableHead>
+                            <TableHead className="font-bold capitalize">Hierarchy</TableHead>
+                            <TableHead className="font-bold capitalize">Start/End Period</TableHead>
+                            <TableHead className="font-bold">Absent/s</TableHead>
+                            <TableHead className="font-bold capitalize">Days/Hours Worked</TableHead>
+                            <TableHead className="font-bold text-right capitalize">Gross Pay</TableHead>
+                            <TableHead className="font-bold text-right capitalize">Net Pay</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -531,7 +526,7 @@ function Payroll() {
                                             {`${format(new Date(item.period_start), 'MMMM d')} - ${format(new Date(item.period_end), 'd, yyyy')}`}
                                         </TableCell>
                                         <TableCell className="whitespace-nowrap">{item.absent}</TableCell>
-                                        <TableCell className="whitespace-nowrap">{item.hours_worked} Hour/s</TableCell>
+                                        <TableCell className="whitespace-nowrap">{item.days_present && `(${item.days_present} Day/s)`} {item.hours_worked} Hour/s</TableCell>
                                         <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
                                         <TableCell className="font-bold text-right capitalize whitespace-nowrap" onClick={() => handleNetPayClick(item)}>{formatCurrency(netPay)}</TableCell>
                                         <TableCell className="max-w-[30px]">
@@ -604,8 +599,8 @@ const NetPayDialog = ({ open, onClose, employee }) => {
 
     const InfoRow = ({ label, value, isDeduction }) => (
         <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
-            <div className="text-sm font-medium text-gray-400">{label}</div>
-            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : 'text-white'} font-bold`}>{value}</div>
+            <div className="text-sm font-medium ">{label}</div>
+            <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : ''} font-bold`}>{value}</div>
         </div>
     );
 
@@ -618,14 +613,14 @@ const NetPayDialog = ({ open, onClose, employee }) => {
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl bg-black border-gray-800">
+            <DialogContent className="max-w-2xl ">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold text-white">Net Pay Details</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold ">Net Pay Details</DialogTitle>
                 </DialogHeader>
                 <ScrollArea className="max-h-[80vh] pr-4">
                     <div className="space-y-0">
-                        <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
-                            <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
+                        <div className="p-4 mb-4 rounded-lg ">
+                            <h3 className="mb-2 text-lg font-semibold ">Employee Information</h3>
                             <InfoRow label="Name" value={employee.name} />
                             <InfoRow label="Hierarchy" value={employee.hierarchy} />
                             <InfoRow label="Total Salary" value={formatCurrency(employee.total_pay)} />

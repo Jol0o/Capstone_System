@@ -38,6 +38,22 @@ import { ConfirmationModal } from '../modal/ConfirmationModal';
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 const socket = io(`${API_URL}`);
 
+const fieldLabels = {
+    name: "Name",
+    position: "Position",
+    department: "Department",
+    inclusiveDates: "Inclusive Dates",
+    toDate: "To Date",
+    daysRequested: "Days Requested",
+    reason: "Reason",
+    date: "Date",
+    personToTakeover: "Person to Take Over",
+    requestedBy: "Requested By",
+    supportingDocument: "Supporting Document",
+    distributionCopy: "Distribution Copy",
+    leaveType: "Leave Type",
+};
+
 function LeaveRequest() {
     const { user } = useAuth()
     const [formData, setFormData] = useState({
@@ -51,7 +67,7 @@ function LeaveRequest() {
         date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
         personToTakeover: '',
         requestedBy: '',
-        supportingDocument: null,
+        supportingDocument: "",
         distributionCopy: { employeeCopy: false, file201: false },
         leaveType: '',
     });
@@ -96,7 +112,7 @@ function LeaveRequest() {
         return () => {
             socket.off('leaveRequestUpdate');
         };
-    }, []);
+    }, [getRequests])
 
     const calculateDaysRequested = (startDate, endDate) => {
         const start = new Date(startDate);
@@ -150,39 +166,65 @@ function LeaveRequest() {
     const handleConfirmedSubmit = async (e) => {
         e.preventDefault();
         setIsloading(true);
-
+    
         try {
-            // Validate required fields (skip 'supportingDocument' since it's handled separately)
             for (let key of Object.keys(formData)) {
-                if (!formData[key] && key !== 'supportingDocument') {
-                    toast("Error", {
-                        description: `${key} is required`,
-                    });
-                    setIsloading(false);
-                    return;
-                }
-            }
+    const value = formData[key];
 
-            // Upload the supporting document to Cloudinary
-            let supportingDocumentUrl = null;
-            if (formData.supportingDocument) {
+    // Handle nested objects like `distributionCopy`
+    if (key === "distributionCopy") {
+        if (!value.employeeCopy && !value.file201) {
+            toast("Error", {
+                description: `${fieldLabels[key]} requires at least one selection`,
+            });
+            setIsloading(false);
+            return;
+        }
+        continue;
+    }
+
+    // Validate 'supportingDocument' only when 'leaveType' is not 'Vacation Leave'
+    if (key === "supportingDocument" && formData.leaveType !== "Vacation Leave") {
+        if (!value) {
+            toast("Error", {
+                description: `${fieldLabels[key]} is required for ${formData.leaveType}`,
+            });
+            setIsloading(false);
+            return;
+        }
+    }
+
+    // General fields check
+    if (!value && key !== "supportingDocument") { // Skip general validation for 'supportingDocument'
+        toast("Error", {
+            description: `${fieldLabels[key]} is required`,
+        });
+        setIsloading(false);
+        return;
+    }
+}
+
+    
+            // Upload the supporting document to Cloudinary if leaveType is not 'Vacation Leave'
+            let supportingDocumentUrl = " ";
+            if (formData.supportingDocument && formData.leaveType !== 'Vacation Leave') {
                 supportingDocumentUrl = await uploadToCloudinary(formData.supportingDocument, setIsloading);
             }
-
+    
             // Prepare the form data for submission
             const formDataToSend = {
                 ...formData,
                 supportingDocumentUrl,
                 employee_id: user?.user_id
             };
-
+    
             // Submit the request with the form data
             const res = await submitRequest(formDataToSend); // Pass the form data directly, no need to stringify
             if (res) {
                 toast("Success", {
                     description: res.data.message,
                 });
-
+    
                 // Reset form data after successful submission
                 setFormData({
                     name: '',
@@ -206,13 +248,14 @@ function LeaveRequest() {
             toast("Error", {
                 description: e?.response?.data.message || e?.response?.data?.errors[0]?.msg || e.message || 'An error occurred, please try again.',
             });
-            setIsConfirmationOpen(false)
+            setIsConfirmationOpen(false);
         } finally {
             setIsloading(false);
-            
-            setIsConfirmationOpen(false)
+            setIsConfirmationOpen(false);
         }
     };
+
+    console.log(formData)
 
     const handleGenerate = async (data) => {
         setLoadGenerate(true);
@@ -473,7 +516,7 @@ function LeaveRequest() {
 
                                     <div className="flex flex-wrap border border-gray-300">
                                         <div className="flex-1 min-w-[50%] p-1 border-r border-gray-300">
-                                            <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT<span className="text-red-500">*</span></Label>
+                                            <Label htmlFor="supportingDocument" className="text-xs font-bold">SUPPORTING DOCUMENT ATTACHMENT</Label>
                                             <Input
                                                 type="file"
                                                 id="supportingDocument"
@@ -493,7 +536,6 @@ function LeaveRequest() {
                                                         e.target.value = null; // Clear the input
                                                     }
                                                 }}
-                                                required
                                             />
                                         </div>
                                         <div className="flex-1 min-w-[50%] p-1">
@@ -512,22 +554,50 @@ function LeaveRequest() {
                                             <Label htmlFor="hrDepartmentDate" className="text-xs font-bold">Date:</Label>
                                         </div>
                                     </div>
-
                                     <div className="flex items-center justify-between p-1 space-x-4 border border-gray-600">
-                                        <span className="text-xs font-bold">DISTRIBUTION COPY<span className="text-red-500">*</span></span>
-                                                                               <div className="flex items-center">
-                                            <Checkbox id="employee-copy" className="mr-1"  />
-                                            <Label htmlFor="employee-copy" className="text-xs">
-                                                Employee <span className="text-red-500">*</span>
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <Checkbox id="201-file" className="mr-1"  />
-                                            <Label htmlFor="201-file" className="text-xs">
-                                                201 file <span className="text-red-500">*</span>
-                                            </Label>
-                                        </div>
-                                    </div>
+    <span className="text-xs font-bold">DISTRIBUTION COPY<span className="text-red-500">*</span></span>
+    <div className="flex items-center">
+        <input
+            type="checkbox"
+            id="employee-copy"
+            className="mr-1"
+            checked={formData.distributionCopy.employeeCopy}
+            onChange={(e) => {
+                setFormData((prevState) => ({
+                    ...prevState,
+                    distributionCopy: {
+                        employeeCopy: e.target.checked,
+                        file201: e.target.checked ? false : prevState.distributionCopy.file201,
+                    },
+                }));
+            }}
+        />
+        <Label htmlFor="employee-copy" className="text-xs">
+            Employee <span className="text-red-500">*</span>
+        </Label>
+    </div>
+    <div className="flex items-center">
+        <input
+            type="checkbox"
+            className="mr-1"
+            checked={formData.distributionCopy.file201}
+            onChange={(e) => {
+                setFormData((prevState) => ({
+                    ...prevState,
+                    distributionCopy: {
+                        file201: e.target.checked,
+                        employeeCopy: e.target.checked ? false : prevState.distributionCopy.employeeCopy,
+                    },
+                }));
+            }}
+        />
+        <Label htmlFor="201-file" className="text-xs">
+            201 file <span className="text-red-500">*</span>
+        </Label>
+    </div>
+</div>
+
+
                                     <Button disabled={isLoading}>
                                         {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
                                     </Button>

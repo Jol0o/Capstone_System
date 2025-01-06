@@ -33,12 +33,10 @@ const generatePDF = async ({ data, type = "request" }) => {
                     font-size: 0.75rem;
                     line-height: 1.25;
                     color: #2d3748;
-                    background-color: #f7fafc;
                 }
                 .payslip-page {
                     padding: 1rem;
                     margin: 1rem auto;
-                    background-color: #fff;
                     border-radius: 0.5rem;
                     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
                 }

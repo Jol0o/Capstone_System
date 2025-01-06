@@ -186,6 +186,7 @@ function Request() {
             const res = await updateLeaveStatus(selectedData.id, trimmedData);
             if (res.status === 200) {
                 toast("Successfully updated the status");
+                setOpen(false)
             }
         } catch (e) {
             console.log(e);
@@ -250,11 +251,12 @@ function Request() {
                     {filterData && filterData.length ? <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="capitalize">Name</TableHead>
-                                <TableHead className="capitalize">Created At</TableHead>
-                                <TableHead className="capitalize">Type</TableHead>
-                                <TableHead className="capitalize">Start/End Date</TableHead>
-                                <TableHead className="capitalize">Status</TableHead>
+                                <TableHead className="font-bold capitalize">Name</TableHead>
+                                <TableHead className="font-bold capitalize">Created At</TableHead>
+                                <TableHead className="font-bold capitalize">Type</TableHead>
+                                <TableHead className="font-bold capitalize">Start Date</TableHead>
+                                 <TableHead className="font-bold capitalize">End Date</TableHead>
+                                <TableHead className="font-bold capitalize">Status</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -266,7 +268,8 @@ function Request() {
                                         </TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{formatDate(item?.created_at)}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item?.leave_type}</TableCell>
-                                        <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item?.inclusive_dates)} / {formatDate(item?.to_date)}</TableCell>
+                                        <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item?.inclusive_dates)}</TableCell>
+                                        <TableCell className="w-auto capitalize whitespace-nowrap">{formatDate(item?.to_date)}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item?.status}</TableCell>
                                         <TableCell className="max-w-[30px]"> <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -332,7 +335,6 @@ function Request() {
                                 <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
                                 <InfoRow label="Name" value={selectedData?.name} />
                                 <InfoRow label="Email" value={selectedData?.email} />
-                                <InfoRow label="Employee ID" value={selectedData?.employee_id} />
                                 <InfoRow label="Department" value={selectedData?.department} />
                                 <InfoRow label="Position" value={selectedData?.position} />
                             </div>
@@ -525,7 +527,7 @@ function Request() {
                                     value={
                                         selectedData?.supporting_document ? (
                                             <a href={selectedData?.supporting_document} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline" download>
-                                                Download Document
+                                                View Document
                                             </a>
                                         ) : 'No document provided'
                                     }

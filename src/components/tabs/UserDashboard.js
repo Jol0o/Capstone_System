@@ -151,11 +151,11 @@ export default function UserDashboard() {
       case "present":
         return "success"; // Green
       case "late":
-        return "warning"; // Yellow
+        return "destructive"; // Yellow
       case "absent":
         return "destructive"; // Red
       case "off duty":
-        return "secondary"; // Orange
+        return "destructive"; // Orange
       default:
         return "default"; // Default color
     }
@@ -398,7 +398,7 @@ export default function UserDashboard() {
                         <TableCell >{record.time_in || "-"}</TableCell>
                         <TableCell >{record.time_out || "-"}</TableCell>
                         <TableCell>
-                          <Badge variant={getStatusVariant(record.status)}>
+                          <Badge className="capitalize" variant={getStatusVariant(record.status)}>
                             {record.status}
                           </Badge>
                         </TableCell>
