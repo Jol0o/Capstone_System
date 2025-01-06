@@ -213,7 +213,7 @@ useEffect(() => {
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link href="#" className="capitalize">
-                        {tab}
+                        {tab === "userpayroll" ? "User Payroll" : tab}
                       </Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
