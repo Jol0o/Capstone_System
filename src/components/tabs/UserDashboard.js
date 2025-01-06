@@ -87,10 +87,9 @@ export default function UserDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const res = await getUserDataDashboard()
+      const res = await getUserDataDashboard(user.user_id)
       if (res.status === 200) {
-        console.log(res.data)
-        setDashboardData(res.data)
+        setDashboardData(res.data.data)
       }
     } catch (e) {
       console.log(e)
@@ -118,7 +117,7 @@ export default function UserDashboard() {
   useEffect(() => {
     fetchUser();
     fetchDashboardData()
-  }, [fetchUser]);
+  }, [fetchUser, user]);
 
   useEffect(() => {
     const id = userData?.employee_id;
@@ -210,6 +209,8 @@ export default function UserDashboard() {
       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
       XLSX.writeFile(wb, "attendance.xlsx");
   };
+
+  console.log(dashboardData)
 
   return (
     <div className="container mx-auto space-y-6 md:p-4">
@@ -356,7 +357,7 @@ export default function UserDashboard() {
                         selected={new Date(endDate)}
                         onSelect={handleEndDateChange}
                         disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
+                           date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
                         }
                         initialFocus
                       />
@@ -446,7 +447,7 @@ export default function UserDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {dashboardData && dashboardData.totalPayroll.map((payroll, index) => (
+                    {dashboardData?.allPayroll && dashboardData.allPayroll.map((payroll, index) => (
                       <TableRow key={index}>
                         <TableCell>{formatDate(payroll.period_start)}</TableCell>
                         <TableCell>{formatCurrency(payroll.total_pay)}</TableCell>

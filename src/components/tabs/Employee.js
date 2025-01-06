@@ -102,7 +102,6 @@ function Employee({ setTab }) {
     const handleExcelDownload = async () => {
         try {
             const res = await exportData(table);
-            console.log('Response:', res); // Log the response
 
             if (res.status !== 200) {
                 throw new Error('Network response was not ok');

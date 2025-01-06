@@ -334,8 +334,9 @@ export const updateLeaveStatus = async (id, data) => {
     return response;
 };
 
-export const userRequests = cacheWrapper(async (status) => {
-    const response = await axiosInstance.get(`${API_URL}/api/user_request`, status);
+export const userRequests = cacheWrapper(async (id) => {
+    console.log(id)
+    const response = await axiosInstance.get(`${API_URL}/api/user_request/${id}`);
     return response;
 });
 
@@ -497,9 +498,10 @@ export const checkPayroll = async () => {
 }
 
 
-export const getUserDataDashboard = cacheWrapper(async () => {
+export const getUserDataDashboard = cacheWrapper(async (id) => {
+    console.log(id)
     try {
-        const res = await axiosInstance.get(`${API_URL}/api/user-dashboard`)
+        const res = await axiosInstance.get(`${API_URL}/api/employee-summary/${id}`)
         return res
     } catch (e) {
         throw e

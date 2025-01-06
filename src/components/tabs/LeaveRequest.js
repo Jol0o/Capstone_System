@@ -69,9 +69,8 @@ function LeaveRequest() {
 
     const getRequests = async () => {
         try {
-            const res = await userRequests()
+            const res = await userRequests(user.user_id)
             if (res) {
-                console.log(res.data.data)
                 setData(res.data.data)
                 if (res.data.data.length === 0) {
                     setRequest(true)
@@ -84,7 +83,7 @@ function LeaveRequest() {
 
     useEffect(() => {
         getRequests()
-    }, [])
+    }, [user])
 
     useEffect(() => {
         // Listen for real-time updates
@@ -173,7 +172,8 @@ function LeaveRequest() {
             // Prepare the form data for submission
             const formDataToSend = {
                 ...formData,
-                supportingDocumentUrl, // Add the uploaded document URL if it exists
+                supportingDocumentUrl,
+                employee_id: user?.user_id
             };
 
             // Submit the request with the form data
@@ -294,8 +294,6 @@ function LeaveRequest() {
             anchor.click();
             document.body.removeChild(anchor);
     };
-    
-    console.log(availableCredits);
 
 
     return (
@@ -304,8 +302,8 @@ function LeaveRequest() {
                 <div className="max-w-[1000px] m-auto flex flex-col gap-5">
                     <div className="flex justify-end">
                         <Button
-                            variant={data.some(request => request.status === 'Pending' || request.status === 'Processing') ? 'secondary' : ''}
-                            disabled={data.some(request => request.status === 'Pending' || request.status === 'Processing' || request.status === 'Approved') ? true : undefined}
+                            variant={data?.some(request => request.status === 'Pending' || request.status === 'Processing') ? 'secondary' : ''}
+                            disabled={data?.some(request => request.status === 'Pending' || request.status === 'Processing' || request.status === 'Approved') ? true : undefined}
                             onClick={() => {
                                 if (availableCredits >= 0) {
                                     setRequest(!request);
