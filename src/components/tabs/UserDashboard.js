@@ -36,7 +36,7 @@ const userDatas = {
   name: "John Doe",
   position: "Software Engineer",
   department: "Engineering",
-  avatar: "https://github.com/shadcn.png",
+  avatar: "https://res.cloudinary.com/dkibnftac/image/upload/v1736055684/472310634_573909112071832_6346957760146667703_n_ltzgz5.png",
 }
 
 const getDateRange = () => {

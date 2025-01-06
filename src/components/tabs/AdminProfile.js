@@ -122,7 +122,7 @@ export function AdminProfile() {
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader className="flex flex-col items-center gap-4">
                     <Avatar className="w-24 h-24">
-                        <AvatarImage src="https://github.com/shadcn.png" alt="Admin Avatar" />
+                        <AvatarImage src="https://res.cloudinary.com/dkibnftac/image/upload/v1736055684/472310634_573909112071832_6346957760146667703_n_ltzgz5.png" alt="Admin Avatar" />
                         <AvatarFallback>AD</AvatarFallback>
                     </Avatar>
                     <div className="text-center">
