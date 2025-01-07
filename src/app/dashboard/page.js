@@ -68,7 +68,7 @@ const NAV_ITEMS = {
     { name: "Dashboard", icon: Home, tab: "dashboard" },
     { name: "Profile", icon: User, tab: "profile" },
     { name: "Leave Request", icon: FileCheck, tab: "leave" },
-    { name: "Payroll", icon: Coins, tab: "userpayroll" },
+    { name: "Payslip", icon: Coins, tab: "payslip" },
   ],
 };
 

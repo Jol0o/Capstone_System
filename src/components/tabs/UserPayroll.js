@@ -96,7 +96,7 @@ function UserPayroll() {
             {data.length > 0 ? data.map(item => (
                 <Card key={item.id} className="w-full ">
                     <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
-                        <CardTitle className="text-xl font-bold">Payroll</CardTitle>
+                        <CardTitle className="text-xl font-bold">Payslip</CardTitle>
                         <div className="flex space-x-2">
                             <Button disabled variant="outline" size='sm'>
                                 Paid

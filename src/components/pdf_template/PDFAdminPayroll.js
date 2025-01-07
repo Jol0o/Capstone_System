@@ -107,23 +107,6 @@ const PDFAdminPayroll = ({ data }) => {
           <p className="amount-number">{formatCurrency(netPay)}</p>
           <p className="amount-words">{numberToWords(netPay)}</p>
         </div>
-
-        <div className="signature-section">
-          <div className="signature-box">
-            <div className="signature-line">
-              <p className="signature-text">Employer Signature</p>
-            </div>
-          </div>
-          <div className="signature-box">
-            <div className="signature-line">
-              <p className="signature-text">Employee Signature</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer">
-          <p>This is system generated payslip</p>
-        </div>
       </div>
                     );
                 })}
@@ -193,6 +176,7 @@ const PDFAdminPayroll = ({ data }) => {
 
           .detail-label {
             width: 8rem;
+            font-weight: bold
           }
 
           .detail-separator {
@@ -210,7 +194,7 @@ const PDFAdminPayroll = ({ data }) => {
           .table-header {
             padding: 0.5rem 0;
             border-bottom: 1px solid black;
-            font-weight: normal;
+            font-weight: bold;
           }
 
           .left {
@@ -222,7 +206,7 @@ const PDFAdminPayroll = ({ data }) => {
           }
 
           .with-padding {
-            padding-left: 2rem;
+            padding: 0.5rem;
           }
 
           .amount {
