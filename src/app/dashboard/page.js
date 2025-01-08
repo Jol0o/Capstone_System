@@ -124,7 +124,7 @@ useEffect(() => {
       payroll: Payroll,
       profile: Profile,
       leave: LeaveRequest,
-      userpayroll: UserPayroll,
+      payslip: UserPayroll,
       request: Request,
       users: UserAccounts,
     };
