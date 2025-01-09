@@ -33,14 +33,7 @@ const PDFAdminPayroll = ({ data }) => {
               <span className="detail-separator">:</span>
               <span className="detail-value">{payslip?.name}</span>
             </div>
-          </div>
-          <div className="details-row">
-            <div className="detail-item">
-              <span className="detail-label">Pay Period</span>
-              <span className="detail-separator">:</span>
-              <span className="detail-value"> {format(new Date(payslip.period_start), "PPP")}/ {format(new Date(payslip.period_end), "PPP")}</span>
-            </div>
-            <div className="detail-item">
+              <div className="detail-item">
               <span className="detail-label">Hierarchy</span>
               <span className="detail-separator">:</span>
               <span className="detail-value">{payslip?.hierarchy}</span>
@@ -48,7 +41,14 @@ const PDFAdminPayroll = ({ data }) => {
           </div>
           <div className="details-row">
             <div className="detail-item">
-              <span className="detail-label">Worked Days</span>
+              <span className="detail-label">Pay Period</span>
+              <span className="detail-separator">:</span>
+              <span className="detail-value"> {format(new Date(payslip.period_start), "PPP")}/{format(new Date(payslip.period_end), "PPP")}</span>
+            </div>
+          </div>
+          <div className="details-row">
+            <div className="detail-item">
+              <span className="detail-label">Days Worked</span>
               <span className="detail-separator">:</span>
               <span className="detail-value">{payslip?.days_present}</span>
             </div>
@@ -275,6 +275,9 @@ const PDFAdminPayroll = ({ data }) => {
 
           .deduction{
           color: red
+          }
+          .detail-value {
+          text-wrap: nowrap;
           }
                 `}
             </style>
