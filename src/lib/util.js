@@ -45,5 +45,5 @@ export const numberToWords = (num) => {
       num %= part.value;
     }
   }
-  return result.trim();
+  return result.trim() + " " + 'Pesos Only';
 };

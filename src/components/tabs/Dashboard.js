@@ -94,7 +94,7 @@ function Dashboard() {
                   ? employee.difference > 0
                     ? `+${employee.difference} New employees added!`
                     : `${employee.difference} Employees removed!`
-                  : "No change in employees."
+                  : "No changes."
               }
               trend={employee?.difference > 0 ? "increase" : employee?.difference < 0 ? "decrease" : "neutral"}
             />

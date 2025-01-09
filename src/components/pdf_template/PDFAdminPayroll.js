@@ -38,7 +38,7 @@ const PDFAdminPayroll = ({ data }) => {
             <div className="detail-item">
               <span className="detail-label">Pay Period</span>
               <span className="detail-separator">:</span>
-              <span className="detail-value"> {`${format(new Date(payslip.period_start), 'MMMM d')} - ${format(new Date(payslip.period_end), 'd, yyyy')}`}</span>
+              <span className="detail-value"> {format(new Date(data.period_start), "PPP")}/ {format(new Date(data.period_end), "PPP")}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Hierarchy</span>
@@ -69,10 +69,16 @@ const PDFAdminPayroll = ({ data }) => {
               <th className="table-header right">Amount</th>
             </tr>
           </thead>
-          <tbody>
+         <tbody>
             <tr>
-              <td>Basic Salary</td>
+              <td className="with-padding">Basic Salary</td>
               <td className="amount">{formatCurrency(payslip.total_pay)}</td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
               <td className="with-padding">Pag-IBIG</td>
               <td className="amount deduction">{formatCurrency(pagIbigDeduction)}</td>
             </tr>
@@ -83,7 +89,7 @@ const PDFAdminPayroll = ({ data }) => {
               <td className="amount deduction">{formatCurrency(sssDeduction)}</td>
             </tr>
             <tr>
-               <td></td>
+              <td></td>
               <td></td>
               <td className="with-padding">PhilHealth</td>
               <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
@@ -91,6 +97,12 @@ const PDFAdminPayroll = ({ data }) => {
             <tr className="total-row">
               <td>Gross Pay</td>
               <td className="amount">{formatCurrency(payslip.total_pay)}</td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
               <td className="with-padding">Total Deductions</td>
               <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
             </tr>

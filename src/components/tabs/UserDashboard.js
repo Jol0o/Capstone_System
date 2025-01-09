@@ -301,11 +301,11 @@ export default function UserDashboard() {
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Work Days</span>
+                <span className="text-sm font-medium">Working Days</span>
                 <span className="text-sm text-zinc-400">Monday - Friday</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Work Hours</span>
+                <span className="text-sm font-medium">Working Hours</span>
                 <span className="text-sm text-zinc-400">8:00 AM - 5:00 PM</span>
               </div>
             </div>

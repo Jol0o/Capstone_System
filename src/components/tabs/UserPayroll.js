@@ -158,9 +158,9 @@ function UserPayroll() {
                         <ChevronLeft className="w-4 h-4" />
                     </Button>
                     <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
-                    <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
+                    {filterData.totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
                         <ChevronRight className="w-4 h-4" />
-                    </Button>
+                    </Button>}
                 </div>}
             </div>}
         </div>

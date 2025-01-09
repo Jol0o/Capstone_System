@@ -1,6 +1,6 @@
 import * as React from "react";
 import { format } from "date-fns";
-import { formatCurrency , numberToWords } from "@/lib/util";
+import { formatCurrency, numberToWords } from "@/lib/util";
 
 export const PDFPayroll = ({ data }) => {
   const { total_pay } = data;
@@ -39,7 +39,7 @@ export const PDFPayroll = ({ data }) => {
             <div className="detail-item">
               <span className="detail-label">Pay Period</span>
               <span className="detail-separator">:</span>
-              <span className="detail-value"> {`${format(new Date(data.period_start), 'MMMM d')} - ${format(new Date(data.period_end), 'd, yyyy')}`}</span>
+              <span className="detail-value">  {format(new Date(data.period_start), "PPP")}/ {format(new Date(data.period_end), "PPP")}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Hierarchy</span>
@@ -74,17 +74,24 @@ export const PDFPayroll = ({ data }) => {
             <tr>
               <td className="with-padding">Basic Salary</td>
               <td className="amount">{formatCurrency(total_pay)}</td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
               <td className="with-padding">Pag-IBIG</td>
               <td className="amount deduction">{formatCurrency(pagIbigDeduction)}</td>
             </tr>
             <tr>
               <td></td>
               <td></td>
+
               <td className="with-padding">SSS</td>
               <td className="amount deduction">{formatCurrency(sssDeduction)}</td>
             </tr>
             <tr>
-               <td></td>
+              <td></td>
               <td></td>
               <td className="with-padding">PhilHealth</td>
               <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
@@ -92,6 +99,12 @@ export const PDFPayroll = ({ data }) => {
             <tr className="total-row">
               <td>Gross Pay</td>
               <td className="amount">{formatCurrency(total_pay)}</td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
               <td className="with-padding">Total Deductions</td>
               <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
             </tr>
