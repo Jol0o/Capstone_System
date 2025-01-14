@@ -303,7 +303,7 @@ useEffect(() => {
 
                     <div className="flex gap-2">
                         {/* <Button onClick={handleDiscard} className="rounded-lg" variant="outline" size="sm"> Discard </Button> */}
-                        <Button onClick={() => setShowPass(!showPass)} className="rounded-lg" variant="outline" size="sm"> Change Password </Button>
+                        { user?.status === 'user'  && <Button onClick={() => setShowPass(!showPass)} className="rounded-lg" variant="outline" size="sm"> Change Password </Button>}
                         <Button onClick={handleSave} className="rounded-lg" size="sm">     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Save'} </Button>
                     </div>
                 </div>
