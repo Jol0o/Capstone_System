@@ -278,9 +278,9 @@ function Employee({ setTab }) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.employee_id)}>
+                                                        {/* <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.employee_id)}>
                                                             Copy Candidate ID
-                                                        </DropdownMenuItem>
+                                                        </DropdownMenuItem> */}
                                                         <DropdownMenuItem onClick={() => {
                                                             setTab("profile");
                                                             setUser(item.employee_id);
