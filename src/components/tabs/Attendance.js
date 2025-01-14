@@ -433,11 +433,11 @@ function Attendance() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem
+                                            {/* <DropdownMenuItem
                                                 onClick={() => navigator.clipboard.writeText(item.id)}
                                             >
                                                 Copy Attendance ID
-                                            </DropdownMenuItem>
+                                            </DropdownMenuItem> */}
                                             <DropdownMenuItem
                                                 onClick={() => deleteAttendance(item.id)}
                                             >

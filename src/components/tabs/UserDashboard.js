@@ -210,7 +210,7 @@ export default function UserDashboard() {
       XLSX.writeFile(wb, "attendance.xlsx");
   };
 
-  console.log(dashboardData)
+  const attendancePercentage = calculateAttendancePercentage(dashboardData?.totalDays);
 
   return (
     <div className="container mx-auto space-y-6 md:p-4">
@@ -253,7 +253,9 @@ export default function UserDashboard() {
             <Clock className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{calculateAttendancePercentage(dashboardData?.totalDays)}%</div>
+            <div className={`text-2xl font-bold ${attendancePercentage < 70 ? 'text-red-500' : ''}`}>
+    {attendancePercentage}%
+</div>
             <p className="text-xs text-muted-foreground">Last 30 days</p>
           </CardContent>
         </Card>

@@ -43,7 +43,7 @@ const PDFAdminPayroll = ({ data }) => {
             <div className="detail-item">
               <span className="detail-label">Pay Period</span>
               <span className="detail-separator">:</span>
-              <span className="detail-value"> {format(new Date(payslip.period_start), "PPP")}/{format(new Date(payslip.period_end), "PPP")}</span>
+              <span className="detail-value"> {`${format(new Date(payslip.period_start), 'MMMM d')} - ${format(new Date(payslip.period_end), 'd, yyyy')}`}</span>
             </div>
           </div>
           <div className="details-row">

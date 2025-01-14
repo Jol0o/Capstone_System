@@ -140,10 +140,11 @@ useEffect(() => {
         <nav className="flex flex-col gap-4 px-2 sm:py-4">
           <Link
             href="#"
+            onClick={() => setTab('dashboard')}
             className="flex items-center justify-center gap-2 text-lg font-semibold rounded-full group h-9 w-9 shrink-0 bg-primary text-primary-foreground md:h-8 md:w-8 md:text-base"
           >
             <Package2 className="w-4 h-4 transition-all group-hover:scale-110" />
-            <span className="sr-only">Acme Inc</span>
+            <span className="sr-only">Gasbee</span>
           </Link>
           {navItems.map((item) => (
             <TooltipProvider key={item.tab}>

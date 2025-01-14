@@ -93,59 +93,73 @@ function UserPayroll() {
 
     return (
         <div className="max-w-[1000px] m-auto flex flex-col gap-5">
-            {data.length > 0 ? data.map(item => (
-                <Card key={item.id} className="w-full ">
-                    <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
-                        <CardTitle className="text-xl font-bold">Payslip</CardTitle>
-                        <div className="flex space-x-2">
-                            <Button disabled variant="outline" size='sm'>
-                                Paid
-                            </Button>
-                            <Button
-                                disabled={loadingItems[item.id]}
-                                size='sm'
-                                onClick={() => handleGenerate(item)}
-                                className="bg-blue-600 hover:bg-blue-700"
-                            >
-                                {loadingItems[item.id] ? <LoaderCircle className="animate-spin" /> : 'Generate Payslip'}
-                            </Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="flex items-start justify-between">
-                            <div className="space-y-4">
-                                <div className="flex items-center space-x-2 text-[clamp(12px, 18px, 5vw)] ">
-                                    <Clock size={16} />
-                                    <span>Hours worked: </span>
-                                    <span >{item.hours_worked} Hour/s</span>
-                                </div>
-                                <div className="flex items-center text-[clamp(12px, 18px, 5vw)] space-x-2 ">
-                                    <span>Amount: </span>
-                                    <span >{formatCurrency(item.total_pay)}</span>
-                                </div>
-                            </div>
-                            <div className="text-sm sm:text-[clamp(12px, 18px, 5vw)] ">
-                                Period: {format(new Date(item.period_start), "PPP")}/ {format(new Date(item.period_end), "PPP")}
-                            </div>
-                        </div>
+            {data.length > 0 ? data.map(item => 
+                {
+                    // Calculate deductions
+                    const sssDeduction = item.total_pay * 0.095;
+                    const philHealthDeduction = item.total_pay * 0.025;
+                    const pagIbigDeduction = item.total_pay * 0.01;
+                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
 
-                        {links[item.id] && <div className="space-y-2">
-                            <div className="flex items-center space-x-2 text-sm ">
-                                <LinkIcon size={16} />
-                                <span>Payroll Link:</span>
-                            </div>
-                            <Input
-                                value={links[item.id]}
-                                readOnly
-                                className="font-mono text-sm"
-                            />
-                            <Button onClick={() => downloadPDF(links[item.id])} className="bg-blue-600 hover:bg-blue-700">
-                                Download
-                            </Button>
-                        </div>}
-                    </CardContent>
-                </Card>
-            )) : <Card className="rounded-xl">
+                    // Calculate net pay
+                    const netPay = item.total_pay - totalDeductions;
+
+                    return(
+                        <Card key={item.id} className="w-full ">
+                            <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
+                                <CardTitle className="text-xl font-bold">Payslip</CardTitle>
+                                <div className="flex space-x-2">
+                                    <Button disabled variant="outline" size='sm'>
+                                        Paid
+                                    </Button>
+                                    <Button
+                                        disabled={loadingItems[item.id]}
+                                        size='sm'
+                                        onClick={() => handleGenerate(item)}
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                    >
+                                        {loadingItems[item.id] ? <LoaderCircle className="animate-spin" /> : 'Generate Payslip'}
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="flex items-start justify-between">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center space-x-2 text-[clamp(12px, 18px, 5vw)] ">
+                                            <Clock size={16} />
+                                            <span>Hours worked: </span>
+                                            <span >{item.hours_worked} Hour/s</span>
+                                        </div>
+                                        <div className="flex items-center text-[clamp(12px, 18px, 5vw)] space-x-2 ">
+                                            <span>Amount: </span>
+                                            <span >{formatCurrency(netPay)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-sm sm:text-[clamp(12px, 18px, 5vw)] ">
+                                        Period: {format(new Date(item.period_start), "PPP")}/ {format(new Date(item.period_end), "PPP")}
+                                    </div>
+                                </div>
+
+                                {links[item.id] && <div className="space-y-2">
+                                    <div className="flex items-center space-x-2 text-sm ">
+                                        <LinkIcon size={16} />
+                                        <span>Payroll Link:</span>
+                                    </div>
+                                    <Input
+                                        value={links[item.id]}
+                                        readOnly
+                                        className="font-mono text-sm"
+                                    />
+                                    <Button onClick={() => downloadPDF(links[item.id])} className="bg-blue-600 hover:bg-blue-700">
+                                        Download
+                                    </Button>
+                                </div>}
+                            </CardContent>
+                        </Card>
+                    )
+                }
+                
+            ) : <Card className="rounded-xl">
                 <CardContent className="flex flex-col text-xl font-semibold ite">
                     <CardDescription className="flex items-center justify-center">
                         No Available Data

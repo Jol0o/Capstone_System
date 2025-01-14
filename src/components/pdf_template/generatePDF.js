@@ -241,7 +241,26 @@ const generatePDF = async ({ data, type = "request" }) => {
         });
 
         const uploadResult = await uploadResponse.json();
-        if (uploadResult.error) throw new Error(uploadResult.message);
+      if (uploadResult.error) throw new Error(uploadResult.message);
+      
+      const getFilename = (name) => {
+        const nameParts = name.split(' ');
+        if (nameParts.length === 2) {
+            // Format: surname, firstname
+            return `${nameParts[1]}, ${nameParts[0]}.pdf`;
+        } else if (nameParts.length === 3) {
+            // Format: surname, firstname, middlename
+            return `${nameParts[2]}, ${nameParts[0]}, ${nameParts[1]}.pdf`;
+        } else {
+            return `${name}.pdf`; // Fallback for unexpected name formats
+        }
+    };
+
+    const filename = type === "payroll"
+        ? getFilename(data.name)
+        : type === "admin"
+        ? "GeneratedPayslip.pdf"
+        : "LeaveForm.pdf";
 
         // Now send the HTML content directly for conversion
         const convertResponse = await fetch("https://api.pdf.co/v1/pdf/convert/from/html", {
@@ -252,7 +271,7 @@ const generatePDF = async ({ data, type = "request" }) => {
             },
             body: JSON.stringify({
                 html: fullHtmlContent,  // Use the "html" parameter directly
-                name: type === "payroll" || type === "admin" ? "GeneratedPayroll.pdf" : "LeaveForm.pdf",
+              name: filename,
             }),
         });
 

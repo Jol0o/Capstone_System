@@ -285,7 +285,7 @@ function Employee({ setTab }) {
                                                             setTab("profile");
                                                             setUser(item.employee_id);
                                                         }}>
-                                                            View
+                                                            Manage Account
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => deleteEmployee(item.employee_id)}>
                                                             Delete
@@ -324,7 +324,7 @@ function Employee({ setTab }) {
                     </div>
                 </div>}
                 <div className="mt-5 border rounded-md">
-                    <h1 className="p-5">Employee Request Table</h1>
+                    <h1 className="p-5">Request for Account Approval</h1>
                     {employeeData && employeeData.length ? <Table >
                         <TableHeader>
                             <TableRow>

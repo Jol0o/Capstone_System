@@ -204,8 +204,8 @@ function Request() {
 
     const InfoRow = ({ label, value }) => (
         <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">
-            <div className="text-sm font-medium text-gray-400">{label}</div>
-            <div className="col-span-2 text-sm text-white">{value}</div>
+            <div className="text-sm font-semibold ">{label}</div>
+            <div className="col-span-2 text-sm font-medium ">{value}</div>
         </div>
     )
 
@@ -280,11 +280,11 @@ function Request() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem
+                                                {/* <DropdownMenuItem
                                                     onClick={() => navigator.clipboard.writeText(item.employee_id)}
                                                 >
                                                     Copy Employee ID
-                                                </DropdownMenuItem>
+                                                </DropdownMenuItem> */}
                                                 <DropdownMenuItem onClick={() => { setOpen(true); setSelectedData(item); setStatus(item.status) }}>
                                                     View
                                                 </DropdownMenuItem>
@@ -325,22 +325,22 @@ function Request() {
                 </div>}
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="max-w-2xl bg-black border-gray-800">
+                <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-semibold text-white">Leave Request Details</DialogTitle>
+                        <DialogTitle className="text-xl font-semibold">Leave Request Details</DialogTitle>
                     </DialogHeader>
                     <ScrollArea className="max-h-[80vh] pr-4">
                         <div className="space-y-4">
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
-                                <h3 className="mb-2 text-lg font-semibold text-white">Employee Information</h3>
+                            <div className="p-4 mb-4 rounded-lg ">
+                                <h3 className="mb-2 text-lg font-semibold">Employee Information</h3>
                                 <InfoRow label="Name" value={selectedData?.name} />
                                 <InfoRow label="Email" value={selectedData?.email} />
                                 <InfoRow label="Department" value={selectedData?.department} />
                                 <InfoRow label="Position" value={selectedData?.position} />
                             </div>
 
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
-                                <h3 className="mb-2 text-lg font-semibold text-white">Leave Details</h3>
+                            <div className="p-4 mb-4 rounded-lg ">
+                                <h3 className="mb-2 text-lg font-semibold">Leave Details</h3>
                                 <InfoRow
                                     label="Leave Type"
                                     value={selectedData?.leave_type}
@@ -367,8 +367,8 @@ function Request() {
                                 />
                             </div>
 
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
-                                <h3 className="mb-2 text-lg font-semibold text-white">Request Status</h3>
+                            <div className="p-4 mb-4 rounded-lg ">
+                                <h3 className="mb-2 text-lg font-semibold">Request Status</h3>
                                 {(selectedData?.status !== 'Done' ) ? (
                                     <>
                                         <Select value={status} onValueChange={handleChange}>
@@ -391,7 +391,7 @@ function Request() {
                                                 <InfoRow label="Requested By" value={selectedData?.requested_by} />
                                                 <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
                                                 <div>
-                                                    <Label className="block text-sm text-white">Approved By</Label>
+                                                    <Label className="block text-sm">Approved By</Label>
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
@@ -404,7 +404,7 @@ function Request() {
                                                     value={selectedData?.date_of_approve ? formatDate(selectedData.date_of_approve) : formatDate(new Date())}
                                                 />
                                                 <div>
-                                                    <Label className="block text-sm text-white">Received By</Label>
+                                                    <Label className="block text-sm">Received By</Label>
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
@@ -417,7 +417,7 @@ function Request() {
                                                     value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : formatDate(new Date())}
                                                 />
                                                 <div>
-                                                    <Label className="block text-sm text-white">Recorded By</Label>
+                                                    <Label className="block text-sm">Recorded By</Label>
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
@@ -426,7 +426,7 @@ function Request() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="block text-sm text-white">Department Head</Label>
+                                                    <Label className="block text-sm">Department Head</Label>
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
@@ -435,7 +435,7 @@ function Request() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="block text-sm text-white">HR Department</Label>
+                                                    <Label className="block text-sm">HR Department</Label>
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
@@ -449,7 +449,7 @@ function Request() {
                                                         checked={selectedData.withpay || false}
                                                         onChange={(e) => setSelectedData({ ...selectedData, withpay: e.target.checked })}
                                                     />
-                                                    <label className="block text-sm text-white">With Pay</label>
+                                                    <label className="block text-sm">With Pay</label>
                                                 </div>
                                             </div>
                                         )}
@@ -460,7 +460,7 @@ function Request() {
                                                  <InfoRow label="Requested By" value={selectedData?.requested_by} />
                                                 <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
                                                 <div>
-                                                    <Label className="block text-sm text-white">Received By</Label>
+                                                    <Label className="block text-sm">Received By</Label>
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
@@ -473,7 +473,7 @@ function Request() {
                                                     value={selectedData?.date_of_received ? formatDate(selectedData.date_of_received) : formatDate(new Date())}
                                                 />
                                                 <div>
-                                                    <Label className="block text-sm text-white">Recorded By</Label>
+                                                    <Label className="block text-sm">Recorded By</Label>
                                                     <Input
                                                         type="text"
                                                         className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
@@ -520,8 +520,8 @@ function Request() {
                                 ) : null}
                             </div>
 
-                            <div className="p-4 mb-4 rounded-lg bg-gray-900/50">
-                                <h3 className="mb-2 text-lg font-semibold text-white">Additional Information</h3>
+                            <div className="p-4 mb-4 rounded-lg ">
+                                <h3 className="mb-2 text-lg font-semibold">Additional Information</h3>
                                 <InfoRow
                                     label="Supporting Document"
                                     value={
@@ -537,11 +537,11 @@ function Request() {
                                     <div className="col-span-2 space-y-1">
                                         {selectedData?.distribution_copy && (
                                             <>
-                                                <div className="flex items-center gap-2 text-sm text-white">
+                                                <div className="flex items-center gap-2 text-sm">
                                                     <div className={`w-2 h-2 rounded-full ${JSON.parse(selectedData.distribution_copy).employeeCopy ? 'bg-green-500' : 'bg-gray-500'}`} />
                                                     Employee Copy
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm text-white">
+                                                <div className="flex items-center gap-2 text-sm">
                                                     <div className={`w-2 h-2 rounded-full ${JSON.parse(selectedData.distribution_copy).file201 ? 'bg-green-500' : 'bg-gray-500'}`} />
                                                     201 File
                                                 </div>

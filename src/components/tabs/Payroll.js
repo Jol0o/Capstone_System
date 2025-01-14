@@ -299,7 +299,7 @@ function Payroll() {
         const promise = generatePDF({ type: "payroll", data });
 
         toast.promise(promise, {
-            loading: 'Generating PDF...',
+            loading: 'Exporting Payslips...',
             success: (link) => {
                 if (link) {
                     window.open(link, '_blank');
@@ -335,12 +335,12 @@ function Payroll() {
             const promise = generatePDF({ type: "admin", data });
     
             toast.promise(promise, {
-                loading: "Generating PDF...",
+                loading: "Exporting Payslips...",
                 success: (link) => {
                     if (link) {
                         window.open(link, '_blank');
                         setLink(link);
-                        return 'Generate Successfully!';
+                        return 'Exported Successfully!';
                     }
                 },
                 error: "Error generating PDF",
@@ -488,9 +488,9 @@ function Payroll() {
                 <div className="flex items-center gap-1">
                     <Button disabled={filterData.length === 0 ? true : false} size="sm" onClick={() => handleGenerateAll(filterData)} variant="outline" className="gap-1">
                         <FileDown className="h-3.5 w-3.5" />
-                        Export
+                        Export Payslip
                     </Button>
-                    <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Generate Payroll'}</Button>
+                    <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Send Payroll'}</Button>
                 </div>
 
             </div>
@@ -539,9 +539,9 @@ function Payroll() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.id)}>
+                                                    {/* <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.id)}>
                                                         Copy Payroll ID
-                                                    </DropdownMenuItem>
+                                                    </DropdownMenuItem> */}
                                                     <DropdownMenuItem onClick={() => handleGenerate(item)}>
                                                         Payslip
                                                     </DropdownMenuItem>
