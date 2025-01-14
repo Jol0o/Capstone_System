@@ -449,15 +449,24 @@ export default function UserDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {dashboardData?.allPayroll && dashboardData.allPayroll.map((payroll, index) => (
+                    {dashboardData?.allPayroll && dashboardData.allPayroll.map((payroll, index) => {
+                      const sssDeduction = payroll.total_pay * 0.095;
+                      const philHealthDeduction = payroll.total_pay * 0.025;
+                      const pagIbigDeduction = payroll.total_pay * 0.01;
+                      const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+
+                      // Calculate net pay
+                      const netPay = payroll.total_pay - totalDeductions;
+                      
+                      return (
                       <TableRow key={index}>
                         <TableCell>{formatDate(payroll.period_start)}</TableCell>
-                        <TableCell>{formatCurrency(payroll.total_pay)}</TableCell>
+                          <TableCell>{formatCurrency(netPay)}</TableCell>
                         <TableCell>
                           {payroll.hours_worked} Hours
                         </TableCell>
-                      </TableRow>
-                    ))}
+                      </TableRow>)
+})}
                   </TableBody>
                 </Table>
               </ScrollArea>
