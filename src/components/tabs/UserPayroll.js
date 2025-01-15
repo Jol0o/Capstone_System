@@ -136,7 +136,7 @@ function UserPayroll() {
                                         </div>
                                     </div>
                                     <div className="text-sm sm:text-[clamp(12px, 18px, 5vw)] ">
-                                        Period: {format(new Date(item.period_start), "PPP")}/ {format(new Date(item.period_end), "PPP")}
+                                        Period:  {`${format(new Date(item.period_start), 'MMMM d')} - ${format(new Date(item.period_end), 'd, yyyy')}`}
                                     </div>
                                 </div>
 
