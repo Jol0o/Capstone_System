@@ -166,65 +166,65 @@ function LeaveRequest() {
     const handleConfirmedSubmit = async (e) => {
         e.preventDefault();
         setIsloading(true);
-    
+
         try {
             for (let key of Object.keys(formData)) {
-    const value = formData[key];
+                const value = formData[key];
 
-    // Handle nested objects like `distributionCopy`
-    if (key === "distributionCopy") {
-        if (!value.employeeCopy && !value.file201) {
-            toast("Error", {
-                description: `${fieldLabels[key]} requires at least one selection`,
-            });
-            setIsloading(false);
-            return;
-        }
-        continue;
-    }
+                // Handle nested objects like `distributionCopy`
+                if (key === "distributionCopy") {
+                    if (!value.employeeCopy && !value.file201) {
+                        toast("Error", {
+                            description: `${fieldLabels[key]} requires at least one selection`,
+                        });
+                        setIsloading(false);
+                        return;
+                    }
+                    continue;
+                }
 
-    // Validate 'supportingDocument' only when 'leaveType' is not 'Vacation Leave'
-    if (key === "supportingDocument" && formData.leaveType !== "Vacation Leave") {
-        if (!value) {
-            toast("Error", {
-                description: `${fieldLabels[key]} is required for ${formData.leaveType}`,
-            });
-            setIsloading(false);
-            return;
-        }
-    }
+                // Validate 'supportingDocument' only when 'leaveType' is not 'Vacation Leave'
+                if (key === "supportingDocument" && formData.leaveType !== "Vacation Leave") {
+                    if (!value) {
+                        toast("Error", {
+                            description: `${fieldLabels[key]} is required for ${formData.leaveType}`,
+                        });
+                        setIsloading(false);
+                        return;
+                    }
+                }
 
-    // General fields check
-    if (!value && key !== "supportingDocument") { // Skip general validation for 'supportingDocument'
-        toast("Error", {
-            description: `${fieldLabels[key]} is required`,
-        });
-        setIsloading(false);
-        return;
-    }
-}
+                // General fields check
+                if (!value && key !== "supportingDocument") { // Skip general validation for 'supportingDocument'
+                    toast("Error", {
+                        description: `${fieldLabels[key]} is required`,
+                    });
+                    setIsloading(false);
+                    return;
+                }
+            }
 
-    
+
             // Upload the supporting document to Cloudinary if leaveType is not 'Vacation Leave'
             let supportingDocumentUrl = " ";
             if (formData.supportingDocument && formData.leaveType !== 'Vacation Leave') {
                 supportingDocumentUrl = await uploadToCloudinary(formData.supportingDocument, setIsloading);
             }
-    
+
             // Prepare the form data for submission
             const formDataToSend = {
                 ...formData,
                 supportingDocumentUrl,
                 employee_id: user?.user_id
             };
-    
+
             // Submit the request with the form data
             const res = await submitRequest(formDataToSend); // Pass the form data directly, no need to stringify
             if (res) {
                 toast("Success", {
                     description: res.data.message,
                 });
-    
+
                 // Reset form data after successful submission
                 setFormData({
                     name: '',
@@ -278,14 +278,14 @@ function LeaveRequest() {
             const link = await promise;
             if (link) {
                 setLoadGenerate(false);
-                 if (link) {
-                toast('Click the link', {
-                    action: {
-                        label: 'Download',
-                        onClick: () => downloadPDF(link)
-                    },
-                });
-            }
+                if (link) {
+                    toast('Click the link', {
+                        action: {
+                            label: 'Download',
+                            onClick: () => downloadPDF(link)
+                        },
+                    });
+                }
                 setLink(link);
             }
         } catch (e) {
@@ -328,14 +328,14 @@ function LeaveRequest() {
         }
     }
 
-           const downloadPDF = (link) => {
-            const anchor = document.createElement('a');
-            anchor.href = link;
-            anchor.download = 'form.pdf';
-            anchor.target = '_blank'; // Open link in a new tab
-            document.body.appendChild(anchor);
-            anchor.click();
-            document.body.removeChild(anchor);
+    const downloadPDF = (link) => {
+        const anchor = document.createElement('a');
+        anchor.href = link;
+        anchor.download = 'form.pdf';
+        anchor.target = '_blank'; // Open link in a new tab
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
     };
 
 
@@ -391,7 +391,7 @@ function LeaveRequest() {
 
                                     <div className="flex flex-wrap border border-gray-300">
                                         <div className="flex-1 min-w-[33%] p-1 border-r border-gray-300">
-                                                                                        <Label htmlFor="inclusiveDates" className="text-xs font-bold">
+                                            <Label htmlFor="inclusiveDates" className="text-xs font-bold">
                                                 INCLUSIVE DATES <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -555,49 +555,47 @@ function LeaveRequest() {
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between p-1 space-x-4 border border-gray-600">
-    <span className="text-xs font-bold">DISTRIBUTION COPY<span className="text-red-500">*</span></span>
-    <div className="flex items-center">
-        <input
-            type="checkbox"
-            id="employee-copy"
-            className="mr-1"
-            checked={formData.distributionCopy.employeeCopy}
-            onChange={(e) => {
-                setFormData((prevState) => ({
-                    ...prevState,
-                    distributionCopy: {
-                        employeeCopy: e.target.checked,
-                        file201: e.target.checked ? false : prevState.distributionCopy.file201,
-                    },
-                }));
-            }}
-        />
-        <Label htmlFor="employee-copy" className="text-xs">
-            Employee <span className="text-red-500">*</span>
-        </Label>
-    </div>
-    <div className="flex items-center">
-        <input
-            type="checkbox"
-            className="mr-1"
-            checked={formData.distributionCopy.file201}
-            onChange={(e) => {
-                setFormData((prevState) => ({
-                    ...prevState,
-                    distributionCopy: {
-                        file201: e.target.checked,
-                        employeeCopy: e.target.checked ? false : prevState.distributionCopy.employeeCopy,
-                    },
-                }));
-            }}
-        />
-        <Label htmlFor="201-file" className="text-xs">
-            201 file <span className="text-red-500">*</span>
-        </Label>
-    </div>
-</div>
-
-
+                                        <span className="text-xs font-bold">DISTRIBUTION COPY<span className="text-red-500">*</span></span>
+                                        <div className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                id="employee-copy"
+                                                className="mr-1"
+                                                checked={formData.distributionCopy.employeeCopy}
+                                                onChange={(e) => {
+                                                    setFormData((prevState) => ({
+                                                        ...prevState,
+                                                        distributionCopy: {
+                                                            employeeCopy: e.target.checked,
+                                                            file201: e.target.checked ? false : prevState.distributionCopy.file201,
+                                                        },
+                                                    }));
+                                                }}
+                                            />
+                                            <Label htmlFor="employee-copy" className="text-xs">
+                                                Employee <span className="text-red-500">*</span>
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="mr-1"
+                                                checked={formData.distributionCopy.file201}
+                                                onChange={(e) => {
+                                                    setFormData((prevState) => ({
+                                                        ...prevState,
+                                                        distributionCopy: {
+                                                            file201: e.target.checked,
+                                                            employeeCopy: e.target.checked ? false : prevState.distributionCopy.employeeCopy,
+                                                        },
+                                                    }));
+                                                }}
+                                            />
+                                            <Label htmlFor="201-file" className="text-xs">
+                                                201 file <span className="text-red-500">*</span>
+                                            </Label>
+                                        </div>
+                                    </div>
                                     <Button disabled={isLoading}>
                                         {isLoading ? <LoaderCircle className="animate-spin" /> : 'Submit'}
                                     </Button>
@@ -657,21 +655,21 @@ function LeaveRequest() {
                                     <div>Start Date: {format(parseISO(item.inclusive_dates), "PPP")}</div>
                                     <div>End Date: {format(parseISO(item.to_date), "PPP")}</div>
                                 </div>
-                               
-                                   {link && <div className="space-y-2">
-                            <div className="flex items-center space-x-2 text-sm ">
-                                <LinkIcon size={16} />
-                                <span>Form Link:</span>
-                            </div>
-                            <Input
-                                value={link}
-                                readOnly
-                                className="font-mono text-sm"
-                            />
-                            <Button onClick={() => downloadPDF(link)} className="bg-blue-600 hover:bg-blue-700">
-                                Download
-                            </Button>
-                        </div>}
+
+                                {link && <div className="space-y-2">
+                                    <div className="flex items-center space-x-2 text-sm ">
+                                        <LinkIcon size={16} />
+                                        <span>Form Link:</span>
+                                    </div>
+                                    <Input
+                                        value={link}
+                                        readOnly
+                                        className="font-mono text-sm"
+                                    />
+                                    <Button onClick={() => downloadPDF(link)} className="bg-blue-600 hover:bg-blue-700">
+                                        Download
+                                    </Button>
+                                </div>}
                             </CardContent>
                         </Card>
                     ))}
@@ -719,6 +717,7 @@ function LeaveRequest() {
                                 />
                                 <InfoRow label="Requested By" value={selectedData?.requested_by} />
                                 <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
+                                <InfoRow label="Reject Reason" value={selectedData?.rejected_reason} />
                                 {selectedData?.status !== "Done" || selectedData?.status !== 'Approved' && <> <InfoRow label="Approved By" value={selectedData?.approved_by} />
                                     <InfoRow
                                         label="Date of Approval"

@@ -163,6 +163,7 @@ function Request() {
             recorded_by: selectedData.recorded_by?.trim() || "",
             department_head: selectedData.department_head?.trim() || "",
             hr_department: selectedData.hr_department?.trim() || "",
+            rejected_reason: selectedData.rejected_reason?.trim() || "",
             withpay: selectedData.withpay
         };
     
@@ -459,6 +460,15 @@ function Request() {
                                             <div className="mt-4 space-y-4">
                                                  <InfoRow label="Requested By" value={selectedData?.requested_by} />
                                                 <InfoRow label="Date Requested" value={formatDate(selectedData?.created_at)} />
+                                                <div>
+                                                    <Label className="block text-sm">Reason</Label>
+                                                    <Input
+                                                        type="text"
+                                                        className="w-full px-3 py-2 mt-1 text-sm border rounded-md"
+                                                        value={selectedData.  rejected_reason || ""}
+                                                        onChange={(e) => setSelectedData({ ...selectedData, rejected_reason: e.target.value })}
+                                                    />
+                                                </div>
                                                 <div>
                                                     <Label className="block text-sm">Received By</Label>
                                                     <Input

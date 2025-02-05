@@ -126,7 +126,7 @@ function Attendance() {
                 setFilteredData(data);
                 return;
             }
-            const res = await searchAttendance(filter.trim());
+            const res = await searchAttendance(filter.trim(),startDate, endDate);
             setFilteredData(res.data.data);
         };
         fetchData();
@@ -395,11 +395,11 @@ function Attendance() {
                 {filterData && filterData.length ? <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="capitalize font-bold">Name</TableHead>
-                            <TableHead className="capitalize font-bold">Date</TableHead>
-                            <TableHead className="capitalize font-bold">Time In</TableHead>
-                            <TableHead className="capitalize font-bold">Time Out</TableHead>
-                            <TableHead className="capitalize font-bold">Total Hours</TableHead>
+                            <TableHead className="font-bold capitalize">Name</TableHead>
+                            <TableHead className="font-bold capitalize">Date</TableHead>
+                            <TableHead className="font-bold capitalize">Time In</TableHead>
+                            <TableHead className="font-bold capitalize">Time Out</TableHead>
+                            <TableHead className="font-bold capitalize">Total Hours</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -423,7 +423,9 @@ function Attendance() {
                                     <TableCell className="whitespace-nowrap">
                                         {item.time_out}
                                     </TableCell>
-                                    <TableCell className=" whitespace-nowrap">{item.hours} Hour/s</TableCell>
+                                   <TableCell className="whitespace-nowrap">
+  {item.hours ? `${item.hours} Hour${item.hours > 1 ? "s" : ""}` : "-"}
+</TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="w-8 h-8 p-0">

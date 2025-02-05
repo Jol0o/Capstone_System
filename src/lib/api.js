@@ -370,9 +370,14 @@ export const searchEmployee = cacheWrapper(async (search) => {
     }
 });
 
-export const searchAttendance = cacheWrapper(async (search) => {
+export const searchAttendance = cacheWrapper(async (search , startDate, endDate) => {
     try {
-        const response = await axiosInstance.get(`${API_URL}/api/search_attendance?q=${search}`);
+        const response = await axiosInstance.get(`${API_URL}/api/search_attendance?q=${search}`,{
+            params: {
+                startDate,
+                endDate,
+            }
+        });
         return response;
     } catch (error) {
         console.error("Error searching attendance:", error);
@@ -380,9 +385,14 @@ export const searchAttendance = cacheWrapper(async (search) => {
     }
 });
 
-export const searchPayroll = cacheWrapper(async (search) => {
+export const searchPayroll = cacheWrapper(async (search, startDate, endDate) => {
     try {
-        const response = await axiosInstance.get(`${API_URL}/api/search_payroll?q=${search}`);
+        const response = await axiosInstance.get(`${API_URL}/api/search_payroll?q=${search}`, {
+            params: {
+                startDate,
+                endDate,
+            }
+        });
         return response;
     } catch (error) {
         console.error("Error searching payroll:", error);
