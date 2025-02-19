@@ -5,7 +5,7 @@ import PDFAdminPayroll from "./PDFAdminPayroll";
 import { PDFPayroll } from './PDFPayroll';
 import { renderToStaticMarkup } from "react-dom/server";
 
-const PDF_CO_API_KEY = 'jloyd9836@gmail.com_H6gMVZnZlHNA826JpojHyrh3Y3Y2UuECOKF04fOsUnd9u1fkVcRz7sqD3hajZwHL'; // Ensure the environment variable is correctly named
+const PDF_CO_API_KEY = 'mariabasas21@gmail.com_VE9BuAxZpNZ4FSaXHOdWfAFnWDKycu3O1EWrLIQ8W6vtBlIcomwmFwqXSX5DC2Fe'; // Ensure the environment variable is correctly named
 
 const generatePDF = async ({ data, type = "request" }) => {
     let htmlContent;
