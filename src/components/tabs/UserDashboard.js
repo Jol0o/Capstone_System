@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Calendar as CalendarIcon, Clock, PhilippinePeso , FileText, User, ChevronLeft, ChevronRight, Filter, LoaderCircle, FileDown } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, PhilippinePeso, FileText, User, ChevronLeft, ChevronRight, Filter, LoaderCircle, FileDown } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
@@ -201,13 +201,13 @@ export default function UserDashboard() {
   };
 
   const handleExcelDownload = (data) => {
-      // Remove employee_id from each data object
-      const filteredData = data.map(({ employee_id, ...rest }) => rest);
-  
-      const ws = XLSX.utils.json_to_sheet(filteredData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-      XLSX.writeFile(wb, "attendance.xlsx");
+    // Remove employee_id from each data object
+    const filteredData = data.map(({ employee_id, ...rest }) => rest);
+
+    const ws = XLSX.utils.json_to_sheet(filteredData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, "attendance.xlsx");
   };
 
   const attendancePercentage = calculateAttendancePercentage(dashboardData?.totalDays);
@@ -237,7 +237,7 @@ export default function UserDashboard() {
         <Card className="col-span-1">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Last Payroll</CardTitle>
-                       <span className="w-4 h-4 text-muted-foreground">₱</span>
+            <span className="w-4 h-4 text-muted-foreground">₱</span>
           </CardHeader>
           <CardContent>
             {dashboardData && dashboardData.latestPayroll ? <><div className="text-2xl font-bold">{formatCurrency(dashboardData?.latestPayroll.total_pay)}</div>
@@ -254,8 +254,8 @@ export default function UserDashboard() {
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${attendancePercentage < 70 ? 'text-red-500' : ''}`}>
-    {attendancePercentage}%
-</div>
+              {attendancePercentage}%
+            </div>
             <p className="text-xs text-muted-foreground">Last 30 days</p>
           </CardContent>
         </Card>
@@ -304,7 +304,7 @@ export default function UserDashboard() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Working Days</span>
-                <span className="text-sm text-zinc-400">Monday - Friday</span>
+                <span className="text-sm text-zinc-400">Monday - Saturday</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Working Hours</span>
@@ -359,7 +359,7 @@ export default function UserDashboard() {
                         selected={new Date(endDate)}
                         onSelect={handleEndDateChange}
                         disabled={(date) =>
-                           date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
+                          date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
                         }
                         initialFocus
                       />
@@ -438,7 +438,7 @@ export default function UserDashboard() {
             <CardDescription>Your last 3 months of payroll</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto custom-scrollbar">
+            <div className="overflow-x-auto custom-scrollbar max-h-[300px]">
               <ScrollArea className="custom-scrollbar">
                 <Table>
                   <TableHeader>
@@ -457,16 +457,16 @@ export default function UserDashboard() {
 
                       // Calculate net pay
                       const netPay = payroll.total_pay - totalDeductions;
-                      
+
                       return (
-                      <TableRow key={index}>
-                        <TableCell>{formatDate(payroll.period_start)}</TableCell>
+                        <TableRow key={index}>
+                          <TableCell>{formatDate(payroll.period_start)}</TableCell>
                           <TableCell>{formatCurrency(netPay)}</TableCell>
-                        <TableCell>
-                          {payroll.hours_worked} Hours
-                        </TableCell>
-                      </TableRow>)
-})}
+                          <TableCell>
+                            {payroll.hours_worked} Hours
+                          </TableCell>
+                        </TableRow>)
+                    })}
                   </TableBody>
                 </Table>
               </ScrollArea>
