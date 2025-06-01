@@ -21,7 +21,7 @@ export const description = "A bar chart with a label"
 
 const chartConfig = {
   desktop: {
-    label: "Employees",
+    label: "Attendance",
     color: "hsl(var(--chart-1))",
   },
 }

@@ -125,7 +125,7 @@ export default function UserDashboard() {
     setLoadingAttendance(true)
     const fetchAttendance = async () => {
       try {
-        const res = await getUserAttendance(id, startDate, endDate, page, limit);
+        const res = await getUserAttendance(id, startDate, endDate, page);
         if (res.status === 200) {
           setTotalPages(res.data.totalPages)
           setYearData(res.data.data);
