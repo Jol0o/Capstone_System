@@ -22,9 +22,14 @@ import { toast } from 'sonner';
 import createUser from '@/hooks/useCreateUser';
 import { approveEmployeeRequest, getEmployeeById } from '@/lib/api';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import useAuth from '@/hooks/useAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 function UserForm({ id, setIsDialogOpen, data }) {
+    const { user } = useAuth()
+
+    console.log('UserForm data:', user);
+
     const qrCodeRef = useRef(null);
     const [userForm, setUserForm] = useState({
         name: '',
@@ -64,16 +69,16 @@ function UserForm({ id, setIsDialogOpen, data }) {
 
     console.log(userForm)
 
-               const handleChange = (e) => {
-            const { name, value, type, checked } = e.target;
-            if (type === 'number' && value < 0) {
-                return; // Prevent negative values for number inputs
-            }
-            setUserForm({
-                ...userForm,
-                [name]: type === 'checkbox' ? checked : value.trim() === '' ? value.trim() : value
-            });
-        };
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        if (type === 'number' && value < 0) {
+            return; // Prevent negative values for number inputs
+        }
+        setUserForm({
+            ...userForm,
+            [name]: type === 'checkbox' ? checked : value.trim() === '' ? value.trim() : value
+        });
+    };
 
     const axiosInstance = axios.create({
         withCredentials: true,
@@ -120,7 +125,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 basicSalary: updatedForm.basicSalary,
                 employee_id: updatedForm.employee_id,
                 hierarchy: updatedForm.hierarchy,
-                leaveCredits: parseInt(updatedForm.leaveCredits, 10)
+                leaveCredits: parseInt(updatedForm.leaveCredits, 10),
             });
 
             // Now create the user only if the employee creation is successful
@@ -187,7 +192,8 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 userForm.basicSalary,
                 updatedForm.qrcode,
                 userForm.hierarchy,
-                userForm.leaveCredits
+                userForm.leaveCredits,
+                user.name
             );
             toast("Successful", {
                 description: "Employee request approved successfully!",

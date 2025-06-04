@@ -182,7 +182,7 @@ function LeaveRequest() {
                 // Handle nested objects like `distributionCopy`
                 if (key === "distributionCopy") {
                     if (!value.employeeCopy && !value.file201) {
-                        toast("Error", {
+                        toast("Warning", {
                             description: `${fieldLabels[key]} requires at least one selection`,
                         });
                         setIsloading(false);
@@ -194,7 +194,7 @@ function LeaveRequest() {
                 // Validate 'supportingDocument' only when 'leaveType' is not 'Vacation Leave'
                 if (key === "supportingDocument" && formData.leaveType !== "Vacation Leave") {
                     if (!value) {
-                        toast("Error", {
+                        toast("Warning", {
                             description: `${fieldLabels[key]} is required for ${formData.leaveType}`,
                         });
                         setIsloading(false);
@@ -204,7 +204,7 @@ function LeaveRequest() {
 
                 // General fields check
                 if (!value && key !== "supportingDocument") { // Skip general validation for 'supportingDocument'
-                    toast("Error", {
+                    toast("Warning", {
                         description: `${fieldLabels[key]} is required`,
                     });
                     setIsloading(false);
@@ -253,7 +253,7 @@ function LeaveRequest() {
             setRequest(false);
         } catch (e) {
             console.log(e);
-            toast("Error", {
+            toast("Warning", {
                 description: e?.response?.data.message || e?.response?.data?.errors[0]?.msg || e.message || 'An error occurred, please try again.',
             });
             setIsConfirmationOpen(false);

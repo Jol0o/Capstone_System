@@ -1,132 +1,132 @@
 import React from 'react';
-import { formatCurrency , numberToWords } from "@/lib/util";
+import { formatCurrency, numberToWords } from "@/lib/util";
 import { format } from "date-fns";
 
 
 const PDFAdminPayroll = ({ data }) => {
-    function formatDate(dateString) {
-        const options = { year: "numeric", month: "long", day: "numeric" };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    }
+  function formatDate(dateString) {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
 
-    return (
-        <>
-            <div className="payslip-container">
-                {data.map((payslip, index) => {
-                    const sssDeduction = payslip.total_pay * 0.095;
-                    const philHealthDeduction = payslip.total_pay * 0.025;
-                    const pagIbigDeduction = payslip.total_pay * 0.01;
-                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
-                    const netPay = payslip.total_pay - totalDeductions;
+  return (
+    <>
+      <div className="payslip-container">
+        {data.map((payslip, index) => {
+          const sssDeduction = payslip.total_pay * 0.095;
+          const philHealthDeduction = payslip.total_pay * 0.025;
+          const pagIbigDeduction = payslip.total_pay * 0.01;
+          const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+          const netPay = payslip.total_pay - totalDeductions;
 
-                    return (
-                       <div key={index} className="payslip-card">
-        <div className="payslip-header">
-          <h1 className="header-title">Payslip</h1>
-          <h2 className="company-name">Gasbee</h2>
-        </div>
+          return (
+            <div key={index} className="payslip-card">
+              <div className="payslip-header">
+                <h1 className="header-title">Payslip</h1>
+                <h2 className="company-name">Gasbee</h2>
+              </div>
 
-        <div className="employee-details">
-          <div className="details-row">
-            <div className="detail-item">
-              <span className="detail-label">Employee name</span>
-              <span className="detail-separator">:</span>
-              <span className="detail-value">{payslip?.name}</span>
-            </div>
-              <div className="detail-item">
-              <span className="detail-label">Hierarchy</span>
-              <span className="detail-separator">:</span>
-              <span className="detail-value">{payslip?.hierarchy}</span>
-            </div>
-          </div>
-          <div className="details-row">
-            <div className="detail-item">
-              <span className="detail-label">Pay Period</span>
-              <span className="detail-separator">:</span>
-              <span className="detail-value"> {`${format(new Date(payslip.period_start), 'MMMM d')} - ${format(new Date(payslip.period_end), 'd, yyyy')}`}</span>
-            </div>
-          </div>
-          <div className="details-row">
-            <div className="detail-item">
-              <span className="detail-label">Days Worked</span>
-              <span className="detail-separator">:</span>
-              <span className="detail-value">{payslip?.days_present}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Department</span>
-              <span className="detail-separator">:</span>
-              <span className="detail-value">{payslip?.department}</span>
-            </div>
-          </div>
-        </div>
+              <div className="employee-details">
+                <div className="details-row">
+                  <div className="detail-item">
+                    <span className="detail-label">Employee name</span>
+                    <span className="detail-separator">:</span>
+                    <span className="detail-value">{payslip?.name}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Hierarchy</span>
+                    <span className="detail-separator">:</span>
+                    <span className="detail-value">{payslip?.hierarchy}</span>
+                  </div>
+                </div>
+                <div className="details-row">
+                  <div className="detail-item">
+                    <span className="detail-label">Pay Period</span>
+                    <span className="detail-separator">:</span>
+                    <span className="detail-value"> {`${format(new Date(payslip.period_start), 'MMMM d')} - ${format(new Date(payslip.period_end), 'd, yyyy')}`}</span>
+                  </div>
+                </div>
+                <div className="details-row">
+                  <div className="detail-item">
+                    <span className="detail-label">Days Worked</span>
+                    <span className="detail-separator">:</span>
+                    <span className="detail-value">{payslip?.days_present}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Department</span>
+                    <span className="detail-separator">:</span>
+                    <span className="detail-value">{payslip?.department}</span>
+                  </div>
+                </div>
+              </div>
 
-        <table className="payslip-table">
-          <thead>
-            <tr>
-              <th className="table-header left">Earnings</th>
-              <th className="table-header right">Amount</th>
-              <th className="table-header left with-padding">Deductions</th>
-              <th className="table-header right">Amount</th>
-            </tr>
-          </thead>
-         <tbody>
-            <tr>
-              <td className="with-padding">Basic Salary</td>
-              <td className="amount">{formatCurrency(payslip.total_pay)}</td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td className="with-padding">Pag-IBIG</td>
-              <td className="amount deduction">{formatCurrency(pagIbigDeduction)}</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td className="with-padding">SSS</td>
-              <td className="amount deduction">{formatCurrency(sssDeduction)}</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td className="with-padding">PhilHealth</td>
-              <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
-            </tr>
-            <tr className="total-row">
-              <td>Gross Pay</td>
-              <td className="amount">{formatCurrency(payslip.total_pay)}</td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td className="with-padding">Total Deductions</td>
-              <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td className="with-padding">Net Pay</td>
-              <td className="amount">{formatCurrency(netPay)}</td>
-            </tr>
-          </tbody>
-        </table>
+              <table className="payslip-table">
+                <thead>
+                  <tr>
+                    <th className="table-header left">Earnings</th>
+                    <th className="table-header right">Amount</th>
+                    <th className="table-header left with-padding">Deductions</th>
+                    <th className="table-header right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="with-padding">Basic Salary</td>
+                    <td className="amount">{formatCurrency(payslip.total_pay)}</td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="with-padding">Pag-IBIG</td>
+                    <td className="amount deduction">{formatCurrency(pagIbigDeduction)}</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="with-padding">SSS</td>
+                    <td className="amount deduction">{formatCurrency(sssDeduction)}</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="with-padding">PhilHealth</td>
+                    <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
+                  </tr>
+                  <tr className="total-row">
+                    <td>Gross Pay</td>
+                    <td className="amount">{formatCurrency(payslip.total_pay)}</td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="with-padding">Total Deductions</td>
+                    <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="with-padding">Net Pay</td>
+                    <td className="amount">{formatCurrency(netPay)}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-        <div className="net-amount">
-          <p className="amount-number">{formatCurrency(netPay)}</p>
-          <p className="amount-words">{numberToWords(netPay)}</p>
-        </div>
+              <div className="net-amount">
+                <p className="amount-number">{formatCurrency(netPay)}</p>
+                <p className="amount-words">{numberToWords(netPay)}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
-                    );
-                })}
-            </div>
 
-            {/* Styles */}
-            <style>
-                {`
+      {/* Styles */}
+      <style>
+        {`
                     .payslip-container {
                         margin: 0;
                         font-family: sans-serif;
@@ -280,9 +280,9 @@ const PDFAdminPayroll = ({ data }) => {
           text-wrap: nowrap;
           }
                 `}
-            </style>
-        </>
-    );
+      </style>
+    </>
+  );
 };
 
 export default PDFAdminPayroll;

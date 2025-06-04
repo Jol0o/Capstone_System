@@ -61,7 +61,7 @@ const getDateRange = () => {
     const today = new Date();
     const day = today.getDate();
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    
+
     if (day <= 15) {
         return '1-15';
     } else {
@@ -324,16 +324,16 @@ function Payroll() {
             console.log(e);
         }
     };
-    
+
     const handleGenerateAll = async (data) => {
         try {
-    
+
             if (!Array.isArray(data)) {
                 throw new Error("Data is not an array");
             }
-    
+
             const promise = generatePDF({ type: "admin", data });
-    
+
             toast.promise(promise, {
                 loading: "Exporting Payslips...",
                 success: (link) => {
@@ -345,7 +345,7 @@ function Payroll() {
                 },
                 error: "Error generating PDF",
             });
-    
+
             const pdfLink = await promise;
             if (pdfLink) {
                 setLink(pdfLink);
@@ -380,58 +380,58 @@ function Payroll() {
     };
 
     console.log(filterData)
-    
+
     if (isLoading) return <Loader />
 
     return (
         <>
-        <div className="w-full h-full overflow-hidden">
-            <div className="flex flex-col justify-between gap-2 py-4 md:items-center md:flex-row">
-                <div className="flex flex-col gap-2 md:flex-row">
-                    <Input
-                        placeholder="Filter Payrolls..."
-                        onChange={(event) => setFilter(event.target.value)}
-                        className="max-w-sm"
-                    />
-                    <div className="flex gap-2 md:items-center gap-s">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8">
-                                    <CalendarIcon className="w-4 h-4 mr-2" />
-                                    {format(new Date(startDate), "MMM d")}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={new Date(startDate)}
-                                    onSelect={handleStartDateChange}
-                                    disabled={(date) =>
-                                        date > new Date() || date < new Date("1900-01-01")
-                                    }
-                                    initialFocus
-                                />
-                            </PopoverContent>
-                        </Popover>
-                        <span className="text-gray-500">to</span>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8">
-                                    <CalendarIcon className="w-4 h-4 mr-2" />
-                                    {format(new Date(endDate), "MMM d")}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={new Date(endDate)}
-                                    onSelect={handleEndDateChange}
-                                    disabled={(date) =>
-                                        date > new Date() || date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
-                                    }
-                                    initialFocus
-                                />
-                            </PopoverContent>
+            <div className="w-full h-full overflow-hidden">
+                <div className="flex flex-col justify-between gap-2 py-4 md:items-center md:flex-row">
+                    <div className="flex flex-col gap-2 md:flex-row">
+                        <Input
+                            placeholder="Filter Payrolls..."
+                            onChange={(event) => setFilter(event.target.value)}
+                            className="max-w-sm"
+                        />
+                        <div className="flex gap-2 md:items-center gap-s">
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8">
+                                        <CalendarIcon className="w-4 h-4 mr-2" />
+                                        {format(new Date(startDate), "MMM d")}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={new Date(startDate)}
+                                        onSelect={handleStartDateChange}
+                                        disabled={(date) =>
+                                            date > new Date() || date < new Date("1900-01-01")
+                                        }
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                            <span className="text-gray-500">to</span>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8">
+                                        <CalendarIcon className="w-4 h-4 mr-2" />
+                                        {format(new Date(endDate), "MMM d")}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={new Date(endDate)}
+                                        onSelect={handleEndDateChange}
+                                        disabled={(date) =>
+                                            date > new Date() || date < new Date("1900-01-01") || (startDate && date < new Date(startDate))
+                                        }
+                                        initialFocus
+                                    />
+                                </PopoverContent>
                             </Popover>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -443,145 +443,145 @@ function Payroll() {
                                 <DropdownMenuContent className="w-auto p-0" align="start">
                                     <ScrollArea className="max-h-[200px] overflow-y-auto">
                                         {years.map((year) => (
-                                            <DropdownMenuItem  onClick={( ) => {handleYearChange(year)}} key={year} value={year}>
+                                            <DropdownMenuItem onClick={() => { handleYearChange(year) }} key={year} value={year}>
                                                 {year}
                                             </DropdownMenuItem>
                                         ))}
-                                       </ScrollArea> 
+                                    </ScrollArea>
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8">
-                                    <span>{new Date(0, month).toLocaleString('default', { month: 'long' }) || 'Month'}</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                {Array.from({ length: 12 }, (_, i) => (
-                                    <DropdownMenuItem key={i} onClick={() => handleMonthChange({ target: { value: i } })}>
-                                        {new Date(0, i).toLocaleString('default', { month: 'long' })}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8">
+                                        <span>{new Date(0, month).toLocaleString('default', { month: 'long' }) || 'Month'}</span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    {Array.from({ length: 12 }, (_, i) => (
+                                        <DropdownMenuItem key={i} onClick={() => handleMonthChange({ target: { value: i } })}>
+                                            {new Date(0, i).toLocaleString('default', { month: 'long' })}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm" className="flex items-center justify-between h-8">
+                                        <span>{dateRange || 'Date Range'}</span><ChevronDownIcon className="w-6 h-6" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
+                                        1 - 15
                                     </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="flex items-center justify-between h-8">
-                                    <span>{dateRange || 'Date Range'}</span><ChevronDownIcon className="w-6 h-6" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
-                                    1 - 15
-                                </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `16-${lastDayOfMonth}` } })}>
-                                    16 - {lastDayOfMonth}
-                                </DropdownMenuItem>
+                                        16 - {lastDayOfMonth}
+                                    </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `1-${lastDayOfMonth}` } })}>
-                                    1 - {lastDayOfMonth}
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                        1 - {lastDayOfMonth}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
-                </div>
-                <div className="flex items-center gap-1">
-                    <Button disabled={filterData.length === 0 ? true : false} size="sm" onClick={() => handleGenerateAll(filterData)} variant="outline" className="gap-1">
-                        <FileDown className="h-3.5 w-3.5" />
-                        Export Payslip
-                    </Button>
-                    <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Payroll Notification'}</Button>
-                </div>
+                    <div className="flex items-center gap-1">
+                        <Button disabled={filterData.length === 0 ? true : false} size="sm" onClick={() => handleGenerateAll(filterData)} variant="outline" className="gap-1">
+                            <FileDown className="h-3.5 w-3.5" />
+                            Export Payslip
+                        </Button>
+                        <Button disabled={loadPayroll} size="sm" onClick={handlePayroll}>{loadPayroll ? <LoaderCircle className="animate-spin" /> : 'Payroll Notification'}</Button>
+                    </div>
 
-            </div>
-            <div className="border rounded-md">
-                {filterData && filterData.length ? <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="font-bold capitalize">Name</TableHead>
-                            <TableHead className="font-bold capitalize">Hierarchy</TableHead>
-                            <TableHead className="font-bold capitalize">Start/End Period</TableHead>
-                            <TableHead className="font-bold">Absent/s</TableHead>
-                            <TableHead className="font-bold capitalize">Days/Hours Worked</TableHead>
-                            <TableHead className="font-bold text-right capitalize">Gross Pay</TableHead>
-                            <TableHead className="font-bold text-right capitalize">Net Pay</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {
-                            filterData.map(item => {
-                                const sssDeduction = item.total_pay * 0.095;
-                                const philHealthDeduction = item.total_pay * 0.025;
-                                const pagIbigDeduction = item.total_pay * 0.01;
-                                const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
-                                const netPay = item.total_pay - totalDeductions;
+                </div>
+                <div className="border rounded-md">
+                    {filterData && filterData.length ? <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="font-bold capitalize">Name</TableHead>
+                                <TableHead className="font-bold capitalize">Hierarchy</TableHead>
+                                <TableHead className="font-bold capitalize">Start/End Period</TableHead>
+                                <TableHead className="font-bold">Absent/s</TableHead>
+                                <TableHead className="font-bold capitalize">Days/Hours Worked</TableHead>
+                                <TableHead className="font-bold text-right capitalize">Gross Pay</TableHead>
+                                <TableHead className="font-bold text-right capitalize">Net Pay</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {
+                                filterData.map(item => {
+                                    const sssDeduction = item.total_pay * 0.095;
+                                    const philHealthDeduction = item.total_pay * 0.025;
+                                    const pagIbigDeduction = item.total_pay * 0.01;
+                                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+                                    const netPay = item.total_pay - totalDeductions;
 
-                                return (
-                                    <TableRow key={item.id}>
-                                        <TableCell className="flex items-center gap-1 overflow-hidden capitalize truncate whitespace-nowrap">
-                                            {item.name}
-                                        </TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">{item.hierarchy}</TableCell>
-                                        <TableCell className="capitalize whitespace-nowrap">
-                                            {`${format(new Date(item.period_start), 'MMMM d')} - ${format(new Date(item.period_end), 'd, yyyy')}`}
-                                        </TableCell>
-                                        <TableCell className="whitespace-nowrap">{item.absent}</TableCell>
-                                        <TableCell className="whitespace-nowrap">{item.days_present && `(${item.days_present} Day/s)`} {item.hours_worked} Hour/s</TableCell>
-                                        <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
-                                        <TableCell className="font-bold text-right capitalize whitespace-nowrap" onClick={() => handleNetPayClick(item)}>{formatCurrency(netPay)}</TableCell>
-                                        <TableCell className="max-w-[30px]">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="w-8 h-8 p-0">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreHorizontal className="w-4 h-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                    {/* <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.id)}>
+                                    return (
+                                        <TableRow key={item.id}>
+                                            <TableCell className="flex items-center gap-1 overflow-hidden capitalize truncate whitespace-nowrap">
+                                                {item.name}
+                                            </TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">{item.hierarchy}</TableCell>
+                                            <TableCell className="capitalize whitespace-nowrap">
+                                                {`${format(new Date(item.period_start), 'MMMM d')} - ${format(new Date(item.period_end), 'd, yyyy')}`}
+                                            </TableCell>
+                                            <TableCell className="whitespace-nowrap">{item.absent}</TableCell>
+                                            <TableCell className="whitespace-nowrap">{item.days_present && `(${item.days_present} Day/s)`} {item.hours_worked} Hour/s</TableCell>
+                                            <TableCell className="font-bold text-right capitalize whitespace-nowrap">{formatCurrency(item.total_pay)}</TableCell>
+                                            <TableCell className="font-bold text-right capitalize whitespace-nowrap" onClick={() => handleNetPayClick(item)}>{formatCurrency(netPay)}</TableCell>
+                                            <TableCell className="max-w-[30px]">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="w-8 h-8 p-0">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="w-4 h-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                        {/* <DropdownMenuItem onClick={() => navigator.clipboard.writeText(item.id)}>
                                                         Copy Payroll ID
                                                     </DropdownMenuItem> */}
-                                                    <DropdownMenuItem onClick={() => handleGenerate(item)}>
-                                                        Payslip
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => deletePayroll(item.id)}>
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })
-                        }
-                    </TableBody>
-                </Table> : <Table>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell
-                                colSpan={data.length}
-                                className="h-24 text-center"
-                            >
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>}
-            </div>
-            {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
-
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
-                        <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                    <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
-                    {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
-                        <ChevronRight className="w-4 h-4" />
-                    </Button>}
+                                                        <DropdownMenuItem onClick={() => handleGenerate(item)}>
+                                                            Payslip
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => deletePayroll(item.id)}>
+                                                            Delete
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            }
+                        </TableBody>
+                    </Table> : <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell
+                                    colSpan={data.length}
+                                    className="h-24 text-center"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>}
                 </div>
-            </div>}
-        </div>
+                {data.length > 0 && <div className="flex items-center justify-end py-4 space-x-2">
+
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" className="w-8 h-8 p-0" onClick={handlePrev}>
+                            <ChevronLeft className="w-4 h-4" />
+                        </Button>
+                        <p className="flex items-center justify-center text-xs rounded-md w-7 h-7 bg-muted">{page}</p>
+                        {totalPages !== page && <Button variant="ghost" className="w-8 h-8 p-0" onClick={handleNext}>
+                            <ChevronRight className="w-4 h-4" />
+                        </Button>}
+                    </div>
+                </div>}
+            </div>
             <NetPayDialog open={netPayDialogOpen} onClose={() => setNetPayDialogOpen(false)} employee={selectedEmployee} />
         </>
 
@@ -594,7 +594,7 @@ const NetPayDialog = ({ open, onClose, employee }) => {
     const sssDeduction = employee.total_pay * 0.095;
     const philHealthDeduction = employee.total_pay * 0.025;
     const pagIbigDeduction = employee.total_pay * 0.01;
-    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.deduction;
     const netPay = employee.total_pay - totalDeductions;
 
     const InfoRow = ({ label, value, isDeduction }) => (
@@ -627,6 +627,7 @@ const NetPayDialog = ({ open, onClose, employee }) => {
                             <InfoRow label="SSS Deduction" value={formatCurrency(sssDeduction)} isDeduction />
                             <InfoRow label="PhilHealth Deduction" value={formatCurrency(philHealthDeduction)} isDeduction />
                             <InfoRow label="Pag-IBIG Deduction" value={formatCurrency(pagIbigDeduction)} isDeduction />
+                            <InfoRow label="Late Deduction" value={formatCurrency(employee.deduction)} isDeduction />
                             <InfoRow label="Total Deductions" value={formatCurrency(totalDeductions)} isDeduction />
                             <InfoRow label="Net Pay" value={formatCurrency(netPay)} />
                         </div>

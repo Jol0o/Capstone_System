@@ -370,9 +370,9 @@ export const searchEmployee = cacheWrapper(async (search) => {
     }
 });
 
-export const searchAttendance = cacheWrapper(async (search , startDate, endDate) => {
+export const searchAttendance = cacheWrapper(async (search, startDate, endDate) => {
     try {
-        const response = await axiosInstance.get(`${API_URL}/api/search_attendance?q=${search}`,{
+        const response = await axiosInstance.get(`${API_URL}/api/search_attendance?q=${search}`, {
             params: {
                 startDate,
                 endDate,
@@ -420,7 +420,8 @@ export const getEmployeeRequest = cacheWrapper(async (limit, page) => {
         throw error;
     }
 });
-export const approveEmployeeRequest = async (id, employee_id, department, position, basicSalary, qrcode, hierarchy, leaveCredits) => {
+
+export const approveEmployeeRequest = async (id, employee_id, department, position, basicSalary, qrcode, hierarchy, leaveCredits, approved_by) => {
     try {
         console.log(id, employee_id, department, position, basicSalary, hierarchy, qrcode)
         const response = await axiosInstance.post(`${API_URL}/api/employee-requests/${id}/approve`, {
@@ -430,7 +431,8 @@ export const approveEmployeeRequest = async (id, employee_id, department, positi
             position,
             basicSalary,
             hierarchy,
-            leaveCredits: parseInt(leaveCredits, 10)
+            leaveCredits: parseInt(leaveCredits, 10),
+            approved_by
         });
         console.log('Employee request approved:', response.data);
         return response.data;

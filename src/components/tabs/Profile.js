@@ -68,7 +68,7 @@ function Profile() {
 
     const fetchUser = useCallback(async () => {
         const id = userEmail ? userEmail : user?.user_id;
-        console.log('Id',id)
+        console.log('Id', id)
         try {
             if (id) {
                 const response = await getEmployeeById(id);
@@ -114,18 +114,18 @@ function Profile() {
         }
     };
 
-       const handleSave = async (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-    
+
         let data = { ...userData };
-    
+
         if (userData.avatar && typeof userData.avatar !== 'string') {
             try {
                 const url = await uploadAvatar(userData.avatar);
                 if (url) {
                     data.avatar = url;
-    
+
                     // Update avatar in local storage
                     const user = JSON.parse(localStorage.getItem('user'));
                     if (user) {
@@ -142,10 +142,10 @@ function Profile() {
                 return;
             }
         }
-    
+
         for (let key of Object.keys(data)) {
             if (!data.avatar && key === 'avatar') continue;
-            if (key === 'day_off' || key === 'totalSalary' || key === 'monthSalary') continue;
+            if (key === 'day_off' || key === 'totalSalary' || key === 'monthSalary' || key === 'leaveCredits') continue;
             if (!data[key]) {
                 toast("Error", {
                     description: `${key} is required`,
@@ -154,7 +154,7 @@ function Profile() {
                 return;
             }
         }
-    
+
         if (showPass && data.password !== confirmPassword) {
             toast("Error", {
                 description: "Password does not match",
@@ -163,7 +163,7 @@ function Profile() {
             setShowPass(false);
             return;
         }
-    
+
         try {
             await editEmployeeData(data);
             toast("Successful", {
@@ -283,14 +283,14 @@ function Profile() {
         }).format(value);
     };
 
-useEffect(() => {
-    const sssDeduction = userData.totalSalary * 0.095;
-    const philHealthDeduction = userData.totalSalary * 0.025;
-    const pagIbigDeduction = userData.totalSalary * 0.01;
-    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
-    const calculatedNetPay = userData.totalSalary - totalDeductions;
-    setNetPay(calculatedNetPay);
-}, [userData]);
+    useEffect(() => {
+        const sssDeduction = userData.totalSalary * 0.095;
+        const philHealthDeduction = userData.totalSalary * 0.025;
+        const pagIbigDeduction = userData.totalSalary * 0.01;
+        const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+        const calculatedNetPay = userData.totalSalary - totalDeductions;
+        setNetPay(calculatedNetPay);
+    }, [userData]);
 
 
     return (
@@ -303,7 +303,7 @@ useEffect(() => {
 
                     <div className="flex gap-2">
                         {/* <Button onClick={handleDiscard} className="rounded-lg" variant="outline" size="sm"> Discard </Button> */}
-                        { user?.status === 'user'  && <Button onClick={() => setShowPass(!showPass)} className="rounded-lg" variant="outline" size="sm"> Change Password </Button>}
+                        {user?.status === 'user' && <Button onClick={() => setShowPass(!showPass)} className="rounded-lg" variant="outline" size="sm"> Change Password </Button>}
                         <Button onClick={handleSave} className="rounded-lg" size="sm">     {isLoading ? <LoaderCircle className="animate-spin" /> : 'Save'} </Button>
                     </div>
                 </div>
@@ -334,38 +334,38 @@ useEffect(() => {
                                 </div>
                                 {showPass && <> <div className="space-y-1">
                                     <Label htmlFor="password">Password</Label>
-                                        <div className="relative">
-                                     <Input type={eyePass ? 'text' : 'password'}  placeholder="*******" required id="password" value={userData?.password} name="password" onChange={handleChange} />
-                                    <Button
-                                        type="button"
-                                        onClick={() => setEyePass(!eyePass)}
-                                        className="absolute inset-y-0 right-0 flex items-center px-2"
-                                    >
-                                        {eyePass ? (
-                                            <EyeOff className="w-5 h-5" />
-                                        ) : (
-                                            <Eye className="w-5 h-5" />
-                                        )}
-                                    </Button>
-                                </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="change">Confirm Password</Label>
                                     <div className="relative">
-                                     <Input type={eyePass ? 'text' : 'password'} placeholder="*******" required id="change" value={confirmPassword} name="change" onChange={(e) => setConfirmPassword(e.target.value)} />
-                                    <Button
-                                        type="button"
-                                        onClick={() => setEyePass(!eyePass)}
-                                        className="absolute inset-y-0 right-0 flex items-center px-2"
-                                    >
-                                        {eyePass ? (
-                                            <EyeOff className="w-5 h-5" />
-                                        ) : (
-                                            <Eye className="w-5 h-5" />
-                                        )}
-                                    </Button>
+                                        <Input type={eyePass ? 'text' : 'password'} placeholder="*******" required id="password" value={userData?.password} name="password" onChange={handleChange} />
+                                        <Button
+                                            type="button"
+                                            onClick={() => setEyePass(!eyePass)}
+                                            className="absolute inset-y-0 right-0 flex items-center px-2"
+                                        >
+                                            {eyePass ? (
+                                                <EyeOff className="w-5 h-5" />
+                                            ) : (
+                                                <Eye className="w-5 h-5" />
+                                            )}
+                                        </Button>
+                                    </div>
                                 </div>
-                                </div> </>}
+                                    <div className="space-y-1">
+                                        <Label htmlFor="change">Confirm Password</Label>
+                                        <div className="relative">
+                                            <Input type={eyePass ? 'text' : 'password'} placeholder="*******" required id="change" value={confirmPassword} name="change" onChange={(e) => setConfirmPassword(e.target.value)} />
+                                            <Button
+                                                type="button"
+                                                onClick={() => setEyePass(!eyePass)}
+                                                className="absolute inset-y-0 right-0 flex items-center px-2"
+                                            >
+                                                {eyePass ? (
+                                                    <EyeOff className="w-5 h-5" />
+                                                ) : (
+                                                    <Eye className="w-5 h-5" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </div> </>}
                             </CardContent>
                         </Card>
                         <Card className="rounded-xl">
@@ -385,18 +385,18 @@ useEffect(() => {
                                         disabled={user?.status === 'user' ? true : false}
                                     />
                                 </div>
-                                :  <div className="flex items-center gap-2">
-                                    <Input
-                                        type="checkbox"
-                                        id="day_off"
-                                        checked={userData?.day_off}
-                                        name="day_off"
-                                        className="w-5 h-5"
-                                        onChange={(e) => setUserData({ ...userData, day_off: e.target.checked })}
-                                        disabled={user?.status === 'user'}
-                                    />
-                                    <Label htmlFor="day_off">Day Off</Label>
-                                </div>}
+                                    : <div className="flex items-center gap-2">
+                                        <Input
+                                            type="checkbox"
+                                            id="day_off"
+                                            checked={userData?.day_off}
+                                            name="day_off"
+                                            className="w-5 h-5"
+                                            onChange={(e) => setUserData({ ...userData, day_off: e.target.checked })}
+                                            disabled={user?.status === 'user'}
+                                        />
+                                        <Label htmlFor="day_off">Day Off</Label>
+                                    </div>}
                                 <div className="space-y-1">
                                     <Label htmlFor="position">Position / Job Title</Label>
                                     <Input

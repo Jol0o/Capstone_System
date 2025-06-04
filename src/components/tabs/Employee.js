@@ -249,7 +249,7 @@ function Employee({ setTab }) {
                                             </TableCell>
                                             <TableCell className="capitalize whitespace-nowrap">{item.department}</TableCell>
                                             <TableCell className="capitalize whitespace-nowrap">{item.position}</TableCell>
-                                            <TableCell className="capitalize whitespace-nowrap">{item.email}</TableCell>
+                                            <TableCell className="whitespace-nowrap">{item.email}</TableCell>
                                             <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
                                             <TableCell className="whitespace-nowrap">
                                                 <Badge variant={item.hierarchy === "Managerial" ? "default" : item.hierarchy === "Supervisor" ? "secondary" : "outline"}>
@@ -257,15 +257,18 @@ function Employee({ setTab }) {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="capitalize whitespace-nowrap">{item.hierarchy === 'Rank & File' ? 'Daily' : 'Monthly'}</TableCell>
-                                                                                        <TableCell className="capitalize whitespace-nowrap">
+                                            <TableCell className="capitalize whitespace-nowrap">
                                                 <Badge className={item.day_off === 0 ? 'bg-green-500' : 'bg-red-500'}>
                                                     {item.day_off === 0 ? 'On Duty' : 'Off Duty'}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap">
+                                            <TableCell className="capitalize whitespace-nowrap">
+                                                {item.approved_by}
+                                            </TableCell>
+                                            <TableCell className="capitalize max-w-[300px]  font-bold truncate whitespace-nowrap">
                                                 {formatCurrency(item.basicSalary)}
                                             </TableCell>
-                                            <TableCell className="capitalize max-w-[300px] text-right font-bold truncate whitespace-nowrap cursor-pointer" onClick={() => handleNetPayClick(item)}>
+                                            <TableCell className="capitalize max-w-[300px]  font-bold truncate whitespace-nowrap cursor-pointer" onClick={() => handleNetPayClick(item)}>
                                                 {formatCurrency(netPay)}
                                             </TableCell>
                                             <TableCell className="max-w-[30px]">
@@ -344,7 +347,7 @@ function Employee({ setTab }) {
                                         <TableCell className="flex items-center gap-1 capitalize whitespace-nowrap max-w-[200px] truncate overflow-hidden">
                                             {item.name}
                                         </TableCell>
-                                        <TableCell className="capitalize max-w-[300px] truncate whitespace-nowrap">{item.email}</TableCell>
+                                        <TableCell className="max-w-[300px] truncate whitespace-nowrap">{item.email}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.phone_number}</TableCell>
                                         <TableCell className="capitalize whitespace-nowrap">{item.status}</TableCell>
                                         <TableCell className="max-w-[30px]"> <DropdownMenu>
@@ -437,7 +440,7 @@ const NetPayDialog = ({ open, onClose, employee }) => {
     const sssDeduction = employee.totalSalary * 0.095;
     const philHealthDeduction = employee.totalSalary * 0.025;
     const pagIbigDeduction = employee.totalSalary * 0.01;
-    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.deduction;
     const netPay = employee.totalSalary - totalDeductions;
 
     const InfoRow = ({ label, value, isDeduction }) => (
@@ -471,6 +474,7 @@ const NetPayDialog = ({ open, onClose, employee }) => {
                             <InfoRow label="SSS Deduction" value={formatCurrency(sssDeduction)} isDeduction />
                             <InfoRow label="PhilHealth Deduction" value={formatCurrency(philHealthDeduction)} isDeduction />
                             <InfoRow label="Pag-IBIG Deduction" value={formatCurrency(pagIbigDeduction)} isDeduction />
+                            <InfoRow label="Late Deduction" value={formatCurrency(employee.deduction)} isDeduction />
                             <InfoRow label="Total Deductions" value={formatCurrency(totalDeductions)} isDeduction />
                             <InfoRow label="Net Pay" value={formatCurrency(netPay)} />
                         </div>
