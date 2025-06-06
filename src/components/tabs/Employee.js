@@ -239,7 +239,7 @@ function Employee({ setTab }) {
                                     const sssDeduction = item.totalSalary * 0.095;
                                     const philHealthDeduction = item.totalSalary * 0.025;
                                     const pagIbigDeduction = item.totalSalary * 0.01;
-                                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+                                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
                                     const netPay = item.totalSalary - totalDeductions;
 
                                     return (

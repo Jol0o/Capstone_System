@@ -513,7 +513,7 @@ function Payroll() {
                                     const sssDeduction = item.total_pay * 0.095;
                                     const philHealthDeduction = item.total_pay * 0.025;
                                     const pagIbigDeduction = item.total_pay * 0.01;
-                                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+                                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
                                     const netPay = item.total_pay - totalDeductions;
 
                                     return (
@@ -594,7 +594,7 @@ const NetPayDialog = ({ open, onClose, employee }) => {
     const sssDeduction = employee.total_pay * 0.095;
     const philHealthDeduction = employee.total_pay * 0.025;
     const pagIbigDeduction = employee.total_pay * 0.01;
-    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.deduction;
+    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.undertimeDeduction + employee.lateDeduction;
     const netPay = employee.total_pay - totalDeductions;
 
     const InfoRow = ({ label, value, isDeduction }) => (
@@ -627,7 +627,8 @@ const NetPayDialog = ({ open, onClose, employee }) => {
                             <InfoRow label="SSS Deduction" value={formatCurrency(sssDeduction)} isDeduction />
                             <InfoRow label="PhilHealth Deduction" value={formatCurrency(philHealthDeduction)} isDeduction />
                             <InfoRow label="Pag-IBIG Deduction" value={formatCurrency(pagIbigDeduction)} isDeduction />
-                            <InfoRow label="Late Deduction" value={formatCurrency(employee.deduction)} isDeduction />
+                            <InfoRow label="Late Deduction" value={formatCurrency(employee.lateDeduction)} isDeduction />
+                            <InfoRow label="Undertime Deduction" value={formatCurrency(employee.undertimeDeduction)} isDeduction />
                             <InfoRow label="Total Deductions" value={formatCurrency(totalDeductions)} isDeduction />
                             <InfoRow label="Net Pay" value={formatCurrency(netPay)} />
                         </div>

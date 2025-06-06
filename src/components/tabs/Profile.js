@@ -287,7 +287,7 @@ function Profile() {
         const sssDeduction = userData.totalSalary * 0.095;
         const philHealthDeduction = userData.totalSalary * 0.025;
         const pagIbigDeduction = userData.totalSalary * 0.01;
-        const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+        const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + userData.lateDeduction + userData.undertimeDeduction;
         const calculatedNetPay = userData.totalSalary - totalDeductions;
         setNetPay(calculatedNetPay);
     }, [userData]);

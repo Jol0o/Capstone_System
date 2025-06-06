@@ -9,7 +9,7 @@ export const PDFPayroll = ({ data }) => {
   const sssDeduction = total_pay * 0.095;
   const philHealthDeduction = total_pay * 0.025;
   const pagIbigDeduction = total_pay * 0.01;
-  const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+  const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + data.lateDeduction + data.undertimeDeduction;
 
   // Calculate net pay
   const netPay = total_pay - totalDeductions;
@@ -34,7 +34,7 @@ export const PDFPayroll = ({ data }) => {
               <span className="detail-separator">:</span>
               <span className="detail-value">{data?.name}</span>
             </div>
-              <div className="detail-item">
+            <div className="detail-item">
               <span className="detail-label">Hierarchy</span>
               <span className="detail-separator">:</span>
               <span className="detail-value">{data?.hierarchy}</span>
@@ -96,6 +96,12 @@ export const PDFPayroll = ({ data }) => {
               <td className="with-padding">PhilHealth</td>
               <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
             </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td className="with-padding">Tardiness (Late)</td>
+              <td className="amount deduction">{formatCurrency(payslip.lateDeduction)}</td>
+            </tr>
             <tr className="total-row">
               <td>Gross Pay</td>
               <td className="amount">{formatCurrency(total_pay)}</td>
@@ -105,8 +111,8 @@ export const PDFPayroll = ({ data }) => {
             <tr>
               <td></td>
               <td></td>
-              <td className="with-padding">Total Deductions</td>
-              <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
+              <td className="with-padding">Undertime</td>
+              <td className="amount deduction">{formatCurrency(payslip.undertimeDeduction)}</td>
             </tr>
             <tr>
               <td></td>

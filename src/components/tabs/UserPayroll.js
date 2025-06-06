@@ -99,7 +99,7 @@ function UserPayroll() {
                     const sssDeduction = item.total_pay * 0.095;
                     const philHealthDeduction = item.total_pay * 0.025;
                     const pagIbigDeduction = item.total_pay * 0.01;
-                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
 
                     // Calculate net pay
                     const netPay = item.total_pay - totalDeductions;

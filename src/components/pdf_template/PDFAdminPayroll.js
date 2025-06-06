@@ -16,7 +16,7 @@ const PDFAdminPayroll = ({ data }) => {
           const sssDeduction = payslip.total_pay * 0.095;
           const philHealthDeduction = payslip.total_pay * 0.025;
           const pagIbigDeduction = payslip.total_pay * 0.01;
-          const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction;
+          const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + payslip.lateDeduction + payslip.undertimeDeduction;
           const netPay = payslip.total_pay - totalDeductions;
 
           return (
@@ -93,6 +93,18 @@ const PDFAdminPayroll = ({ data }) => {
                     <td></td>
                     <td className="with-padding">PhilHealth</td>
                     <td className="amount deduction">{formatCurrency(philHealthDeduction)}</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="with-padding">Tardiness (Late)</td>
+                    <td className="amount deduction">{formatCurrency(payslip.lateDeduction)}</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td className="with-padding">Undertime</td>
+                    <td className="amount deduction">{formatCurrency(payslip.undertime)}</td>
                   </tr>
                   <tr className="total-row">
                     <td>Gross Pay</td>
