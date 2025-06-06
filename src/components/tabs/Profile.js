@@ -145,7 +145,7 @@ function Profile() {
 
         for (let key of Object.keys(data)) {
             if (!data.avatar && key === 'avatar') continue;
-            if (key === 'day_off' || key === 'totalSalary' || key === 'monthSalary' || key === 'leaveCredits') continue;
+            if (key === 'day_off' || key === 'totalSalary' || key === 'monthSalary' || key === 'leaveCredits' || key === "lateDeduction" || key === "undertimeDeduction") continue;
             if (!data[key]) {
                 toast("Error", {
                     description: `${key} is required`,

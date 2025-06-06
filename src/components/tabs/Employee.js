@@ -200,7 +200,7 @@ function Employee({ setTab }) {
                         <TableHeader>
                             <TableRow>
                                 {Object.keys(filterData[0])
-                                    .filter(key => !['created_at', 'qrcode', 'id', 'avatar', 'password', 'employee_id', 'monthSalary', 'leaveCredits'].includes(key))
+                                    .filter(key => !['created_at', 'qrcode', 'id', 'avatar', 'password', 'employee_id', 'monthSalary', 'leaveCredits', 'lateDeduction', 'undertimeDeduction'].includes(key))
                                     .map(key => {
                                         if (key === 'day_off') return 'status';
                                         if (key === 'email') return 'email address';
@@ -440,7 +440,7 @@ const NetPayDialog = ({ open, onClose, employee }) => {
     const sssDeduction = employee.totalSalary * 0.095;
     const philHealthDeduction = employee.totalSalary * 0.025;
     const pagIbigDeduction = employee.totalSalary * 0.01;
-    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.deduction;
+    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.lateDeduction + employee.undertimeDeduction;
     const netPay = employee.totalSalary - totalDeductions;
 
     const InfoRow = ({ label, value, isDeduction }) => (
@@ -474,7 +474,8 @@ const NetPayDialog = ({ open, onClose, employee }) => {
                             <InfoRow label="SSS Deduction" value={formatCurrency(sssDeduction)} isDeduction />
                             <InfoRow label="PhilHealth Deduction" value={formatCurrency(philHealthDeduction)} isDeduction />
                             <InfoRow label="Pag-IBIG Deduction" value={formatCurrency(pagIbigDeduction)} isDeduction />
-                            <InfoRow label="Late Deduction" value={formatCurrency(employee.deduction)} isDeduction />
+                            <InfoRow label="Late Deduction" value={formatCurrency(employee.lateDeduction)} isDeduction />
+                            <InfoRow label="Undertime Deduction" value={formatCurrency(employee.undertimeDeduction)} isDeduction />
                             <InfoRow label="Total Deductions" value={formatCurrency(totalDeductions)} isDeduction />
                             <InfoRow label="Net Pay" value={formatCurrency(netPay)} />
                         </div>
