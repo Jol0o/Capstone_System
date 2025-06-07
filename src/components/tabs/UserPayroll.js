@@ -1,5 +1,5 @@
 import useAuth from '@/hooks/useAuth';
-import { getUserPayroll } from '@/lib/api';
+import { getDeductionRates, getUserPayroll } from '@/lib/api';
 import axios from 'axios';
 import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
@@ -17,6 +17,7 @@ import { ArrowUpDown, ChevronDown, MoreHorizontal, User, Clock, FileDown, LinkIc
 import generate from '../pdf_template/generatePDF';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import Loader from '../Loader';
 
 function UserPayroll() {
     const { user } = useAuth();
@@ -25,6 +26,28 @@ function UserPayroll() {
     const [filterData, setFilteredData] = useState(null);
     const [loadingItems, setLoadingItems] = useState({}); // Track loading state for each item
     const [links, setLinks] = useState({}); // Track link state for each item
+
+    const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
+    const [isDeductionLoading, setIsDeductionLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchRates = async () => {
+            setIsDeductionLoading(true);
+            const res = await getDeductionRates();
+            if (res.success) {
+                setDeductionRates({
+                    sss: res.rates.sss ?? 0.095,
+                    philhealth: res.rates.philhealth ?? 0.025,
+                    pagibig: res.rates.pagibig ?? 0.01,
+                });
+            } else {
+                setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+            }
+            setIsDeductionLoading(false);
+        };
+        fetchRates();
+    }, []);
+
 
     const limit = 5;
 
@@ -59,7 +82,7 @@ function UserPayroll() {
         setLoadingItems(prev => ({ ...prev, [item.id]: true }));
         console.log(item);
         try {
-            const link = await generate({ type: "payroll", data: item });
+            const link = await generate({ type: "payroll", data: item, deductionRates });
             if (link) {
                 window.open(link, '_blank');
                 toast("Success", {
@@ -91,74 +114,75 @@ function UserPayroll() {
         }).format(value);
     };
 
+    if (isDeductionLoading || !deductionRates) return <Loader />;
+
     return (
         <div className="max-w-[1000px] m-auto flex flex-col gap-5">
-            {data.length > 0 ? data.map(item => 
-                {
-                    // Calculate deductions
-                    const sssDeduction = item.total_pay * 0.095;
-                    const philHealthDeduction = item.total_pay * 0.025;
-                    const pagIbigDeduction = item.total_pay * 0.01;
-                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
+            {data.length > 0 ? data.map(item => {
+                // Calculate deductions
+                const sssDeduction = item.totalSalary * (deductionRates?.sss ?? 0);
+                const philHealthDeduction = item.totalSalary * (deductionRates?.philhealth ?? 0);
+                const pagIbigDeduction = item.totalSalary * (deductionRates?.pagibig ?? 0);
+                const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
 
-                    // Calculate net pay
-                    const netPay = item.total_pay - totalDeductions;
+                // Calculate net pay
+                const netPay = item.total_pay - totalDeductions;
 
-                    return(
-                        <Card key={item.id} className="w-full ">
-                            <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
-                                <CardTitle className="text-xl font-bold">Payslip</CardTitle>
-                                <div className="flex space-x-2">
-                                    <Button disabled variant="outline" size='sm'>
-                                        Paid
-                                    </Button>
-                                    <Button
-                                        disabled={loadingItems[item.id]}
-                                        size='sm'
-                                        onClick={() => handleGenerate(item)}
-                                        className="bg-blue-600 hover:bg-blue-700"
-                                    >
-                                        {loadingItems[item.id] ? <LoaderCircle className="animate-spin" /> : 'Generate Payslip'}
-                                    </Button>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="flex items-start justify-between">
-                                    <div className="space-y-4">
-                                        <div className="flex items-center space-x-2 text-[clamp(12px, 18px, 5vw)] ">
-                                            <Clock size={16} />
-                                            <span>Hours worked: </span>
-                                            <span >{item.hours_worked} Hour/s</span>
-                                        </div>
-                                        <div className="flex items-center text-[clamp(12px, 18px, 5vw)] space-x-2 ">
-                                            <span>Amount: </span>
-                                            <span >{formatCurrency(netPay)}</span>
-                                        </div>
+                return (
+                    <Card key={item.id} className="w-full ">
+                        <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
+                            <CardTitle className="text-xl font-bold">Payslip</CardTitle>
+                            <div className="flex space-x-2">
+                                <Button disabled variant="outline" size='sm'>
+                                    Paid
+                                </Button>
+                                <Button
+                                    disabled={loadingItems[item.id]}
+                                    size='sm'
+                                    onClick={() => handleGenerate(item)}
+                                    className="bg-blue-600 hover:bg-blue-700"
+                                >
+                                    {loadingItems[item.id] ? <LoaderCircle className="animate-spin" /> : 'Generate Payslip'}
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="flex items-start justify-between">
+                                <div className="space-y-4">
+                                    <div className="flex items-center space-x-2 text-[clamp(12px, 18px, 5vw)] ">
+                                        <Clock size={16} />
+                                        <span>Hours worked: </span>
+                                        <span >{item.hours_worked} Hour/s</span>
                                     </div>
-                                    <div className="text-sm sm:text-[clamp(12px, 18px, 5vw)] ">
-                                        Period:  {`${format(new Date(item.period_start), 'MMMM d')} - ${format(new Date(item.period_end), 'd, yyyy')}`}
+                                    <div className="flex items-center text-[clamp(12px, 18px, 5vw)] space-x-2 ">
+                                        <span>Amount: </span>
+                                        <span >{formatCurrency(netPay)}</span>
                                     </div>
                                 </div>
+                                <div className="text-sm sm:text-[clamp(12px, 18px, 5vw)] ">
+                                    Period:  {`${format(new Date(item.period_start), 'MMMM d')} - ${format(new Date(item.period_end), 'd, yyyy')}`}
+                                </div>
+                            </div>
 
-                                {links[item.id] && <div className="space-y-2">
-                                    <div className="flex items-center space-x-2 text-sm ">
-                                        <LinkIcon size={16} />
-                                        <span>Payroll Link:</span>
-                                    </div>
-                                    <Input
-                                        value={links[item.id]}
-                                        readOnly
-                                        className="font-mono text-sm"
-                                    />
-                                    <Button onClick={() => downloadPDF(links[item.id])} className="bg-blue-600 hover:bg-blue-700">
-                                        Download
-                                    </Button>
-                                </div>}
-                            </CardContent>
-                        </Card>
-                    )
-                }
-                
+                            {links[item.id] && <div className="space-y-2">
+                                <div className="flex items-center space-x-2 text-sm ">
+                                    <LinkIcon size={16} />
+                                    <span>Payroll Link:</span>
+                                </div>
+                                <Input
+                                    value={links[item.id]}
+                                    readOnly
+                                    className="font-mono text-sm"
+                                />
+                                <Button onClick={() => downloadPDF(links[item.id])} className="bg-blue-600 hover:bg-blue-700">
+                                    Download
+                                </Button>
+                            </div>}
+                        </CardContent>
+                    </Card>
+                )
+            }
+
             ) : <Card className="rounded-xl">
                 <CardContent className="flex flex-col text-xl font-semibold ite">
                     <CardDescription className="flex items-center justify-center">

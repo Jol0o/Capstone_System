@@ -537,3 +537,36 @@ export const checkLeaveRequest = async () => {
         throw e
     }
 }
+
+export const getDeductionRates = async () => {
+    try {
+        const res = await axiosInstance.get(`${API_URL}/api/deduction-rates`);
+        if (res.status === 200 && res.data && res.data.success) {
+            return { success: true, rates: res.data.rates };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+};
+
+// Update a deduction rate
+export const updateDeductionRate = async (key, value) => {
+    try {
+        // Ensure value is a number before sending
+        const numValue = Number(value);
+        const res = await axiosInstance.put(
+            `${API_URL}/api/deduction-rate/${encodeURIComponent(key)}`,
+            { value: numValue }
+        );
+        if (res.status === 200 && res.data && res.data.success) {
+            return { success: true, key: res.data.key, value: res.data.value };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        console.log(e)
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+};

@@ -23,7 +23,7 @@ import useAuth from '@/hooks/useAuth';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/hooks/useStore';
-import { removeEmployee, searchEmployee, sendEmailToEmployee, getEmployeeRequest, removeEmployeeRequest, exportData } from '@/lib/api';
+import { removeEmployee, searchEmployee, sendEmailToEmployee, getEmployeeRequest, removeEmployeeRequest, exportData, getDeductionRates } from '@/lib/api';
 import Loader from '../Loader';
 import ApproveEmployee from '../modal/ApproveEmployee';
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -46,6 +46,27 @@ function Employee({ setTab }) {
     const [open, setOpen] = useState(false)
     const [netPayDialogOpen, setNetPayDialogOpen] = useState(false)
     const [selectedEmployee, setSelectedEmployee] = useState(null)
+    const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
+    const [isDeductionLoading, setIsDeductionLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchRates = async () => {
+            setIsDeductionLoading(true);
+            const res = await getDeductionRates();
+            if (res.success) {
+                setDeductionRates({
+                    sss: res.rates.sss ?? 0.095,
+                    philhealth: res.rates.philhealth ?? 0.025,
+                    pagibig: res.rates.pagibig ?? 0.01,
+                });
+            } else {
+                setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+            }
+            setIsDeductionLoading(false);
+        };
+        fetchRates();
+    }, []);
+
     const table = "employees"
 
     useEffect(() => {
@@ -155,7 +176,8 @@ function Employee({ setTab }) {
     )
 
 
-    if (isLoading) return <Loader />
+    if (isLoading || isDeductionLoading || !deductionRates) return <Loader />;
+
 
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('en-PH', {
@@ -236,9 +258,9 @@ function Employee({ setTab }) {
                         <TableBody>
                             {
                                 filterData.map(item => {
-                                    const sssDeduction = item.totalSalary * 0.095;
-                                    const philHealthDeduction = item.totalSalary * 0.025;
-                                    const pagIbigDeduction = item.totalSalary * 0.01;
+                                    const sssDeduction = item.totalSalary * (deductionRates?.sss ?? 0);
+                                    const philHealthDeduction = item.totalSalary * (deductionRates?.philhealth ?? 0);
+                                    const pagIbigDeduction = item.totalSalary * (deductionRates?.pagibig ?? 0);
                                     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
                                     const netPay = item.totalSalary - totalDeductions;
 
@@ -428,18 +450,18 @@ function Employee({ setTab }) {
                     </ScrollArea>
                 </DialogContent>
             </Dialog>
-            <NetPayDialog open={netPayDialogOpen} onClose={() => setNetPayDialogOpen(false)} employee={selectedEmployee} />
+            <NetPayDialog open={netPayDialogOpen} onClose={() => setNetPayDialogOpen(false)} employee={selectedEmployee} deductionRates={deductionRates} />
         </>
     )
 }
 
 
-const NetPayDialog = ({ open, onClose, employee }) => {
+const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
     if (!employee) return null;
 
-    const sssDeduction = employee.totalSalary * 0.095;
-    const philHealthDeduction = employee.totalSalary * 0.025;
-    const pagIbigDeduction = employee.totalSalary * 0.01;
+    const sssDeduction = employee.totalSalary * (deductionRates?.sss ?? 0);
+    const philHealthDeduction = employee.totalSalary * (deductionRates?.philhealth ?? 0);
+    const pagIbigDeduction = employee.totalSalary * (deductionRates?.pagibig ?? 0);
     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.lateDeduction + employee.undertimeDeduction;
     const netPay = employee.totalSalary - totalDeductions;
 

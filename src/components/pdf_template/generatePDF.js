@@ -7,18 +7,18 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 const PDF_CO_API_KEY = 'mariabasas21@gmail.com_VE9BuAxZpNZ4FSaXHOdWfAFnWDKycu3O1EWrLIQ8W6vtBlIcomwmFwqXSX5DC2Fe'; // Ensure the environment variable is correctly named
 
-const generatePDF = async ({ data, type = "request" }) => {
-    let htmlContent;
+const generatePDF = async ({ data, type = "request", deductionRates }) => {
+  let htmlContent;
 
-    if (type === "admin") {
-        htmlContent = renderToStaticMarkup(<PDFAdminPayroll data={data} />);
-    } else if (type === "payroll") {
-        htmlContent = renderToStaticMarkup(<PDFPayroll data={data} />);
-    } else {
-        htmlContent = renderToStaticMarkup(<PDFTemplate data={data} type={type} />);
-    }
+  if (type === "admin") {
+    htmlContent = renderToStaticMarkup(<PDFAdminPayroll data={data} deductionRates={deductionRates} />);
+  } else if (type === "payroll") {
+    htmlContent = renderToStaticMarkup(<PDFPayroll data={data} deductionRates={deductionRates} />);
+  } else {
+    htmlContent = renderToStaticMarkup(<PDFTemplate data={data} type={type} />);
+  }
 
-    const fullHtmlContent = `
+  const fullHtmlContent = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -224,66 +224,66 @@ const generatePDF = async ({ data, type = "request" }) => {
         </html>
     `;
 
-    try {
-        // Base64 encode the HTML content
-        const base64Content = Buffer.from(fullHtmlContent).toString("base64");
+  try {
+    // Base64 encode the HTML content
+    const base64Content = Buffer.from(fullHtmlContent).toString("base64");
 
-        // Upload HTML to PDF.co
-        const uploadResponse = await fetch('https://api.pdf.co/v1/file/upload/base64', {
-            method: "POST",
-            headers: {
-                "x-api-key": PDF_CO_API_KEY,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                file: base64Content,  // Use the correct parameter "file"
-            }),
-        });
+    // Upload HTML to PDF.co
+    const uploadResponse = await fetch('https://api.pdf.co/v1/file/upload/base64', {
+      method: "POST",
+      headers: {
+        "x-api-key": PDF_CO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        file: base64Content,  // Use the correct parameter "file"
+      }),
+    });
 
-        const uploadResult = await uploadResponse.json();
-      if (uploadResult.error) throw new Error(uploadResult.message);
-      
-      const getFilename = (name) => {
-        const nameParts = name.split(' ');
-        if (nameParts.length === 2) {
-            // Format: surname, firstname
-            return `${nameParts[1]}, ${nameParts[0]}.pdf`;
-        } else if (nameParts.length === 3) {
-            // Format: surname, firstname, middlename
-            return `${nameParts[2]}, ${nameParts[0]}, ${nameParts[1]}.pdf`;
-        } else {
-            return `${name}.pdf`; // Fallback for unexpected name formats
-        }
+    const uploadResult = await uploadResponse.json();
+    if (uploadResult.error) throw new Error(uploadResult.message);
+
+    const getFilename = (name) => {
+      const nameParts = name.split(' ');
+      if (nameParts.length === 2) {
+        // Format: surname, firstname
+        return `${nameParts[1]}, ${nameParts[0]}.pdf`;
+      } else if (nameParts.length === 3) {
+        // Format: surname, firstname, middlename
+        return `${nameParts[2]}, ${nameParts[0]}, ${nameParts[1]}.pdf`;
+      } else {
+        return `${name}.pdf`; // Fallback for unexpected name formats
+      }
     };
 
     const filename = type === "payroll"
-        ? getFilename(data.name)
-        : type === "admin"
+      ? getFilename(data.name)
+      : type === "admin"
         ? "GeneratedPayslip.pdf"
         : "LeaveForm.pdf";
 
-        // Now send the HTML content directly for conversion
-        const convertResponse = await fetch("https://api.pdf.co/v1/pdf/convert/from/html", {
-            method: "POST",
-            headers: {
-                "x-api-key": PDF_CO_API_KEY,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                html: fullHtmlContent,  // Use the "html" parameter directly
-              name: filename,
-            }),
-        });
+    // Now send the HTML content directly for conversion
+    const convertResponse = await fetch("https://api.pdf.co/v1/pdf/convert/from/html", {
+      method: "POST",
+      headers: {
+        "x-api-key": PDF_CO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        html: fullHtmlContent,  // Use the "html" parameter directly
+        name: filename,
+      }),
+    });
 
-        const convertResult = await convertResponse.json();
-        if (convertResult.error) throw new Error(convertResult.message);
+    const convertResult = await convertResponse.json();
+    if (convertResult.error) throw new Error(convertResult.message);
 
-        // Return the URL of the generated PDF
-        return convertResult.url;
-    } catch (error) {
-        console.error("PDF.co Error:", error);
-        throw error;
-    }
+    // Return the URL of the generated PDF
+    return convertResult.url;
+  } catch (error) {
+    console.error("PDF.co Error:", error);
+    throw error;
+  }
 };
 
 

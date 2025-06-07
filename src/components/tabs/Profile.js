@@ -61,6 +61,26 @@ function Profile() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [eyePass, setEyePass] = useState(false)
     const [netPay, setNetPay] = useState(0);
+    const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
+    const [isDeductionLoading, setIsDeductionLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchRates = async () => {
+            setIsDeductionLoading(true);
+            const res = await getDeductionRates();
+            if (res.success) {
+                setDeductionRates({
+                    sss: res.rates.sss ?? 0.095,
+                    philhealth: res.rates.philhealth ?? 0.025,
+                    pagibig: res.rates.pagibig ?? 0.01,
+                });
+            } else {
+                setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+            }
+            setIsDeductionLoading(false);
+        };
+        fetchRates();
+    }, []);
 
     const filteredValue = yearData.filter(data =>
         isWithinInterval(new Date(data.date), { start: currentMonthStart, end: currentMonthEnd })
@@ -284,13 +304,13 @@ function Profile() {
     };
 
     useEffect(() => {
-        const sssDeduction = userData.totalSalary * 0.095;
-        const philHealthDeduction = userData.totalSalary * 0.025;
-        const pagIbigDeduction = userData.totalSalary * 0.01;
+        const sssDeduction = userData.totalSalary * (deductionRates?.sss ?? 0);
+        const philHealthDeduction = userData.totalSalary * (deductionRates?.philhealth ?? 0);
+        const pagIbigDeduction = userData.totalSalary * (deductionRates?.pagibig ?? 0);
         const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + userData.lateDeduction + userData.undertimeDeduction;
         const calculatedNetPay = userData.totalSalary - totalDeductions;
         setNetPay(calculatedNetPay);
-    }, [userData]);
+    }, [userData, deductionRates]);
 
 
     return (

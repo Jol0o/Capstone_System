@@ -9,11 +9,12 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Shield, Eye, EyeOff, Save, LogOut } from 'lucide-react'
 import useAuth from '@/hooks/useAuth';
-import { logoutUser, getAdminData, updateAdmin } from "@/lib/api";
+import { logoutUser, getAdminData, updateAdmin, getDeductionRates, updateDeductionRate } from "@/lib/api";
 import Loader from '../Loader';
 import { toast } from "sonner";
 import { useRouter } from "next/navigation"
 import { useStore } from '@/hooks/useStore'
+import { Loader2 } from 'lucide-react'
 
 export function AdminProfile() {
     const { user } = useAuth()
@@ -23,8 +24,30 @@ export function AdminProfile() {
     const [name, setName] = useState("")
     const [position, setPosition] = useState("System Administrator")
     const [isLoading, setIsLoading] = useState(false)
-      const { removeAllUser } = useStore();
+    const { removeAllUser } = useStore();
     const router = useRouter()
+
+    const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
+    const [isDeductionLoading, setIsDeductionLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchRates = async () => {
+            setIsDeductionLoading(true);
+            const res = await getDeductionRates();
+            if (res.success) {
+                console.log(res)
+                setDeductionRates({
+                    sss: res.rates.sss_rate,
+                    philhealth: res.rates.philhealth_rate,
+                    pagibig: res.rates.pagibig_rate,
+                });
+            } else {
+                setDeductionRates({ sss: 0, philhealth: 0, pagibig: 0 });
+            }
+            setIsDeductionLoading(false);
+        };
+        fetchRates();
+    }, []);
 
     useEffect(() => {
         if (!user) return;
@@ -38,7 +61,7 @@ export function AdminProfile() {
                 setEmail(data.email);
                 setPosition(data.position || user.position);
                 setName(data.name || user.name)
-                console.log('Admin',user)
+                console.log('Admin', user)
                 setIsLoading(false)
             } catch (e) {
                 console.log(e);
@@ -115,7 +138,7 @@ export function AdminProfile() {
         }
     }
 
-    if (isLoading) return <Loader />
+    if (isLoading || isDeductionLoading || !deductionRates) return <Loader />;
 
     return (
         <div className="container p-6 mx-auto">
@@ -196,6 +219,7 @@ export function AdminProfile() {
 
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold">Quick Actions</h3>
+                        <TaxRatesCard deductionRates={deductionRates} setDeductionRates={setDeductionRates} isDeductionLoading={isDeductionLoading} />
                         <div className="grid grid-cols-2 gap-4">
                             <Button variant="outline" className="h-auto py-4" onClick={() => router.push('/admin-accounts')}>
                                 Manage Admins
@@ -215,5 +239,182 @@ export function AdminProfile() {
                 </CardContent>
             </Card>
         </div>
+    )
+}
+
+// Mock function - replace with your actual API call
+const updateDeductionRates = async (rates) => {
+    try {
+        // Use the correct keys from rates
+        const results = await Promise.all([
+            updateDeductionRate('sss_rate', Number(rates.sss_rate)),
+            updateDeductionRate('philhealth_rate', Number(rates.philhealth_rate)),
+            updateDeductionRate('pagibig_rate', Number(rates.pagibig_rate)),
+        ]);
+        if (results.every(r => r.success)) {
+            return { success: true };
+        } else {
+            return { success: false, error: "Failed to update one or more rates." };
+        }
+    } catch (error) {
+        return { success: false, error: error.message || "Unknown error" };
+    }
+};
+
+export default function TaxRatesCard({ deductionRates, setDeductionRates, isDeductionLoading }) {
+
+    const [rates, setRates] = useState({
+        sss_rate: 0,
+        philhealth_rate: 0,
+        pagibig_rate: 0,
+    })
+    const [isSaving, setIsSaving] = useState(false)
+
+    useEffect(() => {
+        if (deductionRates) {
+            setRates({
+                sss_rate: deductionRates.sss,
+                philhealth_rate: deductionRates.philhealth,
+                pagibig_rate: deductionRates.pagibig,
+            })
+        }
+    }, [deductionRates])
+
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        // Convert to number and limit to 3 decimal places
+        const numValue = Number.parseFloat(Number.parseFloat(value).toFixed(3))
+        setRates((prev) => ({
+            ...prev,
+            [name]: isNaN(numValue) ? 0 : numValue,
+        }))
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setIsSaving(true)
+
+        try {
+            const response = await updateDeductionRates(rates)
+            console.log(response)
+            if (response.success) {
+                setDeductionRates({
+                    sss: rates.sss_rate,
+                    philhealth: rates.philhealth_rate,
+                    pagibig: rates.pagibig_rate,
+                });
+                toast("Success", {
+                    description: "Tax rates updated successfully",
+                })
+            } else {
+                toast("Error", {
+                    description: "Failed to update tax rates",
+                })
+            }
+        } catch (error) {
+            toast("Error", {
+                description: "An unexpected error occurred",
+            })
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    if (isDeductionLoading) {
+        return (
+            <Card className="w-full">
+                <CardHeader>
+                    <CardTitle>Tax Rates</CardTitle>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center py-8">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                </CardContent>
+            </Card>
+        )
+    }
+
+    return (
+        <Card className="w-full">
+            <CardHeader>
+                <CardTitle>Tax Rates</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="sss_rate">SSS Rate</Label>
+                        <div className="relative">
+                            <Input
+                                id="sss_rate"
+                                name="sss_rate"
+                                type="number"
+                                step="0.001"
+                                min="0"
+                                max="1"
+                                value={rates.sss_rate}
+                                onChange={handleChange}
+                                className="pr-12"
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span className="text-sm text-muted-foreground">{(rates.sss_rate * 100).toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="philhealth_rate">PhilHealth Rate</Label>
+                        <div className="relative">
+                            <Input
+                                id="philhealth_rate"
+                                name="philhealth_rate"
+                                type="number"
+                                step="0.001"
+                                min="0"
+                                max="1"
+                                value={rates.philhealth_rate}
+                                onChange={handleChange}
+                                className="pr-12"
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span className="text-sm text-muted-foreground">{(rates.philhealth_rate * 100).toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="pagibig_rate">Pag-IBIG Rate</Label>
+                        <div className="relative">
+                            <Input
+                                id="pagibig_rate"
+                                name="pagibig_rate"
+                                type="number"
+                                step="0.001"
+                                min="0"
+                                max="1"
+                                value={rates.pagibig_rate}
+                                onChange={handleChange}
+                                className="pr-12"
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span className="text-sm text-muted-foreground">{(rates.pagibig_rate * 100).toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button type="submit" className="w-full" disabled={isSaving}>
+                        {isSaving ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Saving Changes
+                            </>
+                        ) : (
+                            <>
+                                <Save className="w-4 h-4 mr-2" />
+                                Save Changes
+                            </>
+                        )}
+                    </Button>
+                </form>
+            </CardContent>
+        </Card>
     )
 }

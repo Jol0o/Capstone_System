@@ -3,7 +3,7 @@ import { formatCurrency, numberToWords } from "@/lib/util";
 import { format } from "date-fns";
 
 
-const PDFAdminPayroll = ({ data }) => {
+const PDFAdminPayroll = ({ data, deductionRates }) => {
   function formatDate(dateString) {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -13,9 +13,9 @@ const PDFAdminPayroll = ({ data }) => {
     <>
       <div className="payslip-container">
         {data.map((payslip, index) => {
-          const sssDeduction = payslip.total_pay * 0.095;
-          const philHealthDeduction = payslip.total_pay * 0.025;
-          const pagIbigDeduction = payslip.total_pay * 0.01;
+          const sssDeduction = payslip.total_pay * deductionRates.sss;
+          const philHealthDeduction = payslip.total_pay * deductionRates.philhealth;
+          const pagIbigDeduction = payslip.total_pay * deductionRates.pagibig;
           const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + payslip.lateDeduction + payslip.undertimeDeduction;
           const netPay = payslip.total_pay - totalDeductions;
 

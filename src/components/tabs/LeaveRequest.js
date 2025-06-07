@@ -12,7 +12,7 @@ import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import useAuth from '@/hooks/useAuth';
 import { toast } from "sonner"
-import { getEmployeeById, submitRequest, userRequests, removeLeaveRequest } from '@/lib/api';
+import { getEmployeeById, submitRequest, userRequests, removeLeaveRequest, getDeductionRates } from '@/lib/api';
 import { Badge } from "@/components/ui/badge"
 import { LoaderCircle, MoreHorizontal, LinkIcon } from 'lucide-react';
 import { io } from 'socket.io-client';
@@ -265,11 +265,31 @@ function LeaveRequest() {
 
     console.log(formData)
 
+    const [deductionRates, setDeductionRates] = useState({
+        sss: 0,
+        philhealth: 0,
+        pagibig: 0,
+    });
+
+    useEffect(() => {
+        const fetchRates = async () => {
+            const res = await getDeductionRates();
+            if (res.success) {
+                setDeductionRates({
+                    sss: res.rates.sss || 0.095,
+                    philhealth: res.rates.philhealth || 0.025,
+                    pagibig: res.rates.pagibig || 0.01,
+                });
+            }
+        };
+        fetchRates();
+    }, []);
+
     const handleGenerate = async (data) => {
         setLoadGenerate(true);
         console.log(data);
         try {
-            const promise = generatePDF({ data });
+            const promise = generatePDF({ data, deductionRates });
 
             toast.promise(promise, {
                 loading: 'Generating PDF...',

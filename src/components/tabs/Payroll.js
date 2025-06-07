@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import useAuth from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import { checkPayroll, exportPayroll, getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
+import { checkPayroll, exportPayroll, getDeductionRates, getPayrolls, removePayroll, searchPayroll } from '@/lib/api';
 import * as XLSX from 'xlsx';
 import Loader from '../Loader';
 import { format, parse, differenceInMinutes } from 'date-fns';
@@ -85,6 +85,27 @@ function Payroll() {
     const [open, setOpen] = useState(false)
     const [netPayDialogOpen, setNetPayDialogOpen] = useState(false)
     const [selectedEmployee, setSelectedEmployee] = useState(null)
+    const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
+    const [isDeductionLoading, setIsDeductionLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchRates = async () => {
+            setIsDeductionLoading(true);
+            const res = await getDeductionRates();
+            if (res.success) {
+                setDeductionRates({
+                    sss: res.rates.sss ?? 0.095,
+                    philhealth: res.rates.philhealth ?? 0.025,
+                    pagibig: res.rates.pagibig ?? 0.01,
+                });
+            } else {
+                setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+            }
+            setIsDeductionLoading(false);
+        };
+        fetchRates();
+    }, []);
+
     const table = "payroll"
 
     const currentDate = new Date();
@@ -296,7 +317,7 @@ function Payroll() {
     };
 
     const handleGenerate = async (data) => {
-        const promise = generatePDF({ type: "payroll", data });
+        const promise = generatePDF({ type: "payroll", data, deductionRates });
 
         toast.promise(promise, {
             loading: 'Exporting Payslips...',
@@ -332,7 +353,7 @@ function Payroll() {
                 throw new Error("Data is not an array");
             }
 
-            const promise = generatePDF({ type: "admin", data });
+            const promise = generatePDF({ type: "admin", data, deductionRates });
 
             toast.promise(promise, {
                 loading: "Exporting Payslips...",
@@ -381,7 +402,7 @@ function Payroll() {
 
     console.log(filterData)
 
-    if (isLoading) return <Loader />
+    if (isLoading || isDeductionLoading || !deductionRates) return <Loader />;
 
     return (
         <>
@@ -510,9 +531,9 @@ function Payroll() {
                         <TableBody>
                             {
                                 filterData.map(item => {
-                                    const sssDeduction = item.total_pay * 0.095;
-                                    const philHealthDeduction = item.total_pay * 0.025;
-                                    const pagIbigDeduction = item.total_pay * 0.01;
+                                    const sssDeduction = item.totalSalary * (deductionRates?.sss ?? 0);
+                                    const philHealthDeduction = item.totalSalary * (deductionRates?.philhealth ?? 0);
+                                    const pagIbigDeduction = item.totalSalary * (deductionRates?.pagibig ?? 0);
                                     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
                                     const netPay = item.total_pay - totalDeductions;
 
@@ -582,18 +603,18 @@ function Payroll() {
                     </div>
                 </div>}
             </div>
-            <NetPayDialog open={netPayDialogOpen} onClose={() => setNetPayDialogOpen(false)} employee={selectedEmployee} />
+            <NetPayDialog open={netPayDialogOpen} onClose={() => setNetPayDialogOpen(false)} employee={selectedEmployee} deductionRates={deductionRates} />
         </>
 
     )
 }
 
-const NetPayDialog = ({ open, onClose, employee }) => {
+const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
     if (!employee) return null;
 
-    const sssDeduction = employee.total_pay * 0.095;
-    const philHealthDeduction = employee.total_pay * 0.025;
-    const pagIbigDeduction = employee.total_pay * 0.01;
+    const sssDeduction = employee.totalSalary * (deductionRates?.sss ?? 0);
+    const philHealthDeduction = employee.totalSalary * (deductionRates?.philhealth ?? 0);
+    const pagIbigDeduction = employee.totalSalary * (deductionRates?.pagibig ?? 0);
     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.undertimeDeduction + employee.lateDeduction;
     const netPay = employee.total_pay - totalDeductions;
 

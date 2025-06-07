@@ -2,13 +2,13 @@ import * as React from "react";
 import { format } from "date-fns";
 import { formatCurrency, numberToWords } from "@/lib/util";
 
-export const PDFPayroll = ({ data }) => {
+export const PDFPayroll = ({ data, deductionRates }) => {
   const { total_pay } = data;
 
   // Calculate deductions
-  const sssDeduction = total_pay * 0.095;
-  const philHealthDeduction = total_pay * 0.025;
-  const pagIbigDeduction = total_pay * 0.01;
+  const sssDeduction = payslip.total_pay * deductionRates.sss;
+  const philHealthDeduction = payslip.total_pay * deductionRates.philhealth;
+  const pagIbigDeduction = payslip.total_pay * deductionRates.pagibig;
   const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + data.lateDeduction + data.undertimeDeduction;
 
   // Calculate net pay

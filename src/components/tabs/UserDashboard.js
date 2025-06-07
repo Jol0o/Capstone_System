@@ -69,6 +69,27 @@ export default function UserDashboard() {
   const [totalPages, setTotalPages] = useState(1)
   const [page, setPage] = useState(1)
   const limit = 5
+  const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
+  const [isDeductionLoading, setIsDeductionLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      setIsDeductionLoading(true);
+      const res = await getDeductionRates();
+      if (res.success) {
+        setDeductionRates({
+          sss: res.rates.sss ?? 0.095,
+          philhealth: res.rates.philhealth ?? 0.025,
+          pagibig: res.rates.pagibig ?? 0.01,
+        });
+      } else {
+        setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+      }
+      setIsDeductionLoading(false);
+    };
+    fetchRates();
+  }, []);
+
 
   const defaultStartDate = new Date();
   defaultStartDate.setDate(defaultStartDate.getDate() - 15);
@@ -144,7 +165,8 @@ export default function UserDashboard() {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
-  if (loading) return <Loader />
+  if (loading || isDeductionLoading || !deductionRates) return <Loader />;
+
 
   const getStatusVariant = (status) => {
     switch (status) {
@@ -450,9 +472,9 @@ export default function UserDashboard() {
                   </TableHeader>
                   <TableBody>
                     {dashboardData?.allPayroll && dashboardData.allPayroll.map((payroll, index) => {
-                      const sssDeduction = payroll.total_pay * 0.095;
-                      const philHealthDeduction = payroll.total_pay * 0.025;
-                      const pagIbigDeduction = payroll.total_pay * 0.01;
+                      const sssDeduction = payroll.totalSalary * (deductionRates?.sss ?? 0);
+                      const philHealthDeduction = payroll.totalSalary * (deductionRates?.philhealth ?? 0);
+                      const pagIbigDeduction = payroll.totalSalary * (deductionRates?.pagibig ?? 0);
                       const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + payroll.lateDeduction + payroll.undertimeDeduction;
 
                       // Calculate net pay

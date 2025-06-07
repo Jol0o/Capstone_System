@@ -8,23 +8,23 @@ export const PDFTemplate = ({ data, type }) => {
   return (
     <div className="form-container">
       <div className="header">
-        <img 
-          src="/placeholder.svg?height=50&width=200" 
-          alt="GASBEE PO! Logo with Bee" 
+        <img
+          src="/placeholder.svg?height=50&width=200"
+          alt="GASBEE PO! Logo with Bee"
           className="header-logo"
         />
         <p className="header-subtitle">BEE GAS GANDA! • PRESYONG BODEGA!</p>
       </div>
-      
+
       <h1 className="form-title">
         APPLICATION FOR LEAVE FORM
       </h1>
-      
+
       <div className="form-content">
         <div className="grid-2-cols">
           <div className="form-cell-border-rb">
             <label className="form-label">NAME:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -33,7 +33,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell-border-b">
             <label className="form-label">DATE FILED:</label>
-            <input 
+            <input
               type="date"
               className="form-input"
               readOnly
@@ -42,7 +42,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell-border-r">
             <label className="form-label">POSITION:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -51,7 +51,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell">
             <label className="form-label">DEPARTMENT:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -63,7 +63,7 @@ export const PDFTemplate = ({ data, type }) => {
         <div className="grid-3-cols">
           <div className="form-cell-border-r">
             <label className="form-label">INCLUSIVE DATES:</label>
-            <input 
+            <input
               type="date"
               className="form-input"
               readOnly
@@ -72,7 +72,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell-border-r">
             <label className="form-label">TO:</label>
-            <input 
+            <input
               type="date"
               className="form-input"
               readOnly
@@ -81,7 +81,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell">
             <label className="form-label">No. of Days Requested:</label>
-            <input 
+            <input
               type="number"
               className="form-input"
               readOnly
@@ -93,7 +93,7 @@ export const PDFTemplate = ({ data, type }) => {
         <div className="form-section">
           <div className="form-cell">
             <label className="form-label">REASON:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -105,7 +105,7 @@ export const PDFTemplate = ({ data, type }) => {
         <div className="form-section">
           <div className="form-cell">
             <label className="form-label">PERSON TO HAND OVER THE TASK:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -117,14 +117,14 @@ export const PDFTemplate = ({ data, type }) => {
         <div className="grid-3-cols">
           <div className="form-cell-border-r">
             <label className="form-label">Requested by:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
               value={data?.requested_by || ''}
             />
             <label className="mt-4 form-label">Date:</label>
-            <input 
+            <input
               type="date"
               className="form-input"
               readOnly
@@ -133,7 +133,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell-border-r">
             <label className="form-label">Approved by:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -142,7 +142,7 @@ export const PDFTemplate = ({ data, type }) => {
             <div className="text-center-section">
               <p className="form-label">DEPARTMENT HEAD</p>
               <label className="mt-2 form-label">Date:</label>
-              <input 
+              <input
                 type="date"
                 className="form-input"
                 readOnly
@@ -152,7 +152,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell">
             <label className="form-label">Received by:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -161,7 +161,7 @@ export const PDFTemplate = ({ data, type }) => {
             <div className="text-center-section">
               <p className="form-label">HR DEPARTMENT</p>
               <label className="mt-2 form-label">Date:</label>
-              <input 
+              <input
                 type="date"
                 className="form-input"
                 readOnly
@@ -173,7 +173,7 @@ export const PDFTemplate = ({ data, type }) => {
 
         <div className="form-section">
           <div className="form-section-title">
-                      FOR HRD&rsquo;S USE
+            FOR HRD&rsquo;S USE
           </div>
           <div className="grid-2-cols">
             <div className="form-cell-border-r">
@@ -244,7 +244,7 @@ export const PDFTemplate = ({ data, type }) => {
         <div className="grid-2-cols">
           <div className="form-cell-border-r">
             <label className="form-label">SUPPORTING DOCUMENT ATTACHMENT</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               placeholder="Please specify"
@@ -254,7 +254,7 @@ export const PDFTemplate = ({ data, type }) => {
           </div>
           <div className="form-cell">
             <label className="form-label">Recorded by:</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               readOnly
@@ -263,7 +263,7 @@ export const PDFTemplate = ({ data, type }) => {
             <div className="text-center-section">
               <p className="form-label">HRD</p>
               <label className="mt-2 form-label">Date:</label>
-              <input 
+              <input
                 type="date"
                 className="form-input"
                 readOnly
