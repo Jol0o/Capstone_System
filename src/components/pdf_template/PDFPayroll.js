@@ -6,9 +6,9 @@ export const PDFPayroll = ({ data, deductionRates }) => {
   const { total_pay } = data;
 
   // Calculate deductions
-  const sssDeduction = payslip.total_pay * deductionRates.sss;
-  const philHealthDeduction = payslip.total_pay * deductionRates.philhealth;
-  const pagIbigDeduction = payslip.total_pay * deductionRates.pagibig;
+  const sssDeduction = data.total_pay * deductionRates.sss;
+  const philHealthDeduction = data.total_pay * deductionRates.philhealth;
+  const pagIbigDeduction = data.total_pay * deductionRates.pagibig;
   const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + data.lateDeduction + data.undertimeDeduction;
 
   // Calculate net pay
@@ -100,7 +100,13 @@ export const PDFPayroll = ({ data, deductionRates }) => {
               <td></td>
               <td></td>
               <td className="with-padding">Tardiness (Late)</td>
-              <td className="amount deduction">{formatCurrency(payslip.lateDeduction)}</td>
+              <td className="amount deduction">{formatCurrency(data.lateDeduction)}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td className="with-padding">Undertime</td>
+              <td className="amount deduction">{formatCurrency(data.undertimeDeduction)}</td>
             </tr>
             <tr className="total-row">
               <td>Gross Pay</td>
@@ -108,12 +114,7 @@ export const PDFPayroll = ({ data, deductionRates }) => {
               <td></td>
               <td></td>
             </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td className="with-padding">Undertime</td>
-              <td className="amount deduction">{formatCurrency(payslip.undertimeDeduction)}</td>
-            </tr>
+           
             <tr>
               <td></td>
               <td></td>

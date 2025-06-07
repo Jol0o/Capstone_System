@@ -18,7 +18,7 @@ import useAuth from '@/hooks/useAuth'
 import { useStore } from '@/hooks/useStore';
 import Loader from '../Loader'
 import { format, getDaysInMonth } from 'date-fns';
-import { getEmployeeById, getUserAttendance, getUserDataDashboard } from "@/lib/api";
+import { getEmployeeById, getUserAttendance, getUserDataDashboard, getDeductionRates } from "@/lib/api";
 import { Calendar } from "@/components/ui/calendar"
 import { Label } from "@/components/ui/label";
 import {
@@ -78,12 +78,12 @@ export default function UserDashboard() {
       const res = await getDeductionRates();
       if (res.success) {
         setDeductionRates({
-          sss: res.rates.sss ?? 0.095,
-          philhealth: res.rates.philhealth ?? 0.025,
-          pagibig: res.rates.pagibig ?? 0.01,
+          sss: res.rates.sss_rate,
+          philhealth: res.rates.philhealth_rate,
+          pagibig: res.rates.pagibig_rate,
         });
       } else {
-        setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+        setDeductionRates({ sss: 0, philhealth: 0, pagibig: 0 });
       }
       setIsDeductionLoading(false);
     };

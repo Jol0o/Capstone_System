@@ -94,16 +94,17 @@ function Payroll() {
             const res = await getDeductionRates();
             if (res.success) {
                 setDeductionRates({
-                    sss: res.rates.sss ?? 0.095,
-                    philhealth: res.rates.philhealth ?? 0.025,
-                    pagibig: res.rates.pagibig ?? 0.01,
+                    sss: res.rates.sss_rate,
+                    philhealth: res.rates.philhealth_rate,
+                    pagibig: res.rates.pagibig_rate,
                 });
             } else {
-                setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+                setDeductionRates({ sss: 0, philhealth: 0, pagibig: 0 });
             }
             setIsDeductionLoading(false);
         };
         fetchRates();
+        console.log(deductionRates)
     }, []);
 
     const table = "payroll"
@@ -531,11 +532,17 @@ function Payroll() {
                         <TableBody>
                             {
                                 filterData.map(item => {
-                                    const sssDeduction = item.totalSalary * (deductionRates?.sss ?? 0);
-                                    const philHealthDeduction = item.totalSalary * (deductionRates?.philhealth ?? 0);
-                                    const pagIbigDeduction = item.totalSalary * (deductionRates?.pagibig ?? 0);
-                                    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
-                                    const netPay = item.total_pay - totalDeductions;
+                                    const baseSalary = item.totalSalary ?? item.total_pay ?? 0;
+                                    const sssDeduction = baseSalary * (deductionRates?.sss ?? 0);
+                                    const philHealthDeduction = baseSalary * (deductionRates?.philhealth ?? 0);
+                                    const pagIbigDeduction = baseSalary * (deductionRates?.pagibig ?? 0);
+                                    const totalDeductions =
+                                        sssDeduction +
+                                        philHealthDeduction +
+                                        pagIbigDeduction +
+                                        (item.lateDeduction ?? 0) +
+                                        (item.undertimeDeduction ?? 0);
+                                    const netPay = baseSalary - totalDeductions;
 
                                     return (
                                         <TableRow key={item.id}>
@@ -612,11 +619,17 @@ function Payroll() {
 const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
     if (!employee) return null;
 
-    const sssDeduction = employee.totalSalary * (deductionRates?.sss ?? 0);
-    const philHealthDeduction = employee.totalSalary * (deductionRates?.philhealth ?? 0);
-    const pagIbigDeduction = employee.totalSalary * (deductionRates?.pagibig ?? 0);
-    const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.undertimeDeduction + employee.lateDeduction;
-    const netPay = employee.total_pay - totalDeductions;
+    const baseSalary = employee.totalSalary ?? employee.total_pay ?? 0;
+    const sssDeduction = baseSalary * (deductionRates?.sss ?? 0);
+    const philHealthDeduction = baseSalary * (deductionRates?.philhealth ?? 0);
+    const pagIbigDeduction = baseSalary * (deductionRates?.pagibig ?? 0);
+    const totalDeductions =
+      sssDeduction +
+      philHealthDeduction +
+      pagIbigDeduction +
+      (employee.lateDeduction ?? 0) +
+      (employee.undertimeDeduction ?? 0);
+    const netPay = baseSalary - totalDeductions;
 
     const InfoRow = ({ label, value, isDeduction }) => (
         <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">

@@ -36,9 +36,9 @@ function UserPayroll() {
             const res = await getDeductionRates();
             if (res.success) {
                 setDeductionRates({
-                    sss: res.rates.sss ?? 0.095,
-                    philhealth: res.rates.philhealth ?? 0.025,
-                    pagibig: res.rates.pagibig ?? 0.01,
+                    sss: res.rates.sss_rate,
+                    philhealth: res.rates.philhealth_rate,
+                    pagibig: res.rates.pagibig_rate,
                 });
             } else {
                 setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
@@ -120,9 +120,9 @@ function UserPayroll() {
         <div className="max-w-[1000px] m-auto flex flex-col gap-5">
             {data.length > 0 ? data.map(item => {
                 // Calculate deductions
-                const sssDeduction = item.totalSalary * (deductionRates?.sss ?? 0);
-                const philHealthDeduction = item.totalSalary * (deductionRates?.philhealth ?? 0);
-                const pagIbigDeduction = item.totalSalary * (deductionRates?.pagibig ?? 0);
+                const sssDeduction = item.total_pay * (deductionRates?.sss ?? 0);
+                const philHealthDeduction = item.total_pay * (deductionRates?.philhealth ?? 0);
+                const pagIbigDeduction = item.total_pay * (deductionRates?.pagibig ?? 0);
                 const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
 
                 // Calculate net pay

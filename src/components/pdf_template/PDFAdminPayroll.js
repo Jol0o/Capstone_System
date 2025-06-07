@@ -104,7 +104,7 @@ const PDFAdminPayroll = ({ data, deductionRates }) => {
                     <td></td>
                     <td></td>
                     <td className="with-padding">Undertime</td>
-                    <td className="amount deduction">{formatCurrency(payslip.undertime)}</td>
+                    <td className="amount deduction">{formatCurrency(payslip.undertimeDeduction)}</td>
                   </tr>
                   <tr className="total-row">
                     <td>Gross Pay</td>

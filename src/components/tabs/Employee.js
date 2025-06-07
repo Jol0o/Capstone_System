@@ -55,9 +55,9 @@ function Employee({ setTab }) {
             const res = await getDeductionRates();
             if (res.success) {
                 setDeductionRates({
-                    sss: res.rates.sss ?? 0.095,
-                    philhealth: res.rates.philhealth ?? 0.025,
-                    pagibig: res.rates.pagibig ?? 0.01,
+                    sss: res.rates.sss_rate,
+                    philhealth: res.rates.philhealth_rate,
+                    pagibig: res.rates.pagibig_rate,
                 });
             } else {
                 setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
