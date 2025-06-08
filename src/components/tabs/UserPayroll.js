@@ -1,5 +1,5 @@
 import useAuth from '@/hooks/useAuth';
-import { getDeductionRates, getUserPayroll } from '@/lib/api';
+import { getUserPayroll } from '@/lib/api';
 import axios from 'axios';
 import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
@@ -13,11 +13,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, User, Clock, FileDown, LinkIcon, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
+import { Clock, LinkIcon, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import generate from '../pdf_template/generatePDF';
-import Link from 'next/link';
 import { toast } from 'sonner';
-import Loader from '../Loader';
 
 function UserPayroll() {
     const { user } = useAuth();
@@ -26,28 +24,6 @@ function UserPayroll() {
     const [filterData, setFilteredData] = useState(null);
     const [loadingItems, setLoadingItems] = useState({}); // Track loading state for each item
     const [links, setLinks] = useState({}); // Track link state for each item
-
-    const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
-    const [isDeductionLoading, setIsDeductionLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchRates = async () => {
-            setIsDeductionLoading(true);
-            const res = await getDeductionRates();
-            if (res.success) {
-                setDeductionRates({
-                    sss: res.rates.sss_rate,
-                    philhealth: res.rates.philhealth_rate,
-                    pagibig: res.rates.pagibig_rate,
-                });
-            } else {
-                setDeductionRates({ sss: 0, philhealth: 0, pagibig: 0 });
-            }
-            setIsDeductionLoading(false);
-        };
-        fetchRates();
-    }, []);
-
 
     const limit = 5;
 
@@ -82,7 +58,7 @@ function UserPayroll() {
         setLoadingItems(prev => ({ ...prev, [item.id]: true }));
         console.log(item);
         try {
-            const link = await generate({ type: "payroll", data: item, deductionRates });
+            const link = await generate({ type: "payroll", data: item });
             if (link) {
                 window.open(link, '_blank');
                 toast("Success", {
@@ -114,15 +90,14 @@ function UserPayroll() {
         }).format(value);
     };
 
-    if (isDeductionLoading || !deductionRates) return <Loader />;
 
     return (
         <div className="max-w-[1000px] m-auto flex flex-col gap-5">
             {data.length > 0 ? data.map(item => {
                 // Calculate deductions
-                const sssDeduction = item.total_pay * (deductionRates?.sss ?? 0);
-                const philHealthDeduction = item.total_pay * (deductionRates?.philhealth ?? 0);
-                const pagIbigDeduction = item.total_pay * (deductionRates?.pagibig ?? 0);
+                const sssDeduction = item.total_pay * (item?.sss_rate ?? 0);
+                const philHealthDeduction = item.total_pay * (item?.philhealth_rate ?? 0);
+                const pagIbigDeduction = item.total_pay * (item?.pagibig_rate ?? 0);
                 const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
 
                 // Calculate net pay
