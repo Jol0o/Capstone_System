@@ -472,9 +472,9 @@ export default function UserDashboard() {
                   </TableHeader>
                   <TableBody>
                     {dashboardData?.allPayroll && dashboardData.allPayroll.map((payroll, index) => {
-                      const sssDeduction = payroll.totalSalary * (deductionRates?.sss ?? 0);
-                      const philHealthDeduction = payroll.totalSalary * (deductionRates?.philhealth ?? 0);
-                      const pagIbigDeduction = payroll.totalSalary * (deductionRates?.pagibig ?? 0);
+                      const sssDeduction = payroll.total_pay * (deductionRates?.sss ?? 0);
+                      const philHealthDeduction = payroll.total_pay * (deductionRates?.philhealth ?? 0);
+                      const pagIbigDeduction = payroll.total_pay * (deductionRates?.pagibig ?? 0);
                       const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + payroll.lateDeduction + payroll.undertimeDeduction;
 
                       // Calculate net pay

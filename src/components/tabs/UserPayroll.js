@@ -41,7 +41,7 @@ function UserPayroll() {
                     pagibig: res.rates.pagibig_rate,
                 });
             } else {
-                setDeductionRates({ sss: 0.095, philhealth: 0.025, pagibig: 0.01 });
+                setDeductionRates({ sss: 0, philhealth: 0, pagibig: 0 });
             }
             setIsDeductionLoading(false);
         };

@@ -318,7 +318,7 @@ function Payroll() {
     };
 
     const handleGenerate = async (data) => {
-        const promise = generatePDF({ type: "payroll", data, deductionRates });
+        const promise = generatePDF({ type: "payroll", data });
 
         toast.promise(promise, {
             loading: 'Exporting Payslips...',
@@ -354,7 +354,7 @@ function Payroll() {
                 throw new Error("Data is not an array");
             }
 
-            const promise = generatePDF({ type: "admin", data, deductionRates });
+            const promise = generatePDF({ type: "admin", data });
 
             toast.promise(promise, {
                 loading: "Exporting Payslips...",
@@ -533,9 +533,9 @@ function Payroll() {
                             {
                                 filterData.map(item => {
                                     const baseSalary = item.totalSalary ?? item.total_pay ?? 0;
-                                    const sssDeduction = baseSalary * (deductionRates?.sss ?? 0);
-                                    const philHealthDeduction = baseSalary * (deductionRates?.philhealth ?? 0);
-                                    const pagIbigDeduction = baseSalary * (deductionRates?.pagibig ?? 0);
+                                    const sssDeduction = baseSalary * (item?.sss_rate ?? 0);
+    const philHealthDeduction = baseSalary * (item?.philhealth_rate ?? 0);
+    const pagIbigDeduction = baseSalary * (item?.pagibig_rate ?? 0);
                                     const totalDeductions =
                                         sssDeduction +
                                         philHealthDeduction +
@@ -619,16 +619,16 @@ function Payroll() {
 const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
     if (!employee) return null;
 
-    const baseSalary = employee.totalSalary ?? employee.total_pay ?? 0;
-    const sssDeduction = baseSalary * (deductionRates?.sss ?? 0);
-    const philHealthDeduction = baseSalary * (deductionRates?.philhealth ?? 0);
-    const pagIbigDeduction = baseSalary * (deductionRates?.pagibig ?? 0);
+    const baseSalary = employee.total_pay ?? 0;
+    const sssDeduction = baseSalary * (employee?.sss_rate ?? 0);
+    const philHealthDeduction = baseSalary * (employee?.philhealth_rate ?? 0);
+    const pagIbigDeduction = baseSalary * (employee?.pagibig_rate ?? 0);
     const totalDeductions =
-      sssDeduction +
-      philHealthDeduction +
-      pagIbigDeduction +
-      (employee.lateDeduction ?? 0) +
-      (employee.undertimeDeduction ?? 0);
+        sssDeduction +
+        philHealthDeduction +
+        pagIbigDeduction +
+        (employee.lateDeduction ?? 0) +
+        (employee.undertimeDeduction ?? 0);
     const netPay = baseSalary - totalDeductions;
 
     const InfoRow = ({ label, value, isDeduction }) => (

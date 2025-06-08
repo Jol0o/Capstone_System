@@ -57,7 +57,6 @@ export function AdminProfile() {
             try {
                 const res = await getAdminData(user.email);
                 const { data } = res.data
-                setPassword(data.password);
                 setEmail(data.email);
                 setPosition(data.position || user.position);
                 setName(data.name || user.name)

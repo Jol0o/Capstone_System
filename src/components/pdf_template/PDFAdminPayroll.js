@@ -13,9 +13,9 @@ const PDFAdminPayroll = ({ data, deductionRates }) => {
     <>
       <div className="payslip-container">
         {data.map((payslip, index) => {
-          const sssDeduction = payslip.total_pay * deductionRates.sss;
-          const philHealthDeduction = payslip.total_pay * deductionRates.philhealth;
-          const pagIbigDeduction = payslip.total_pay * deductionRates.pagibig;
+          const sssDeduction = payslip.total_pay * payslip.sss_rate;
+          const philHealthDeduction = payslip.total_pay * payslip.philhealth_rate;
+          const pagIbigDeduction = payslip.total_pay * payslip.pagibig_rate;
           const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + payslip.lateDeduction + payslip.undertimeDeduction;
           const netPay = payslip.total_pay - totalDeductions;
 
