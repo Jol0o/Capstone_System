@@ -101,7 +101,8 @@ function UserPayroll() {
                 const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
 
                 // Calculate net pay
-                const netPay = item.total_pay - totalDeductions;
+                const netPayRaw = payslip.total_pay - totalDeductions;
+                const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
                 return (
                     <Card key={item.id} className="w-full ">

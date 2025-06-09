@@ -12,7 +12,8 @@ export const PDFPayroll = ({ data }) => {
   const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + data.lateDeduction + data.undertimeDeduction;
 
   // Calculate net pay
-  const netPay = total_pay - totalDeductions;
+  const netPayRaw = payslip.total_pay - totalDeductions;
+  const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };

@@ -499,7 +499,8 @@ export default function UserDashboard() {
                       const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + payroll.lateDeduction + payroll.undertimeDeduction;
 
                       // Calculate net pay
-                      const netPay = payroll.total_pay - totalDeductions;
+                      const netPayRaw = payslip.total_pay - totalDeductions;
+                      const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
                       return (
                         <TableRow key={index}>

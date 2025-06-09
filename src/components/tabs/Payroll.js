@@ -534,15 +534,16 @@ function Payroll() {
                                 filterData.map(item => {
                                     const baseSalary = item.totalSalary ?? item.total_pay ?? 0;
                                     const sssDeduction = baseSalary * (item?.sss_rate ?? 0);
-    const philHealthDeduction = baseSalary * (item?.philhealth_rate ?? 0);
-    const pagIbigDeduction = baseSalary * (item?.pagibig_rate ?? 0);
+                                    const philHealthDeduction = baseSalary * (item?.philhealth_rate ?? 0);
+                                    const pagIbigDeduction = baseSalary * (item?.pagibig_rate ?? 0);
                                     const totalDeductions =
                                         sssDeduction +
                                         philHealthDeduction +
                                         pagIbigDeduction +
                                         (item.lateDeduction ?? 0) +
                                         (item.undertimeDeduction ?? 0);
-                                    const netPay = baseSalary - totalDeductions;
+                                    const netPayRaw = payslip.total_pay - totalDeductions;
+                                    const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
                                     return (
                                         <TableRow key={item.id}>
@@ -629,7 +630,8 @@ const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
         pagIbigDeduction +
         (employee.lateDeduction ?? 0) +
         (employee.undertimeDeduction ?? 0);
-    const netPay = baseSalary - totalDeductions;
+    const netPayRaw = payslip.total_pay - totalDeductions;
+    const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
     const InfoRow = ({ label, value, isDeduction }) => (
         <div className="grid grid-cols-3 gap-4 py-3 border-b border-gray-800">

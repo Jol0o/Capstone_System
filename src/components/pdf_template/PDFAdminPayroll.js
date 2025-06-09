@@ -17,7 +17,8 @@ const PDFAdminPayroll = ({ data, deductionRates }) => {
           const philHealthDeduction = payslip.total_pay * payslip.philhealth_rate;
           const pagIbigDeduction = payslip.total_pay * payslip.pagibig_rate;
           const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + payslip.lateDeduction + payslip.undertimeDeduction;
-          const netPay = payslip.total_pay - totalDeductions;
+          const netPayRaw = payslip.total_pay - totalDeductions;
+          const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
           return (
             <div key={index} className="payslip-card">
