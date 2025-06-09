@@ -72,6 +72,8 @@ export default function UserDashboard() {
   const [deductionRates, setDeductionRates] = useState(undefined); // Start as undefined
   const [isDeductionLoading, setIsDeductionLoading] = useState(true);
 
+  console.log(dashboardData)
+
   useEffect(() => {
     const fetchRates = async () => {
       setIsDeductionLoading(true);
@@ -262,9 +264,28 @@ export default function UserDashboard() {
             <span className="w-4 h-4 text-muted-foreground">₱</span>
           </CardHeader>
           <CardContent>
-            {dashboardData && dashboardData.latestPayroll ? <><div className="text-2xl font-bold">{formatCurrency(dashboardData?.latestPayroll.total_pay)}</div>
-              <p className="text-xs text-muted-foreground">{formatDate(dashboardData?.latestPayroll.created_at)}</p>
-            </> : <div className="text-2xl font-bold">0</div>}
+            {dashboardData && dashboardData.latestPayroll ? (
+              <>
+                <div className="text-2xl font-bold">
+                  {
+                    // Use the same calculation as in the payroll table, with all fallbacks
+                    formatCurrency(
+                      (dashboardData.latestPayroll.total_pay ?? 0)
+                      - ((dashboardData.latestPayroll.total_pay ?? 0) * (deductionRates?.philhealth ?? 0))
+                      - ((dashboardData.latestPayroll.total_pay ?? 0) * (deductionRates?.sss ?? 0))
+                      - ((dashboardData.latestPayroll.total_pay ?? 0) * (deductionRates?.pagibig ?? 0))
+                      - (dashboardData.latestPayroll.lateDeduction ?? 0)
+                      - (dashboardData.latestPayroll.undertimeDeduction ?? 0)
+                    )
+                  }
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {formatDate(dashboardData?.latestPayroll.created_at)}
+                </p>
+              </>
+            ) : (
+              <div className="text-2xl font-bold">0</div>
+            )}
           </CardContent>
         </Card>
 

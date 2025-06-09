@@ -56,7 +56,7 @@ const getDateRange = () => {
     const today = new Date();
     const day = today.getDate();
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    
+
     if (day <= 15) {
         return '1-15';
     } else {
@@ -82,7 +82,7 @@ function Attendance() {
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
     const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
-    
+
     let defaultStartDate;
     let defaultEndDate;
 
@@ -126,7 +126,7 @@ function Attendance() {
                 setFilteredData(data);
                 return;
             }
-            const res = await searchAttendance(filter.trim(),startDate, endDate);
+            const res = await searchAttendance(filter.trim(), startDate, endDate);
             setFilteredData(res.data.data);
         };
         fetchData();
@@ -184,12 +184,12 @@ function Attendance() {
         try {
             await removeAttendance(id, token)
             toast("Successfull", {
-                description: "Deleted payroll successfully!",
+                description: "Deleted Attendance successfully!",
             })
             setData(data.filter(item => item.id !== id))
             setFilteredData(filterData.filter(item => item.id !== id))
         } catch (error) {
-            console.error('Error deleting payroll:', error);
+            console.error('Error deleting Attendance:', error);
         }
     }
 
@@ -265,14 +265,14 @@ function Attendance() {
         setEndDate(format(endDate, 'yyyy-MM-dd'));
     };
 
-        const handleYearChange = (item) => {
+    const handleYearChange = (item) => {
         setYear(item);
         const { startDate, endDate } = getDefaultDates(dateRange, month, year);
         setStartDate(startDate);
         setEndDate(endDate);
     };
 
-      const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
+    const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
 
 
     if (isLoading) return <Loader />
@@ -326,23 +326,23 @@ function Attendance() {
                                 />
                             </PopoverContent>
                         </Popover>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm" className="h-8">
-                                        <CalendarIcon className="w-4 h-4 mr-2" />
-                                        {year}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-auto p-0" align="start">
-                                    <ScrollArea className="max-h-[200px] overflow-y-auto">
-                                        {years.map((year) => (
-                                            <DropdownMenuItem  onClick={( ) => {handleYearChange(year)}} key={year} value={year}>
-                                                {year}
-                                            </DropdownMenuItem>
-                                        ))}
-                                       </ScrollArea> 
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8">
+                                    <CalendarIcon className="w-4 h-4 mr-2" />
+                                    {year}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-auto p-0" align="start">
+                                <ScrollArea className="max-h-[200px] overflow-y-auto">
+                                    {years.map((year) => (
+                                        <DropdownMenuItem onClick={() => { handleYearChange(year) }} key={year} value={year}>
+                                            {year}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </ScrollArea>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-8">
@@ -364,15 +364,15 @@ function Attendance() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                               <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
-                                                                  1 - 15
-                                                              </DropdownMenuItem>
-                                                                  <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `16-${lastDayOfMonth}` } })}>
-                                                                  16 - {lastDayOfMonth}
-                                                              </DropdownMenuItem>
-                                                                  <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `1-${lastDayOfMonth}` } })}>
-                                                                  1 - {lastDayOfMonth}
-                                                              </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: '1-15' } })}>
+                                    1 - 15
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `16-${lastDayOfMonth}` } })}>
+                                    16 - {lastDayOfMonth}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDateRangeChange({ target: { value: `1-${lastDayOfMonth}` } })}>
+                                    1 - {lastDayOfMonth}
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -410,7 +410,7 @@ function Attendance() {
                                         {item.name}
                                     </TableCell>
                                     <TableCell className="capitalize whitespace-nowrap">{formatDate(item.date)}</TableCell>
-                                                                       <TableCell className="whitespace-nowrap">
+                                    <TableCell className="whitespace-nowrap">
                                         <span className={calculateLateTime(item.time_in) === 'On time' ? 'text-green-500' : ''}>
                                             {item.time_in}
                                         </span>
@@ -423,9 +423,25 @@ function Attendance() {
                                     <TableCell className="whitespace-nowrap">
                                         {item.time_out}
                                     </TableCell>
-                                   <TableCell className="whitespace-nowrap">
-  {item.hours ? `${item.hours} Hour${item.hours > 1 ? "s" : ""}` : "-"}
-</TableCell>
+                                    <TableCell className="whitespace-nowrap">
+                                        {item.hours != null && item.hours !== undefined && item.hours !== 0
+                                            ? `${item.hours} Hour${item.hours !== 1 ? "s" : ""}`
+                                            : (() => {
+                                                // If hours is 0 or null, show minutes difference between time_in and time_out
+                                                if (item.time_in && item.time_out) {
+                                                    const timeInDate = parse(item.time_in, 'hh:mm a', new Date());
+                                                    const timeOutDate = parse(item.time_out, 'hh:mm a', new Date());
+                                                    const diffMinutes = differenceInMinutes(timeOutDate, timeInDate);
+                                                    if (diffMinutes > 0) {
+                                                        const hours = Math.floor(diffMinutes / 60);
+                                                        const minutes = diffMinutes % 60;
+                                                        return `${hours > 0 ? `${hours} Hour${hours !== 1 ? "s" : ""} ` : ""}${minutes} Minute${minutes !== 1 ? "s" : ""}`;
+                                                    }
+                                                }
+                                                return "-";
+                                            })()
+                                        }
+                                    </TableCell>
                                     <TableCell className="max-w-[30px]"> <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="w-8 h-8 p-0">
