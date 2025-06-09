@@ -114,7 +114,12 @@ export const PDFPayroll = ({ data }) => {
               <td></td>
               <td></td>
             </tr>
-           
+            <tr>
+              <td></td>
+              <td></td>
+              <td className="with-padding">Total Deductions</td>
+              <td className="amount deduction">{formatCurrency(totalDeductions)}</td>
+            </tr>
             <tr>
               <td></td>
               <td></td>
