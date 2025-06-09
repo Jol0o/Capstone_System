@@ -31,6 +31,7 @@ import { io } from 'socket.io-client';
 import generatePDF from '../pdf_template/generatePDF';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { formatCurrency } from '@/lib/util';
 
 const currentDate = new Date();
 const currentDay = currentDate.getDate();
@@ -285,13 +286,6 @@ function Payroll() {
             });
         }
     }
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
-    };
 
     const handleDateRangeChange = (e) => {
         setDateRange(e.target.value);
@@ -639,13 +633,6 @@ const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
             <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : ''} font-bold`}>{value}</div>
         </div>
     );
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
-    };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>

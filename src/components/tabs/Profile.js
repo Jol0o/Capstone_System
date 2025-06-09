@@ -26,6 +26,7 @@ import { Tooltip } from 'react-tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import * as XLSX from 'xlsx';
 import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { formatCurrency } from '@/lib/util';
 
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
@@ -294,13 +295,6 @@ function Profile() {
         if (!isNaN(numericValue)) {
             handleChange({ target: { name: 'basicSalary', value: numericValue } });
         }
-    };
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
     };
 
     useEffect(() => {

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, LinkIcon, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import generate from '../pdf_template/generatePDF';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/util';
 
 function UserPayroll() {
     const { user } = useAuth();
@@ -81,13 +82,6 @@ function UserPayroll() {
         document.body.appendChild(anchor);
         anchor.click();
         document.body.removeChild(anchor);
-    };
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
     };
 
 

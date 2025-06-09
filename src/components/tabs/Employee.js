@@ -29,6 +29,7 @@ import ApproveEmployee from '../modal/ApproveEmployee';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { formatCurrency } from '@/lib/util';
 
 function Employee({ setTab }) {
     const [data, setData] = useState([])
@@ -178,14 +179,6 @@ function Employee({ setTab }) {
 
     if (isLoading || isDeductionLoading || !deductionRates) return <Loader />;
 
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
-    };
-
     const camelCaseToWords = (str) => {
         return str.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ');
     };
@@ -262,7 +255,7 @@ function Employee({ setTab }) {
                                     const philHealthDeduction = item.totalSalary * (deductionRates?.philhealth ?? 0);
                                     const pagIbigDeduction = item.totalSalary * (deductionRates?.pagibig ?? 0);
                                     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
-                                    const netPayRaw = item.total_pay - totalDeductions;
+                                    const netPayRaw = item.totalSalary - totalDeductions;
                                     const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
                                     return (
@@ -464,7 +457,7 @@ const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
     const philHealthDeduction = employee.totalSalary * (deductionRates?.philhealth ?? 0);
     const pagIbigDeduction = employee.totalSalary * (deductionRates?.pagibig ?? 0);
     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.lateDeduction + employee.undertimeDeduction;
-    const netPayRaw = employee.total_pay - totalDeductions;
+    const netPayRaw = employee.totalSalary - totalDeductions;
     const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
     const InfoRow = ({ label, value, isDeduction }) => (
@@ -473,13 +466,6 @@ const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
             <div className={`col-span-2 text-sm ${isDeduction ? 'text-red-600' : ''} font-bold`}>{value}</div>
         </div>
     );
-
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(value);
-    };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>

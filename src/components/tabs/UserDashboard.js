@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button"
 import cn from 'classnames';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import * as XLSX from 'xlsx';
+import { formatCurrency } from '@/lib/util'
 
 // Mock data - replace with actual API calls
 const userDatas = {
@@ -210,12 +211,6 @@ export default function UserDashboard() {
     }
   };
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP',
-    }).format(value);
-  };
 
   const calculateAttendancePercentage = (totalDays) => {
     const currentDate = new Date();

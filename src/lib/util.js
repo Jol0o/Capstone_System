@@ -7,7 +7,6 @@ export const formatCurrency = (value) => {
   }).format(value);
 };
 
-
 export const numberToWords = (num) => {
 
   const a = [
