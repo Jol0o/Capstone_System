@@ -542,7 +542,7 @@ function Payroll() {
                                         pagIbigDeduction +
                                         (item.lateDeduction ?? 0) +
                                         (item.undertimeDeduction ?? 0);
-                                    const netPayRaw = payslip.total_pay - totalDeductions;
+                                    const netPayRaw = item.total_pay - totalDeductions;
                                     const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
                                     return (
@@ -630,7 +630,7 @@ const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
         pagIbigDeduction +
         (employee.lateDeduction ?? 0) +
         (employee.undertimeDeduction ?? 0);
-    const netPayRaw = payslip.total_pay - totalDeductions;
+    const netPayRaw = employee.total_pay - totalDeductions;
     const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
     const InfoRow = ({ label, value, isDeduction }) => (

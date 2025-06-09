@@ -262,7 +262,7 @@ function Employee({ setTab }) {
                                     const philHealthDeduction = item.totalSalary * (deductionRates?.philhealth ?? 0);
                                     const pagIbigDeduction = item.totalSalary * (deductionRates?.pagibig ?? 0);
                                     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + item.lateDeduction + item.undertimeDeduction;
-                                    const netPayRaw = payslip.total_pay - totalDeductions;
+                                    const netPayRaw = item.total_pay - totalDeductions;
                                     const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
                                     return (
@@ -464,7 +464,7 @@ const NetPayDialog = ({ open, onClose, employee, deductionRates }) => {
     const philHealthDeduction = employee.totalSalary * (deductionRates?.philhealth ?? 0);
     const pagIbigDeduction = employee.totalSalary * (deductionRates?.pagibig ?? 0);
     const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + employee.lateDeduction + employee.undertimeDeduction;
-    const netPayRaw = payslip.total_pay - totalDeductions;
+    const netPayRaw = employee.total_pay - totalDeductions;
     const netPay = netPayRaw < 0 ? 0 : netPayRaw;
 
     const InfoRow = ({ label, value, isDeduction }) => (

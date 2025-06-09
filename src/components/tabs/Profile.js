@@ -308,7 +308,7 @@ function Profile() {
         const philHealthDeduction = userData.totalSalary * (deductionRates?.philhealth ?? 0);
         const pagIbigDeduction = userData.totalSalary * (deductionRates?.pagibig ?? 0);
         const totalDeductions = sssDeduction + philHealthDeduction + pagIbigDeduction + userData.lateDeduction + userData.undertimeDeduction;
-        const netPayRaw = payslip.total_pay - totalDeductions;
+        const netPayRaw = userData.total_pay - totalDeductions;
         const calculatedNetPay = netPayRaw < 0 ? 0 : netPayRaw;
         setNetPay(calculatedNetPay);
     }, [userData, deductionRates]);
