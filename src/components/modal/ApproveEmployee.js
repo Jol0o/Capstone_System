@@ -18,7 +18,7 @@ import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 
 function ApproveEmployee({ data }) {
-    const [isDialogOpen, setIsDialogOpen] = useState(true);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     console.log(data)
 
     return (

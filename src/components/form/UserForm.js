@@ -20,15 +20,31 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { toast } from 'sonner';
 import createUser from '@/hooks/useCreateUser';
-import { approveEmployeeRequest, getEmployeeById } from '@/lib/api';
+import { approveEmployeeRequest, getDepartments, getEmployeeById, getPositions } from '@/lib/api';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import useAuth from '@/hooks/useAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 function UserForm({ id, setIsDialogOpen, data }) {
     const { user } = useAuth()
+    const [departments, setDepartments] = useState([]);
+    const [positions, setPositions] = useState([]);
 
-    console.log('UserForm data:', user);
+    const fetchDepartments = async () => {
+        const res = await getDepartments()
+        if (res.success) setDepartments(res.departments)
+    }
+
+    const fetchPositions = async () => {
+        const res = await getPositions()
+        console.log(res)
+        if (res.success) setPositions(res.positions)
+    }
+
+    useEffect(() => {
+        fetchPositions()
+        fetchDepartments()
+    }, [])
 
     const qrCodeRef = useRef(null);
     const [userForm, setUserForm] = useState({
@@ -58,6 +74,7 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 console.error(error);
             }
         };
+
         fetchData()
     }, [id])
 
@@ -323,24 +340,40 @@ function UserForm({ id, setIsDialogOpen, data }) {
                 </div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="department">Department</Label>
-                    <Input
-                        id="department"
-                        type="text"
-                        name="department"
-                        value={userForm.department} onChange={handleChange}
-                        placeholder="Enter department"
+                    <Select
+                        value={userForm.department}
+                        onValueChange={(value) => setUserForm({ ...userForm, department: value })}
                         required
-                    /></div>
+                    >
+                        <SelectTrigger className="w-full bg-transparent border-gray-800">
+                            <SelectValue placeholder="Select department" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {departments.map((dept) => (
+                                <SelectItem key={dept.id} value={dept.name}>
+                                    {dept.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select></div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="position">Position</Label>
-                    <Input
-                        id="position"
-                        type="text"
-                        name="position"
-                        value={userForm.position} onChange={handleChange}
-                        placeholder="Enter position"
+                    <Select
+                        value={userForm.position}
+                        onValueChange={(value) => setUserForm({ ...userForm, position: value })}
                         required
-                    /></div>
+                    >
+                        <SelectTrigger className="w-full bg-transparent border-gray-800">
+                            <SelectValue placeholder="Select position" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {positions.map((dept) => (
+                                <SelectItem key={dept.id} value={dept.name}>
+                                    {dept.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select></div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="phone_number">Phone Number</Label>
                     <Input
