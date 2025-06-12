@@ -570,3 +570,109 @@ export const updateDeductionRate = async (key, value) => {
         return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
     }
 };
+
+
+export const getDepartments = cacheWrapper(async () => {
+    try {
+        const res = await axiosInstance.get(`${API_URL}/api/departments`);
+        if (res.status === 200 && res.data ) {
+            return { success: true, departments: res.data.data };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+});
+
+export const createDepartment = async (name) => {
+    try {
+        const res = await axiosInstance.post(`${API_URL}/api/departments`, { name });
+        if (res.status === 201 && res.data ) {
+            return { success: true, department: res.data.data };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+}
+
+export const updateDepartment = async (id, name) => {
+    try {
+        const res = await axiosInstance.put(`${API_URL}/api/departments/${id}`, { name });
+        if (res.status === 200 && res.data ) {
+            return { success: true, department: res.data.data };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+}
+
+export const deleteDepartment = async (id) => {
+    try {
+        const res = await axiosInstance.delete(`${API_URL}/api/departments/${id}`);
+        if (res.status === 200 && res.data ) {
+            return { success: true, message: 'Department deleted successfully.' };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+};
+
+export const getPositions = cacheWrapper(async () => {
+    try {
+        const res = await axiosInstance.get(`${API_URL}/api/positions`);
+        console.log(res)
+        if (res.status === 200 && res.data ) {
+            return { success: true, positions: res.data.data };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+});
+
+export const createPosition = async (name) => {
+    try {
+        const res = await axiosInstance.post(`${API_URL}/api/positions`, { name });
+        if (res.status === 201 && res.data ) {
+            return { success: true, position: res.data.data };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+}
+
+export const updatePosition = async (id, name) => {
+    try {
+        const res = await axiosInstance.put(`${API_URL}/api/positions/${id}`, { name });
+        if (res.status === 200 && res.data ) {
+            return { success: true, position: res.data.data };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+}
+
+export const deletePosition = async (id) => {
+    try {
+        const res = await axiosInstance.delete(`${API_URL}/api/positions/${id}`);
+        if (res.status === 200 && res.data ) {
+            return { success: true, message: 'Position deleted successfully.' };
+        } else {
+            return { success: false, error: 'Unexpected response from server.' };
+        }
+    } catch (e) {
+        return { success: false, error: e?.response?.data?.error || e.message || 'Unknown error' };
+    }
+};

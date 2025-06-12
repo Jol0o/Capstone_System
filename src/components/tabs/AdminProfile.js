@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation"
 import { useStore } from '@/hooks/useStore'
 import { Loader2 } from 'lucide-react'
+import DepartmentPositionComponent from './DepartmentPositionComponent'
 
 export function AdminProfile() {
     const { user } = useAuth()
@@ -218,6 +219,7 @@ export function AdminProfile() {
 
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold">Quick Actions</h3>
+                        <DepartmentPositionComponent />
                         <TaxRatesCard deductionRates={deductionRates} setDeductionRates={setDeductionRates} isDeductionLoading={isDeductionLoading} />
                         <div className="grid grid-cols-2 gap-4">
                             <Button variant="outline" className="h-auto py-4" onClick={() => router.push('/admin-accounts')}>
