@@ -15,6 +15,7 @@ import useAuth from "@/hooks/useAuth"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { getUserByQrCode } from "@/lib/api"
+import { LoaderCircle } from "lucide-react"
 
 const API_URL = process.env.NEXT_PUBLIC_APP_API_URL || 'http://localhost:8080';
 export default function LoginPage() {
@@ -136,10 +137,34 @@ export default function LoginPage() {
   // }, [user, result]);
 
   return (
-    <div className="grid w-full min-h-screen grid-cols-1 ">
+    <div className="grid w-full min-h-screen grid-cols-1 md:grid-cols-2">
+      {/* QR Code Scanner Section */}
       <div className="flex flex-col items-center justify-center bg-muted/50">
-        <div id="reader" className="w-[300px] h-[300px] border-0"></div>
+        <h1 className="mb-4 text-2xl font-bold">QR Code Scanner</h1>
+        <p className="mb-6 text-sm text-muted-foreground">
+          Please scan your QR code to log your attendance.
+        </p>
+        <div id="reader" className="w-[400px] h-[400px] border-4 border-blue-500 rounded-lg  shadow-lg"></div>
+        {!result && (
+          <div className="flex items-center justify-center mt-4">
+            <LoaderCircle className="w-6 h-6 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-sm text-muted-foreground">Waiting for QR code...</span>
+          </div>
+        )}
+      </div>
+
+      {/* User Information Section */}
+      <div className="flex flex-col items-center justify-center p-6">
+        {user ? (
+          <div className="p-4 mt-6 bg-white rounded-lg shadow-md text-zinc-950">
+            <h2 className="text-lg font-bold">Welcome, {user.name}</h2>
+            <p className="text-sm ">Department: {user.department}</p>
+            <p className="text-sm ">Position: {user.position}</p>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Scan your QR code to see your details.</p>
+        )}
       </div>
     </div>
-  )
+  );
 }
