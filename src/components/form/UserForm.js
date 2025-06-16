@@ -7,7 +7,7 @@ import { format } from "date-fns"
 import { Calendar as CalendarIcon, LoaderCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
+import { Badge } from "@/components/ui/badge"
 import {
     Popover,
     PopoverContent,
@@ -316,15 +316,19 @@ function UserForm({ id, setIsDialogOpen, data }) {
                     /></div> */}
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="basicSalary">Base Salary</Label>
-                    <Input
-                        id="basicSalary"
-                        type="number"
-                        name="basicSalary"
-                        value={userForm.basicSalary}
-                        onChange={handleChange}
-                        placeholder="Enter base salary"
-                        required
-                    />
+                    <div className="flex gap-2">
+                        <Input
+                            id="basicSalary"
+                            type="number"
+                            name="basicSalary"
+                            value={userForm.basicSalary}
+                            onChange={handleChange}
+                            placeholder="Enter base salary"
+                            required
+                        />
+                        <Badge className="text-sm text-nowrap">{userForm.hierarchy === "Rank & File" ? "Per day" : "Monthly"}</Badge>
+                    </div>
+
                 </div>
                 <div className="grid items-center grid-cols-1 gap-2">
                     <Label htmlFor="leaveCredits">Leave Credits</Label>
